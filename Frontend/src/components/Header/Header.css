@@ -1,0 +1,64 @@
+.header {
+  font-family: "Quicksand", sans-serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 2px 4px !important;
+  background-color: #fff;
+  z-index: 100000;
+}
+.header .header_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.header .header_container .ant-input-search-button {
+  background-color: #87c84a;
+}
+.header .header_container .ant-input-search-button:hover {
+  background: #b5e389 !important;
+}
+.header .header_container .skip-account {
+  text-decoration: none;
+}
+.header .header_container .account_option {
+  position: absolute;
+  background: rgb(255, 255, 255);
+  box-shadow: rgba(0, 0, 0, 0.06) 0px 3px 25.5px 4.5px;
+  padding: 20px;
+  left: 78%;
+  opacity: 0;
+  transition: all 0.2s;
+}
+.header .header_container .account_option li {
+  list-style: none;
+  padding-bottom: 10px;
+}
+.header .header_container .account_option li a {
+  text-decoration: none;
+  color: black;
+  transition: all 0.3s;
+}
+.header .header_container .account_option li a:hover {
+  color: #87c84a;
+}
+.header .header_container .account_option.visible {
+  opacity: 1;
+}
+.header .header_container .account:hover,
+.header .header_container .cart:hover {
+  color: #87c84a;
+}
+.header .header_container .cart {
+  color: black;
+}
+.header .header_container .cart-count {
+  position: absolute;
+  right: 320px;
+  color: red;
+  font-weight: bold;
+  font-size: 15px;
+}
+
+/*# sourceMappingURL=Header.css.map */
