@@ -29,7 +29,7 @@ public class Customer {
     @Column(nullable = false, name = "fullname")
     String fullname;
 
-    @Column(nullable = false, name = "username")
+    @Column(unique = true, nullable = false, name = "username")
     String username;
 
     @Column(unique = true, length = 100, nullable = false, name = "email")

@@ -3,7 +3,10 @@ package com.example.mobileapi.service;
 
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.CustomerUpdateRequestDTO;
+import com.example.mobileapi.dto.request.IntrospectRequest;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
+import com.example.mobileapi.dto.response.IntrospectResponse;
+import com.example.mobileapi.dto.response.LoginResponse;
 
 import java.util.List;
 
@@ -24,6 +27,8 @@ public interface CustomerService {
 
     CustomerResponseDTO updateCustomerById(int customerId, CustomerUpdateRequestDTO request);
 
+    LoginResponse getToken(String username, String password);
+
     void updateByAdmin(int customerId, CustomerRequestDTO customerRequestDTO);
 
     void resetPassword(String username, String resetCode, String newPassword);
@@ -33,4 +38,6 @@ public interface CustomerService {
     int getQuantityByCustomerId(int customerId);
 
     void changePassword(int customerId, String oldPassword, String newPassword);
+
+    IntrospectResponse introspect(IntrospectRequest request) throws Exception;
 }
