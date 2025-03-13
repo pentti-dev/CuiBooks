@@ -11,5 +11,7 @@ public interface CartService {
 
     CartResponseDTO getCartByCustomerId(int id);
 
+    CartResponseDTO getCartByUsername(String username);
+
     int getQuantityCartItemInCart(int cartId);
 }

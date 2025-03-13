@@ -1,26 +1,31 @@
 package com.example.mobileapi.dto.response;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import com.example.mobileapi.model.enums.Role;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+
 
 @Getter
 @Builder
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomerResponseDTO {
-    private int id;
+    int id;
 
-    private String fullname;
+    String fullName;
 
-    private String username;
+    String username;
 
-    private String email;
+    String email;
 
-    private String phone;
+    String phone;
+    @Enumerated(EnumType.STRING)
+    Role role;
 
-    private boolean role;
-
-    private int cartId;
+    int cartId;
 }

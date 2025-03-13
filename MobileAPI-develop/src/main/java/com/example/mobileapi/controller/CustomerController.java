@@ -1,15 +1,13 @@
 package com.example.mobileapi.controller;
 
-import com.example.mobileapi.config.BCryptPasswordEncoder;
 import com.example.mobileapi.dto.request.*;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
-import com.example.mobileapi.dto.response.ResponseData;
-import com.example.mobileapi.model.Customer;
+import com.example.mobileapi.dto.response.IntrospectResponse;
+import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.service.CartService;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.impl.CustomerServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,10 +73,17 @@ public class CustomerController {
     }
 
     @PostMapping("/login")
-    public CustomerResponseDTO login(@RequestBody LoginRequest loginRequest) {
-        CustomerResponseDTO cus = customerService.login(loginRequest.getUsername(), loginRequest.getPassword());
-        cus.setCartId(cartService.getCartByCustomerId(cus.getId()).getId());
-        return cus;
+    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
+        LoginResponse token = customerService.getToken(loginRequest.getUsername(), loginRequest.getPassword());
+//        cus.setCartId(cartService.getCartByUsername(loginRequest.getUsername()).getId());
+        return token;
+    }
+
+    @PostMapping("/introspect")
+    public IntrospectResponse authenticate(@RequestBody IntrospectRequest request) throws Exception {
+        return customerService.introspect(request);
+
+
     }
 
     @PostMapping("/resetPassword/{username}")
@@ -104,6 +109,10 @@ public class CustomerController {
     public void changePassword(@PathVariable int customerId, @RequestBody ChangePasswordDto dto) {
         customerService.changePassword(customerId, dto.getOldPassword(), dto.getNewPassword());
     }
+//    @GetMapping("/getCustomerByUsername/{username}")
+//    public CustomerResponseDTO getCustomerByUsername(@PathVariable String username) {
+//        return customerServiceImpl.getCustomerByUsername(username);
+//    }
 
 }
 
