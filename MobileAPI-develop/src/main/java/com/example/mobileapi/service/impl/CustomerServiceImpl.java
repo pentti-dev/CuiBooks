@@ -3,32 +3,43 @@ package com.example.mobileapi.service.impl;
 import com.example.mobileapi.config.BCryptPasswordEncoder;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.CustomerUpdateRequestDTO;
+import com.example.mobileapi.dto.request.IntrospectRequest;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
+import com.example.mobileapi.dto.response.IntrospectResponse;
+import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.model.Customer;
+import com.example.mobileapi.model.enums.Role;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.EmailService;
+import com.example.mobileapi.util.JwtUtil;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jwt.SignedJWT;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
 @Slf4j
 @Transactional
+@RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
     private final EmailService emailService;
     private final BCryptPasswordEncoder passwordEncoder; // Đổi tên cho rõ ràng
+    private final JwtUtil jwtUtil;
 
-    public CustomerServiceImpl(CustomerRepository customerRepository, EmailService emailService, BCryptPasswordEncoder passwordEncoder) {
-        this.customerRepository = customerRepository;
-        this.emailService = emailService;
-        this.passwordEncoder = passwordEncoder;
-    }
 
     @Override
     public int saveCustomer(CustomerRequestDTO request) {
@@ -59,6 +70,8 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.deleteById(customerId);
     }
 
+
+    @PostAuthorize("returnObject.username ==authentication.name")
     @Override
     public CustomerResponseDTO getCustomer(int customerId) {
         Customer customer = getCustomerById(customerId);
@@ -69,28 +82,31 @@ public class CustomerServiceImpl implements CustomerService {
                 .username(customer.getUsername())
                 .phone(customer.getPhone())
                 .email(customer.getEmail())
-                .fullname(customer.getFullname())
+                .fullName(customer.getFullname())
                 .id(customer.getId())
-                .role(customer.isRole())
+                .role(Role.role(customer.isRole()))
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<CustomerResponseDTO> getAllCustomers() {
+        log.info("Get all customers");
         List<Customer> customers = customerRepository.findAll();
         List<CustomerResponseDTO> customerResponseDTOS = new ArrayList<>();
         for (Customer customer : customers) {
             customerResponseDTOS.add(CustomerResponseDTO.builder()
-                    .fullname(customer.getFullname())
+                    .fullName(customer.getFullname())
                     .username(customer.getUsername())
                     .phone(customer.getPhone())
                     .email(customer.getEmail())
                     .id(customer.getId())
-                    .role(customer.isRole())
+                    .role(Role.role(customer.isRole()))
                     .build());
         }
         return customerResponseDTOS;
     }
+
 
     @Override
     public boolean checkUsername(String username) {
@@ -99,21 +115,22 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponseDTO login(String username, String password) {
-        log.warn("Username: " + username + " Password: " + password);
+//        log.warn("Username: " + username + " Password: " + password);
         Customer customer = customerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
         if (passwordEncoder.matches(password, customer.getPassword())) { // Sử dụng passwordEncoder
             return CustomerResponseDTO.builder()
-                    .fullname(customer.getFullname())
+                    .fullName(customer.getFullname())
                     .username(customer.getUsername())
                     .email(customer.getEmail())
                     .phone(customer.getPhone())
                     .id(customer.getId())
-                    .role(customer.isRole())
+                    .role(Role.role(customer.isRole()))
                     .build();
         } else {
             throw new IllegalArgumentException("Sai mật khẩu");
         }
     }
+
 
     @Override
     public CustomerResponseDTO updateCustomerById(int customerId, CustomerUpdateRequestDTO request) {
@@ -124,13 +141,28 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setPhone(request.getPhone());
         customerRepository.save(customer);
         return CustomerResponseDTO.builder()
-                .fullname(customer.getFullname())
+                .fullName(customer.getFullname())
                 .username(customer.getUsername())
                 .email(customer.getEmail())
                 .phone(customer.getPhone())
                 .id(customer.getId())
-                .role(customer.isRole())
+                .role(Role.role(customer.isRole()))
                 .build();
+    }
+
+    @Override
+    public LoginResponse getToken(String username, String password) {
+        log.warn("Username: " + username + " Password: " + password);
+        Customer customer = customerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
+        if (passwordEncoder.matches(password, customer.getPassword())) { // Sử dụng passwordEncoder
+
+            var token = jwtUtil.generateToken(customer);
+            return LoginResponse.builder()
+                    .token(token)
+                    .build();
+        } else {
+            throw new IllegalArgumentException("Sai mật khẩu");
+        }
     }
 
     @Override
@@ -191,6 +223,31 @@ public class CustomerServiceImpl implements CustomerService {
             customerRepository.save(customer);
         } else {
             throw new IllegalArgumentException("Mật khẩu cũ không chính xác");
+        }
+    }
+
+    @Override
+    public IntrospectResponse introspect(IntrospectRequest request) {
+        try {
+            JWSVerifier verifier = new RSASSAVerifier(jwtUtil.loadPublicKey());
+
+            var token = request.getToken();
+            SignedJWT signedJWT = SignedJWT.parse(token);
+
+
+            Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+
+            var verify = signedJWT.verify(verifier);
+
+            return IntrospectResponse.builder()
+                    .valid(verify && expirationTime.after(new Date()))
+                    .build();
+        } catch (JOSEException e) {
+            throw new RuntimeException(e);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
