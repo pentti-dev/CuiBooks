@@ -1,5 +1,3 @@
-USE mobile
-SELECT * FROM categories
 
 CREATE TABLE customers (
 	id INT AUTO_INCREMENT PRIMARY KEY,
@@ -8,15 +6,12 @@ CREATE TABLE customers (
 	email VARCHAR(200),
 	numer_phone VARCHAR(50),
 	role INT
-)
-DELETE from customerscustomers
-	customerscustomers
+);
 CREATE TABLE categories(
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	NAME NVARCHAR(255),
 	image VARCHAR(255)
-)
-SELECT * FROM customers
+);
 CREATE TABLE products (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	NAME NVARCHAR(200),
@@ -24,14 +19,12 @@ CREATE TABLE products (
 	image VARCHAR(255),
 	category_id INT,
 	FOREIGN KEY (category_id) REFERENCES categories(id)
-)
+);
 CREATE TABLE carts (
     id INT AUTO_INCREMENT PRIMARY KEY,
     customer_id INT,
     FOREIGN KEY (customer_id) REFERENCES customers(id)
 );
-SELECT * FROM carts
-SELECT * FROM cart_items
 CREATE TABLE cart_items (
 	id INT AUTO_INCREMENT PRIMARY KEY,
 	cart_id INT,
@@ -39,8 +32,7 @@ CREATE TABLE cart_items (
 	quantity INT,
 	FOREIGN KEY (cart_id) REFERENCES carts(id),
 	FOREIGN KEY (product_id) REFERENCES products(id)
-)
-DROP TABLE carts
+);
 
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -58,10 +50,6 @@ ALTER TABLE orders DROP FOREIGN KEY FKf5464gxwc32ongdvka2rtvw96;
 ALTER TABLE orders DROP COLUMN address_id;
 
 
-DROP TABLE orders
-SELECT * FROM orders
-
-SELECT * FROM customers
 
 
 INSERT INTO `products` (`name`, `price`, `category_id`, `img`, `detail`) VALUES ('Laptop HP Pavilion 14-DV2073TU 7C0P2PA', 17190000, 1, 'https://cdn2.cellphones.com.vn/insecure/rs:fill:0:358/q:90/plain/https://cellphones.com.vn/media/catalog/product/t/e/text_ng_n_12__1_16.png', '- Card đồ họa tích hợp Intel Iris Xe Graphics cho khả năng chỉnh sửa hình ảnh cơ bản, làm poster trên Lightroom, Photoshop, Illustrator,... một cách trơn tru. 16GB RAM DDR4 đáp ứng tốt khả năng đa nhiệm.Cùng ổ cứng SSD 512GB NVMe PCIe cho không gian lưu trữ các tài liệu học tập, làm việc. Đa dạng kết nối với các cổng như: USB Type-C, USB Type-A, HDMI 2.0, jack tai nghe/mic,...');
