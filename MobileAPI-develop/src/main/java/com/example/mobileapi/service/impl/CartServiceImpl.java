@@ -79,8 +79,34 @@ public class CartServiceImpl implements CartService {
                 .build();
     }
 
+    /**
+     * @param username username khach hang
+     * @return gio hang cua khach hang
+     */
+    @Override
+    public CartResponseDTO getCartByUsername(String username) {
+        Cart cart = getByUsername(username);
+        if (cart == null) {
+            return null; // Or throw an exception if preferred
+        }
+
+        List<CartItemResponseDTO> cartItemResponseDTOs = cart.getCartItems().stream()
+                .map(this::convertToCartItemResponseDTO)
+                .collect(Collectors.toList());
+
+        return CartResponseDTO.builder()
+                .id(cart.getId())
+                .customerId(cart.getCustomer().getId())
+                .cartItems(cartItemResponseDTOs)
+                .build();
+    }
+
     public Cart getByCustomerId(int customerId) {
         return cartRepository.findByCustomerId(customerId).orElse(null);
+    }
+
+    public Cart getByUsername(String username) {
+        return cartRepository.findCartByCustomer_Username(username).orElse(null);
     }
 
     public int getQuantityCartItemInCart(int cartId) {
