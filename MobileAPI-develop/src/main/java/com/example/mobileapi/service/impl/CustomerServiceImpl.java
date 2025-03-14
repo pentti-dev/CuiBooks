@@ -7,6 +7,7 @@ import com.example.mobileapi.dto.request.IntrospectRequest;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
+import com.example.mobileapi.mapper.CustomerMapper;
 import com.example.mobileapi.model.Customer;
 import com.example.mobileapi.model.enums.Role;
 import com.example.mobileapi.repository.CustomerRepository;
@@ -18,6 +19,7 @@ import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,7 +27,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,12 +34,14 @@ import java.util.List;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class CustomerServiceImpl implements CustomerService {
 
-    private final CustomerRepository customerRepository;
-    private final EmailService emailService;
-    private final BCryptPasswordEncoder passwordEncoder; // Đổi tên cho rõ ràng
-    private final JwtUtil jwtUtil;
+    CustomerRepository customerRepository;
+    EmailService emailService;
+    BCryptPasswordEncoder passwordEncoder; // Đổi tên cho rõ ràng
+    JwtUtil jwtUtil;
+    CustomerMapper customerMapper;
 
 
     @Override
@@ -82,7 +85,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .username(customer.getUsername())
                 .phone(customer.getPhone())
                 .email(customer.getEmail())
-                .fullName(customer.getFullname())
+                .fullname(customer.getFullname())
                 .id(customer.getId())
                 .role(Role.role(customer.isRole()))
                 .build();
@@ -93,18 +96,11 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerResponseDTO> getAllCustomers() {
         log.info("Get all customers");
         List<Customer> customers = customerRepository.findAll();
-        List<CustomerResponseDTO> customerResponseDTOS = new ArrayList<>();
-        for (Customer customer : customers) {
-            customerResponseDTOS.add(CustomerResponseDTO.builder()
-                    .fullName(customer.getFullname())
-                    .username(customer.getUsername())
-                    .phone(customer.getPhone())
-                    .email(customer.getEmail())
-                    .id(customer.getId())
-                    .role(Role.role(customer.isRole()))
-                    .build());
-        }
-        return customerResponseDTOS;
+        customers.forEach(customer -> log.info(customer.getFullname()));
+        return customers
+                .stream()
+                .map(customerMapper::toCustomerResponse)
+                .toList();
     }
 
 
@@ -119,7 +115,7 @@ public class CustomerServiceImpl implements CustomerService {
         Customer customer = customerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
         if (passwordEncoder.matches(password, customer.getPassword())) { // Sử dụng passwordEncoder
             return CustomerResponseDTO.builder()
-                    .fullName(customer.getFullname())
+                    .fullname(customer.getFullname())
                     .username(customer.getUsername())
                     .email(customer.getEmail())
                     .phone(customer.getPhone())
@@ -141,7 +137,7 @@ public class CustomerServiceImpl implements CustomerService {
         customer.setPhone(request.getPhone());
         customerRepository.save(customer);
         return CustomerResponseDTO.builder()
-                .fullName(customer.getFullname())
+                .fullname(customer.getFullname())
                 .username(customer.getUsername())
                 .email(customer.getEmail())
                 .phone(customer.getPhone())
