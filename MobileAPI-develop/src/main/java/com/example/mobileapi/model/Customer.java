@@ -2,6 +2,7 @@ package com.example.mobileapi.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -31,14 +32,12 @@ public class Customer {
 
     @Column(unique = true, nullable = false, name = "username")
     String username;
-
     @Column(unique = true, length = 100, nullable = false, name = "email")
     String email;
 
     @Column(nullable = false, name = "password")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     String password;
-
     @Column(nullable = false, name = "number_phone")
     String phone;
     // 0-customer, 1-admin

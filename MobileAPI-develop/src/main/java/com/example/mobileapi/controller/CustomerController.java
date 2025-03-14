@@ -1,6 +1,7 @@
 package com.example.mobileapi.controller;
 
 import com.example.mobileapi.dto.request.*;
+import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
@@ -63,8 +64,9 @@ public class CustomerController {
     }
 
     @GetMapping("/list")
-    public List<CustomerResponseDTO> getCustomers() {
-        return customerService.getAllCustomers();
+    public ApiResponse<List<CustomerResponseDTO>> getCustomers() {
+
+        return ApiResponse.<List<CustomerResponseDTO>>builder().data(customerService.getAllCustomers()).build();
     }
 
     @GetMapping("/checkUsername/{username}")
