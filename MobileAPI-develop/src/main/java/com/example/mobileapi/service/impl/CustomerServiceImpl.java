@@ -4,12 +4,14 @@ import com.example.mobileapi.config.BCryptPasswordEncoder;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.CustomerUpdateRequestDTO;
 import com.example.mobileapi.dto.request.IntrospectRequest;
+import com.example.mobileapi.dto.request.LoginRequest;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.mapper.CustomerMapper;
 import com.example.mobileapi.model.Customer;
 import com.example.mobileapi.model.enums.Role;
+import com.example.mobileapi.repository.CartRepository;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.EmailService;
@@ -42,7 +44,7 @@ public class CustomerServiceImpl implements CustomerService {
     BCryptPasswordEncoder passwordEncoder; // Đổi tên cho rõ ràng
     JwtUtil jwtUtil;
     CustomerMapper customerMapper;
-
+    CartRepository cartRepository;
 
     @Override
     public int saveCustomer(CustomerRequestDTO request) {
@@ -73,7 +75,6 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.deleteById(customerId);
     }
 
-
     @PostAuthorize("returnObject.username ==authentication.name")
     @Override
     public CustomerResponseDTO getCustomer(int customerId) {
@@ -96,13 +97,11 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerResponseDTO> getAllCustomers() {
         log.info("Get all customers");
         List<Customer> customers = customerRepository.findAll();
-        customers.forEach(customer -> log.info(customer.getFullname()));
         return customers
                 .stream()
                 .map(customerMapper::toCustomerResponse)
                 .toList();
     }
-
 
     @Override
     public boolean checkUsername(String username) {
@@ -110,23 +109,25 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerResponseDTO login(String username, String password) {
-//        log.warn("Username: " + username + " Password: " + password);
-        Customer customer = customerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
-        if (passwordEncoder.matches(password, customer.getPassword())) { // Sử dụng passwordEncoder
-            return CustomerResponseDTO.builder()
-                    .fullname(customer.getFullname())
-                    .username(customer.getUsername())
-                    .email(customer.getEmail())
-                    .phone(customer.getPhone())
-                    .id(customer.getId())
-                    .role(Role.role(customer.isRole()))
+    public boolean checkEmail(String email) {
+        return customerRepository.findCustomerByEmail(email).isPresent();
+    }
+
+    @Override
+    public LoginResponse login(LoginRequest loginRequest) {
+        log.warn("Username: " + loginRequest.getUsername() + " Password: " + loginRequest.getPassword());
+        Customer customer = customerRepository.findByUsername(loginRequest.getUsername())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
+        if (passwordEncoder.matches(loginRequest.getPassword(), customer.getPassword())) { // Sử dụng passwordEncoder
+
+            var token = jwtUtil.generateToken(customer);
+            return LoginResponse.builder()
+                    .token(token)
                     .build();
         } else {
             throw new IllegalArgumentException("Sai mật khẩu");
         }
     }
-
 
     @Override
     public CustomerResponseDTO updateCustomerById(int customerId, CustomerUpdateRequestDTO request) {
@@ -144,21 +145,6 @@ public class CustomerServiceImpl implements CustomerService {
                 .id(customer.getId())
                 .role(Role.role(customer.isRole()))
                 .build();
-    }
-
-    @Override
-    public LoginResponse getToken(String username, String password) {
-        log.warn("Username: " + username + " Password: " + password);
-        Customer customer = customerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
-        if (passwordEncoder.matches(password, customer.getPassword())) { // Sử dụng passwordEncoder
-
-            var token = jwtUtil.generateToken(customer);
-            return LoginResponse.builder()
-                    .token(token)
-                    .build();
-        } else {
-            throw new IllegalArgumentException("Sai mật khẩu");
-        }
     }
 
     @Override
@@ -180,8 +166,7 @@ public class CustomerServiceImpl implements CustomerService {
             emailService.sendPasswordResetEmail(
                     customer.getEmail(),
                     "Xác nhận Đặt Lại Mật Khẩu",
-                    "Mật khẩu của bạn đã được đặt lại thành công."
-            );
+                    "Mật khẩu của bạn đã được đặt lại thành công.");
         } else {
             throw new IllegalArgumentException("Mã reset không hợp lệ hoặc đã hết hạn.");
         }
@@ -189,7 +174,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void initPasswordReset(String username) {
-        Customer customer = customerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
+        Customer customer = customerRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
         if (customer != null) {
             String resetCode = generateResetCode();
             customer.setResetCode(resetCode);
@@ -199,8 +185,7 @@ public class CustomerServiceImpl implements CustomerService {
             emailService.sendPasswordResetEmail(
                     customer.getEmail(),
                     "Yêu cầu Đặt Lại Mật Khẩu",
-                    "Mã xác nhận đặt lại mật khẩu của bạn là: " + resetCode
-            );
+                    "Mã xác nhận đặt lại mật khẩu của bạn là: " + resetCode);
         } else {
             throw new IllegalArgumentException("Không tìm thấy khách hàng với username: " + username);
         }
@@ -230,7 +215,6 @@ public class CustomerServiceImpl implements CustomerService {
             var token = request.getToken();
             SignedJWT signedJWT = SignedJWT.parse(token);
 
-
             Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
             var verify = signedJWT.verify(verifier);
@@ -248,7 +232,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     Customer getCustomerByName(String username) {
-        return customerRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
+        return customerRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
     }
 
     private String generateResetCode() {

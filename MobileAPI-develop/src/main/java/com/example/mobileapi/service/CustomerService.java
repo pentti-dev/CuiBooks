@@ -4,6 +4,7 @@ package com.example.mobileapi.service;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.CustomerUpdateRequestDTO;
 import com.example.mobileapi.dto.request.IntrospectRequest;
+import com.example.mobileapi.dto.request.LoginRequest;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
@@ -23,11 +24,11 @@ public interface CustomerService {
 
     boolean checkUsername(String username);
 
-    CustomerResponseDTO login(String username, String password);
+    boolean checkEmail(String email);
+
+    LoginResponse login(LoginRequest loginRequest);
 
     CustomerResponseDTO updateCustomerById(int customerId, CustomerUpdateRequestDTO request);
-
-    LoginResponse getToken(String username, String password);
 
     void updateByAdmin(int customerId, CustomerRequestDTO customerRequestDTO);
 
