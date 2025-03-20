@@ -2,10 +2,10 @@ package com.example.mobileapi.config;
 
 import com.example.mobileapi.util.JwtUtil;
 import com.nimbusds.jose.JWSAlgorithm;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
@@ -20,11 +21,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
-@Slf4j
 @Configuration
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -38,7 +40,7 @@ public class SecurityConfig {
             "/swagger-resources", "/swagger-resources/**",
             "/configuration/ui", "/configuration/security",
             "/swagger-ui/**", "/webjars/**", "/swagger-ui.html",
-            "/api/customer/login", "/api/customer/introspect", "/api/test/**",
+            "/api/customer/login", "/api/customer/introspect", "/api/customer", "/api/test/**",
             "/authenticate"};
 
     @Bean
@@ -53,10 +55,10 @@ public class SecurityConfig {
         httpSecurity.oauth2ResourceServer(
                 oauth2 ->
                         oauth2.jwt(
-                                jwtConfigurer -> {
-                                    jwtConfigurer.decoder(jwtDecoder())
-                                            .jwtAuthenticationConverter(jwtAuthenticationConverter());
-                                }));
+                                        jwtConfigurer ->
+                                                jwtConfigurer.decoder(jwtDecoder())
+                                                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
@@ -79,16 +81,38 @@ public class SecurityConfig {
 
         // Cấu hình JWT Processor với thuật toán RS512
         ConfigurableJWTProcessor<SecurityContext> jwtProcessor = new DefaultJWTProcessor<>();
-        jwtProcessor.setJWSKeySelector(
-                (header, context) -> {
-                    if (!JWSAlgorithm.RS512.equals(header.getAlgorithm())) {
-                        throw new RuntimeException("Invalid algorithm: " + header.getAlgorithm());
-                    }
-                    return List.of(publicKey);
-                }
-        );
+        jwtProcessor.setJWSKeySelector((header, context) -> {
+            if (!JWSAlgorithm.RS512.equals(header.getAlgorithm())) {
+                throw new RuntimeException("Invalid algorithm: " + header.getAlgorithm());
+            }
+            return List.of(publicKey);
+        });
 
-        return new NimbusJwtDecoder(jwtProcessor);
+        NimbusJwtDecoder decoder = new NimbusJwtDecoder(jwtProcessor);
+
+        // Trả về một JwtDecoder wrapper để bắt lỗi khi decode token
+        return token -> {
+            try {
+                return decoder.decode(token);
+            } catch (JwtException e) {
+                HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
+                String errorMessage = e.getMessage().toLowerCase();
+                if (errorMessage.contains("expired")) {
+                    request.setAttribute("jwtError", "EXPIRED");
+                } else if (errorMessage.contains("signature")) {
+                    request.setAttribute("jwtError", "INVALID_SIGNATURE");
+                } else if (errorMessage.contains("unsupported")) {
+                    request.setAttribute("jwtError", "UNSUPPORTED");
+                } else {
+                    request.setAttribute("jwtError", "INVALID");
+                }
+
+
+                // Ném lại exception để ngăn không cho request tiếp tục xử lý
+                throw e;
+            }
+        };
     }
 
 
