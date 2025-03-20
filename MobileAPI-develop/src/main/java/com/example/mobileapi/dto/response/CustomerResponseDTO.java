@@ -1,31 +1,28 @@
 package com.example.mobileapi.dto.response;
 
 import com.example.mobileapi.model.enums.Role;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 
 @Getter
 @Builder
-@Setter
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CustomerResponseDTO {
-    int id;
+    Integer id;
 
-    String fullName;
+    String fullname;
 
     String username;
 
     String email;
 
     String phone;
-    @Enumerated(EnumType.STRING)
     Role role;
 
-    int cartId;
+    Integer cartId;
 }

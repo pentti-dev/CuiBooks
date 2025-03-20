@@ -1,29 +1,28 @@
 package com.example.mobileapi.dto.request;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
-import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 
-import java.io.Serializable;
 
 @Getter
-public class CustomerRequestDTO implements Serializable {
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+public class CustomerRequestDTO {
 
-    @NotNull(message = "Fullname không được để trống ")
-    private String fullname;
-    @NotNull(message = "Username không được để trống ")
-    private String username;
+    @NotBlank(message = "MISSING_FULLNAME")
+    String fullname;
+    @NotBlank(message = "MISSING_USERNAME")
+    String username;
 
-    @NotNull(message = "Email không được để trống ")
-    @Email(message = "email không hợp lệ")
-    private String email;
+    @NotBlank(message = "MISSING_EMAIL")
+    @Email(message = "INVALID_EMAIL")
+    String email;
 
-    @NotNull(message = "password không được để trống ")
-    private String password;
+    @NotBlank(message = "MISSING_PASSWORD")
+    String password;
 
-    @NotNull(message = "Phone không được để trống ")
-    private String phone;
+    @NotBlank(message = "MISSING_PHONE")
+    String phone;
 
 }

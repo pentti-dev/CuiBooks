@@ -9,6 +9,4 @@ import lombok.Getter;
 @Builder
 public class LoginResponse {
     String token;
-//    @Hidden
-//    CustomerResponseDTO customerDTO;
 }

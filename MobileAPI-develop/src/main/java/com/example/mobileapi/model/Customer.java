@@ -5,10 +5,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
 import java.util.*;
 
 
@@ -31,20 +27,19 @@ public class Customer {
 
     @Column(unique = true, nullable = false, name = "username")
     String username;
-
     @Column(unique = true, length = 100, nullable = false, name = "email")
     String email;
 
     @Column(nullable = false, name = "password")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     String password;
-
     @Column(nullable = false, name = "number_phone")
     String phone;
     // 0-customer, 1-admin
     boolean role;
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    List<Cart> carts = new ArrayList<>();
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    Cart cart;
 
     @Column(name = "reset_code")
     String resetCode;
