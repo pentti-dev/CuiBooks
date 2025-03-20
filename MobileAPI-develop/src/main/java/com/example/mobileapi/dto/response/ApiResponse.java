@@ -2,9 +2,7 @@ package com.example.mobileapi.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
-import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
-
 
 @Setter
 @Getter
@@ -12,9 +10,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
-    int code ;
+    Integer code;
     String message;
     T data;
-
 
 }
