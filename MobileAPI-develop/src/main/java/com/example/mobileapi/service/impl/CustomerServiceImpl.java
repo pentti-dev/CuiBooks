@@ -8,6 +8,8 @@ import com.example.mobileapi.dto.request.LoginRequest;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.CustomerMapper;
 import com.example.mobileapi.model.Customer;
 import com.example.mobileapi.model.enums.Role;
@@ -75,21 +77,21 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.deleteById(customerId);
     }
 
-    @PostAuthorize("returnObject.username ==authentication.name")
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public CustomerResponseDTO getCustomer(int customerId) {
         Customer customer = getCustomerById(customerId);
-        if (customer == null) {
-            return null;
-        }
-        return CustomerResponseDTO.builder()
-                .username(customer.getUsername())
-                .phone(customer.getPhone())
-                .email(customer.getEmail())
-                .fullname(customer.getFullname())
-                .id(customer.getId())
-                .role(Role.role(customer.isRole()))
-                .build();
+
+//        return CustomerResponseDTO.builder()
+//                .username(customer.getUsername())
+//                .phone(customer.getPhone())
+//                .email(customer.getEmail())
+//                .fullname(customer.getFullname())
+//                .id(customer.getId())
+//                .role(Role.role(customer.isRole()))
+//                .build();
+
+        return customerMapper.toCustomerResponse(customer);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -147,6 +149,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .build();
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public void updateByAdmin(int customerId, CustomerRequestDTO request) {
         Customer customer = getCustomerById(customerId);
@@ -197,38 +200,47 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void changePassword(int customerId, String oldPassword, String newPassword) {
+    public void changePassword(int customerId, String oldPassword, String newPassword) throws AppException {
         Customer customer = getCustomerById(customerId);
         if (passwordEncoder.matches(oldPassword, customer.getPassword())) { // Sử dụng passwordEncoder
             customer.setPassword(passwordEncoder.encode(newPassword)); // Sử dụng passwordEncoder
             customerRepository.save(customer);
         } else {
-            throw new IllegalArgumentException("Mật khẩu cũ không chính xác");
+            throw new AppException(ErrorCode.WRONG_OLD_PASSWORD);
         }
     }
 
     @Override
     public IntrospectResponse introspect(IntrospectRequest request) {
-        try {
-            JWSVerifier verifier = new RSASSAVerifier(jwtUtil.loadPublicKey());
+//        try {
+//            JWSVerifier verifier = new RSASSAVerifier(jwtUtil.loadPublicKey());
+//
+//            var token = request.getToken();
+//            SignedJWT signedJWT = SignedJWT.parse(token);
+//
+//            Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
+//
+//            var verify = signedJWT.verify(verifier);
+//
+//            return IntrospectResponse.builder()
+//                    .valid(verify && expirationTime.after(new Date()))
+//                    .build();
+//        } catch (JOSEException e) {
+//            throw new RuntimeException(e);
+//        } catch (ParseException e) {
+//            throw new RuntimeException(e);
+//        } catch (Exception e) {
+//            throw new RuntimeException(e);
+//        }
+        return null;
+    }
 
-            var token = request.getToken();
-            SignedJWT signedJWT = SignedJWT.parse(token);
+    @PostAuthorize("returnObject.username ==authentication.name")
+    @Override
+    public CustomerResponseDTO getCustomerProfile(String username) {
+//    String username =
+        return customerMapper.toCustomerResponse(getCustomerByName(username));
 
-            Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-
-            var verify = signedJWT.verify(verifier);
-
-            return IntrospectResponse.builder()
-                    .valid(verify && expirationTime.after(new Date()))
-                    .build();
-        } catch (JOSEException e) {
-            throw new RuntimeException(e);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     Customer getCustomerByName(String username) {
@@ -248,6 +260,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public Customer getCustomerById(int customerId) {
-        return customerRepository.findById(customerId).orElse(null);
+        try {
+            return customerRepository.findById(customerId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

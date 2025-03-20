@@ -8,6 +8,7 @@ import com.example.mobileapi.dto.request.LoginRequest;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
+import com.example.mobileapi.exception.AppException;
 
 import java.util.List;
 
@@ -38,7 +39,9 @@ public interface CustomerService {
 
     int getQuantityByCustomerId(int customerId);
 
-    void changePassword(int customerId, String oldPassword, String newPassword);
+    void changePassword(int customerId, String oldPassword, String newPassword) throws AppException;
 
     IntrospectResponse introspect(IntrospectRequest request) throws Exception;
+
+    CustomerResponseDTO getCustomerProfile(String username);
 }
