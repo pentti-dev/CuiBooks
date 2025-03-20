@@ -2,14 +2,9 @@ package com.example.mobileapi.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
 import java.util.*;
 
 
@@ -42,8 +37,9 @@ public class Customer {
     String phone;
     // 0-customer, 1-admin
     boolean role;
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
-    List<Cart> carts = new ArrayList<>();
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    Cart cart;
 
     @Column(name = "reset_code")
     String resetCode;

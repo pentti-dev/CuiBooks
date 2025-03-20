@@ -1,6 +1,8 @@
 package com.example.mobileapi.dto.response;
 
 import com.example.mobileapi.model.enums.Role;
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,8 +11,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CustomerResponseDTO {
-    int id;
+    Integer id;
 
     String fullname;
 
@@ -21,5 +24,5 @@ public class CustomerResponseDTO {
     String phone;
     Role role;
 
-    int cartId;
+    Integer cartId;
 }

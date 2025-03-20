@@ -5,13 +5,18 @@ import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.CartService;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.impl.CustomerServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,11 +25,12 @@ import java.util.List;
 @RequestMapping("/api/customer")
 @RequiredArgsConstructor
 @Tag(name = "Customer", description = "Customer API")
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class CustomerController {
-    private static final Logger log = LoggerFactory.getLogger(CustomerController.class);
-    private final CustomerService customerService;
-    private final CartService cartService;
-    private final CustomerServiceImpl customerServiceImpl;
+    Logger log = LoggerFactory.getLogger(CustomerController.class);
+    CustomerService customerService;
+    CartService cartService;
+    CustomerServiceImpl customerServiceImpl;
 
     @GetMapping("/quantity/{customerId}")
     public int getQuantity(@PathVariable("customerId") int customerId) {
@@ -32,15 +38,19 @@ public class CustomerController {
     }
 
     @PostMapping
-    public int addCustomer(@RequestBody CustomerRequestDTO customer) {
+    public ApiResponse addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
         if (customerService.checkUsername(customer.getUsername())) {
-            return -1;
+            throw new AppException(ErrorCode.USERNAME_TAKEN);
+        } else if (customerService.checkEmail(customer.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_TAKEN);
+
         }
+
         int userId = customerService.saveCustomer(customer);
         CartRequestDTO cartRequestDTO = new CartRequestDTO();
         cartRequestDTO.setCustomerId(userId);
         cartService.saveCart(cartRequestDTO);
-        return userId;
+        return ApiResponse.builder().code(2000).message("Thêm người dùng thành công").build();
     }
 
     @PutMapping("/{customerId}")
@@ -75,10 +85,11 @@ public class CustomerController {
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest loginRequest) {
-        LoginResponse token = customerService.getToken(loginRequest.getUsername(), loginRequest.getPassword());
-//        cus.setCartId(cartService.getCartByUsername(loginRequest.getUsername()).getId());
-        return token;
+    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        return ApiResponse.<LoginResponse>builder()
+                .code(HttpStatus.OK.value())
+                .data(customerService.login(loginRequest))
+                .build();
     }
 
     @PostMapping("/introspect")
