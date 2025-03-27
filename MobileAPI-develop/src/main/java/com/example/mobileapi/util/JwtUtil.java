@@ -2,6 +2,7 @@ package com.example.mobileapi.util;
 
 import com.example.mobileapi.model.Customer;
 import com.example.mobileapi.model.enums.Role;
+import com.example.mobileapi.repository.InvalidateTokenRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
@@ -10,11 +11,12 @@ import com.nimbusds.jwt.SignedJWT;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.KeyFactory;
@@ -26,15 +28,17 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
+import java.util.UUID;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Component
-@NoArgsConstructor
+@RequiredArgsConstructor
 public class JwtUtil {
 
     static final String PRIVATE_KEY_PATH = "src/main/resources/keys/private_key.pem";
     static final String PUBLIC_KEY_PATH = "src/main/resources/keys/public_key.pem";
+    final InvalidateTokenRepository invalidateTokenRepository;
 
     RSAPrivateKey privateKey;
     RSAPublicKey publicKey;
@@ -82,7 +86,8 @@ public class JwtUtil {
                     .subject(customer.getUsername())
                     .issuer("ngoctaiphan")
                     .issueTime(new Date())
-                    .expirationTime(Date.from(Instant.now().plus(30, ChronoUnit.SECONDS)))
+                    .expirationTime(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))
+                    .jwtID(UUID.randomUUID().toString())
                     .claim("scope", Role.role(customer.isRole()))
                     .build();
 
@@ -113,6 +118,7 @@ public class JwtUtil {
                 return false;
             }
 
+
             return isValid;
         } catch (Exception e) {
             log.warn("Error verifying token", e);
@@ -120,8 +126,7 @@ public class JwtUtil {
         }
     }
 
-    // 🛠 Trích xuất username từ token
-    public String extractUsername(String token) {
+    public String getUserNameFormToken(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             return signedJWT.getJWTClaimsSet().getSubject();
@@ -130,4 +135,38 @@ public class JwtUtil {
             return null;
         }
     }
+
+    public String getJwtIDFromToken(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            return signedJWT.getJWTClaimsSet().getJWTID();
+        } catch (Exception e) {
+            log.warn("Error extracting jwtID from token", e);
+            return null;
+        }
+    }
+
+    public Date getExpirationTimeFromToken(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            log.error(token);
+            return signedJWT.getJWTClaimsSet().getExpirationTime();
+        } catch (Exception e) {
+            log.warn("Error extracting expiration time from token", e);
+            return null;
+        }
+    }
+
+    public boolean isLogout(String token) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(token);
+            String jwtID = signedJWT.getJWTClaimsSet().getJWTID();
+            log.error("Token is logout: " + jwtID);
+            return invalidateTokenRepository.existsById(jwtID);
+        } catch (Exception e) {
+            log.warn("Error extracting expiration time from token", e);
+            return false;
+        }
+    }
+
 }

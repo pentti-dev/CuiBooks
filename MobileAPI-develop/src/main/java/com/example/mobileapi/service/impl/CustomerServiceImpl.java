@@ -2,36 +2,23 @@ package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.config.BCryptPasswordEncoder;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
-import com.example.mobileapi.dto.request.CustomerUpdateRequestDTO;
-import com.example.mobileapi.dto.request.IntrospectRequest;
-import com.example.mobileapi.dto.request.LoginRequest;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
-import com.example.mobileapi.dto.response.IntrospectResponse;
-import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.CustomerMapper;
 import com.example.mobileapi.model.Customer;
-import com.example.mobileapi.model.enums.Role;
 import com.example.mobileapi.repository.CartRepository;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.EmailService;
 import com.example.mobileapi.util.JwtUtil;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSVerifier;
-import com.nimbusds.jose.crypto.RSASSAVerifier;
-import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -61,23 +48,12 @@ public class CustomerServiceImpl implements CustomerService {
         return id;
     }
 
-    @Override
-    public void updateCustomer(int customerId, CustomerRequestDTO request) {
-        Customer customer = getCustomerById(customerId);
-        customer.setFullname(request.getFullname());
-        customer.setUsername(request.getUsername());
-        customer.setPassword(passwordEncoder.encode(request.getPassword())); // Sử dụng passwordEncoder
-        customer.setEmail(request.getEmail());
-        customer.setPhone(request.getPhone());
-        customerRepository.save(customer);
-    }
 
     @Override
     public void deleteCustomer(int customerId) {
         customerRepository.deleteById(customerId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public CustomerResponseDTO getCustomer(int customerId) {
         Customer customer = getCustomerById(customerId);
@@ -94,7 +70,6 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toCustomerResponse(customer);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @Override
     public List<CustomerResponseDTO> getAllCustomers() {
         log.info("Get all customers");
@@ -112,56 +87,30 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public boolean checkEmail(String email) {
-        return customerRepository.findCustomerByEmail(email).isPresent();
+        return customerRepository.existsByEmail(email).isPresent();
     }
 
-    @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        log.warn("Username: " + loginRequest.getUsername() + " Password: " + loginRequest.getPassword());
-        Customer customer = customerRepository.findByUsername(loginRequest.getUsername())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
-        if (passwordEncoder.matches(loginRequest.getPassword(), customer.getPassword())) { // Sử dụng passwordEncoder
 
-            var token = jwtUtil.generateToken(customer);
-            return LoginResponse.builder()
-                    .token(token)
-                    .build();
-        } else {
-            throw new IllegalArgumentException("Sai mật khẩu");
+    @Override
+    public CustomerResponseDTO updateCustomerById(int customerId, CustomerRequestDTO request) {
+        Customer customer = null;
+        try {
+            customer = customerRepository.findById(customerId)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        } catch (AppException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    @Override
-    public CustomerResponseDTO updateCustomerById(int customerId, CustomerUpdateRequestDTO request) {
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
-        customer.setFullname(request.getName());
-        customer.setEmail(request.getEmail());
-        customer.setPhone(request.getPhone());
-        customerRepository.save(customer);
-        return CustomerResponseDTO.builder()
-                .fullname(customer.getFullname())
-                .username(customer.getUsername())
-                .email(customer.getEmail())
-                .phone(customer.getPhone())
-                .id(customer.getId())
-                .role(Role.role(customer.isRole()))
-                .build();
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @Override
-    public void updateByAdmin(int customerId, CustomerRequestDTO request) {
-        Customer customer = getCustomerById(customerId);
         customer.setFullname(request.getFullname());
         customer.setEmail(request.getEmail());
         customer.setPhone(request.getPhone());
         customerRepository.save(customer);
+        return customerMapper.toCustomerResponse(customer);
     }
+
 
     @Override
     public void resetPassword(String username, String resetCode, String newPassword) {
-        Customer customer = getCustomerByName(username);
+        Customer customer = getCustomerByUserName(username);
         if (customer != null && resetCode.equals(customer.getResetCode())) {
             customer.setPassword(passwordEncoder.encode(newPassword)); // Sử dụng passwordEncoder
             customer.setResetCode(null); // Xóa mã reset sau khi đặt lại mật khẩu thành công
@@ -171,7 +120,11 @@ public class CustomerServiceImpl implements CustomerService {
                     "Xác nhận Đặt Lại Mật Khẩu",
                     "Mật khẩu của bạn đã được đặt lại thành công.");
         } else {
-            throw new IllegalArgumentException("Mã reset không hợp lệ hoặc đã hết hạn.");
+            try {
+                throw new AppException(ErrorCode.INVALID_RESET_CODE);
+            } catch (AppException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -210,42 +163,22 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-    @Override
-    public IntrospectResponse introspect(IntrospectRequest request) {
-//        try {
-//            JWSVerifier verifier = new RSASSAVerifier(jwtUtil.loadPublicKey());
-//
-//            var token = request.getToken();
-//            SignedJWT signedJWT = SignedJWT.parse(token);
-//
-//            Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-//
-//            var verify = signedJWT.verify(verifier);
-//
-//            return IntrospectResponse.builder()
-//                    .valid(verify && expirationTime.after(new Date()))
-//                    .build();
-//        } catch (JOSEException e) {
-//            throw new RuntimeException(e);
-//        } catch (ParseException e) {
-//            throw new RuntimeException(e);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
-        return null;
-    }
 
+    @Override
     @PostAuthorize("returnObject.username ==authentication.name")
-    @Override
-    public CustomerResponseDTO getCustomerProfile(String username) {
-//    String username =
-        return customerMapper.toCustomerResponse(getCustomerByName(username));
+    public CustomerResponseDTO getCustomerProfile(String token) {
+        String username = jwtUtil.getUserNameFormToken(token);
+        return customerMapper.toCustomerResponse(getCustomerByUserName(username));
 
     }
 
-    Customer getCustomerByName(String username) {
-        return customerRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
+    Customer getCustomerByUserName(String username) {
+        try {
+            return customerRepository.findByUsername(username)
+                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private String generateResetCode() {

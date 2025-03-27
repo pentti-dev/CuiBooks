@@ -4,13 +4,13 @@ import com.example.mobileapi.dto.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.nio.file.AccessDeniedException;
 
 @Slf4j
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse> handlingAppException(AppException e) {
@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException e) {
+    ResponseEntity<ApiResponse> handlingRuntimeException(Exception e) {
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
         log.error(e.getMessage());
         return ResponseEntity

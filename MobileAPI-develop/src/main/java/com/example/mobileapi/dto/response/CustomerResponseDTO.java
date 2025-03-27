@@ -22,6 +22,7 @@ public class CustomerResponseDTO {
     String email;
 
     String phone;
+
     Role role;
 
     Integer cartId;
