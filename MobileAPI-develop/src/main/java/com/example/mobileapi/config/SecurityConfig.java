@@ -1,5 +1,6 @@
 package com.example.mobileapi.config;
 
+import com.example.mobileapi.repository.InvalidateTokenRepository;
 import com.example.mobileapi.util.JwtUtil;
 import com.nimbusds.jose.JWSAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,7 +41,7 @@ public class SecurityConfig {
             "/swagger-resources", "/swagger-resources/**",
             "/configuration/ui", "/configuration/security",
             "/swagger-ui/**", "/webjars/**", "/swagger-ui.html",
-            "/api/customer/login", "/api/customer/introspect", "/api/customer", "/api/test/**",
+            "/api/auth/login", "/api/customer/introspect", "/api/customer", "/api/test/**",
             "/authenticate"};
 
     @Bean
@@ -58,7 +59,7 @@ public class SecurityConfig {
                                         jwtConfigurer ->
                                                 jwtConfigurer.decoder(jwtDecoder())
                                                         .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                                .authenticationEntryPoint(new JwtAuthenticationEntryPoint()));
+                                .authenticationEntryPoint(new SecurityExceptionHandler()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
@@ -92,10 +93,17 @@ public class SecurityConfig {
 
         // Trả về một JwtDecoder wrapper để bắt lỗi khi decode token
         return token -> {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            if (jwtUtil.isLogout(token)) {
+                request.setAttribute("jwtError", "LOGOUT");
+            }
             try {
+//                if (iVTokenRepo.existsById(token)) {
+//                    request.setAttribute("jwtError", "TOKEN_REVOKED");
+//                }
                 return decoder.decode(token);
             } catch (JwtException e) {
-                HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+
 
                 String errorMessage = e.getMessage().toLowerCase();
                 if (errorMessage.contains("expired")) {

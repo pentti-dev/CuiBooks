@@ -2,7 +2,6 @@ package com.example.mobileapi.service;
 
 
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
-import com.example.mobileapi.dto.request.CustomerUpdateRequestDTO;
 import com.example.mobileapi.dto.request.IntrospectRequest;
 import com.example.mobileapi.dto.request.LoginRequest;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
@@ -15,7 +14,6 @@ import java.util.List;
 public interface CustomerService {
     int saveCustomer(CustomerRequestDTO request);
 
-    void updateCustomer(int customerId, CustomerRequestDTO request);
 
     void deleteCustomer(int customerId);
 
@@ -27,11 +25,9 @@ public interface CustomerService {
 
     boolean checkEmail(String email);
 
-    LoginResponse login(LoginRequest loginRequest);
 
-    CustomerResponseDTO updateCustomerById(int customerId, CustomerUpdateRequestDTO request);
+    CustomerResponseDTO updateCustomerById(int customerId, CustomerRequestDTO request);
 
-    void updateByAdmin(int customerId, CustomerRequestDTO customerRequestDTO);
 
     void resetPassword(String username, String resetCode, String newPassword);
 
@@ -41,7 +37,6 @@ public interface CustomerService {
 
     void changePassword(int customerId, String oldPassword, String newPassword) throws AppException;
 
-    IntrospectResponse introspect(IntrospectRequest request) throws Exception;
 
-    CustomerResponseDTO getCustomerProfile(String username);
+    CustomerResponseDTO getCustomerProfile(String token);
 }

@@ -1,37 +1,34 @@
 package com.example.mobileapi.controller;
 
+import com.example.mobileapi.annotation.GetToken;
 import com.example.mobileapi.dto.request.*;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
-import com.example.mobileapi.dto.response.IntrospectResponse;
-import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.CartService;
 import com.example.mobileapi.service.CustomerService;
-import com.example.mobileapi.service.impl.CustomerServiceImpl;
 import com.example.mobileapi.util.JwtUtil;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Slf4j
 @RestController
 @RequestMapping("/api/customer")
 @RequiredArgsConstructor
 @Tag(name = "Customer", description = "Customer API")
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
+@PreAuthorize("hasRole('USER')")
 public class CustomerController {
-    Logger log = LoggerFactory.getLogger(CustomerController.class);
     CustomerService customerService;
     CartService cartService;
-    CustomerServiceImpl customerServiceImpl;
     JwtUtil jwtUtil;
 
     @GetMapping("/quantity/{customerId}")
@@ -57,46 +54,36 @@ public class CustomerController {
 
     @PutMapping("/{customerId}")
     public ApiResponse updateCustomer(@PathVariable int customerId, @RequestBody CustomerRequestDTO customer) throws AppException {
-        customerService.updateCustomer(customerId, customer);
+        customerService.updateCustomerById(customerId, customer);
         return ApiResponse.builder().code(2000).message("Cập nhật người dùng thành công").build();
     }
 
-    @PutMapping("/admin/{customerId}")
-    public ApiResponse updateAdmin(@PathVariable int customerId, @RequestBody CustomerRequestDTO customer) throws AppException {
-        customerService.updateByAdmin(customerId, customer);
-
-        return ApiResponse.builder().code(2000).message("Cập nhật người dùng thành công").build();
-    }
-
-    @DeleteMapping("/{customerId}")
-    public ApiResponse deleteCustomer(@PathVariable int customerId) {
-        customerService.deleteCustomer(customerId);
-        return ApiResponse.builder().code(2000).message("Xóa người dùng thành công").build();
-    }
-
-    @GetMapping("/{customerId}")
-    public ApiResponse<CustomerResponseDTO> getCustomer(@PathVariable int customerId) {
-        return ApiResponse.<CustomerResponseDTO>builder().data(customerService.getCustomer(customerId)).build();
-    }
 
     //Lay token tu header request sau do lay username tu token
+//    @PostAuthorize("returnObject.username ==authentication.name")
+//    @GetMapping("/profile")
+//    public ApiResponse<CustomerResponseDTO> getCustomerFromToken(@RequestHeader(value = "Authorization",
+//            required = false) String auth) throws AppException {
+//
+//        String token = auth.replace("Bearer ", "");
+//        if (!jwtUtil.verifyToken(token)) {
+//            throw new AppException(ErrorCode.INVALID_TOKEN);
+//        }
+//
+//        String username = jwtUtil.getUserNameFormToken(token);
+//        return ApiResponse.<CustomerResponseDTO>builder()
+//                .data(customerService.getCustomerProfile(username))
+//                .build();
+//    }
+
     @GetMapping("/profile")
-    public ApiResponse<CustomerResponseDTO> getCustomerProfile(@RequestHeader(value = "Authorization",
-            required = false) String auth) throws AppException {
+    public ApiResponse<CustomerResponseDTO> getCustomerFromToken(@Parameter(hidden = true) @GetToken String token) {
 
-        String token = auth.replace("Bearer ", "");
-        if (!jwtUtil.verifyToken(token)) {
-            throw new AppException(ErrorCode.INVALID_TOKEN);
-        }
+//        log.info("token: " + token);
 
-        String username = jwtUtil.extractUsername(token);
-        return ApiResponse.<CustomerResponseDTO>builder().data(customerService.getCustomerProfile(username)).build();
-    }
-
-    @GetMapping("/list")
-    public ApiResponse<List<CustomerResponseDTO>> getCustomers() {
-
-        return ApiResponse.<List<CustomerResponseDTO>>builder().data(customerService.getAllCustomers()).build();
+        return ApiResponse.<CustomerResponseDTO>builder()
+                .data(customerService.getCustomerProfile(token))
+                .build();
     }
 
     @GetMapping("/checkUsername/{username}")
@@ -106,20 +93,6 @@ public class CustomerController {
         return ApiResponse.<Boolean>builder().data(customerService.checkUsername(username)).build();
     }
 
-    @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        return ApiResponse.<LoginResponse>builder()
-                .code(HttpStatus.OK.value())
-                .data(customerService.login(loginRequest))
-                .build();
-    }
-
-    @PostMapping("/introspect")
-    public IntrospectResponse authenticate(@RequestBody IntrospectRequest request) throws Exception {
-        return customerService.introspect(request);
-
-
-    }
 
     @PostMapping("/resetPassword/{username}")
     public ApiResponse resetPassword(
@@ -141,12 +114,6 @@ public class CustomerController {
 
     }
 
-    @PutMapping("/updateByUser/{id}")
-    public ApiResponse<CustomerResponseDTO> updateByUser(@PathVariable int id, @RequestBody CustomerUpdateRequestDTO customer) {
-//        return customerService.updateCustomerById(id, customer);
-
-        return ApiResponse.<CustomerResponseDTO>builder().message("Cập nhật thông tin thành công!").data(customerService.updateCustomerById(id, customer)).build();
-    }
 
     @PatchMapping("/changePassword/{customerId}")
     public ApiResponse changePassword(@PathVariable int customerId, @RequestBody ChangePasswordDto dto) throws AppException {
