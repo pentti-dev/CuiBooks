@@ -41,7 +41,7 @@ public class AdminController {
     }
 
     @PostMapping("/customer")
-    public ApiResponse addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+    public ApiResponse<Void> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
         if (customerService.checkUsername(customer.getUsername())) {
             throw new AppException(ErrorCode.USERNAME_EXISTED);
         } else if (customerService.checkEmail(customer.getEmail())) {
@@ -51,23 +51,22 @@ public class AdminController {
         CartRequestDTO cartRequestDTO = new CartRequestDTO();
         cartRequestDTO.setCustomerId(userId);
         cartService.saveCart(cartRequestDTO);
-        return ApiResponse.builder().code(2000).message("Thêm người dùng thành công").build();
+        return ApiResponse.success("Thêm người dùng thành công");
     }
 
     @PutMapping("/customer/{customerId}")
-    public ApiResponse updateCustomer(@PathVariable int customerId, @RequestBody CustomerRequestDTO customer) throws AppException {
+    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable int customerId, @RequestBody CustomerRequestDTO customer) {
 
 
-        return ApiResponse.builder().code(2000)
-                .message("Cập nhật người dùng thành công")
+        return ApiResponse.<CustomerResponseDTO>builder()
                 .data(customerService.updateCustomerById(customerId, customer))
                 .build();
     }
 
     @DeleteMapping("/customer/{customerId}")
-    public ApiResponse deleteCustomer(@PathVariable int customerId) {
+    public ApiResponse<Void> deleteCustomer(@PathVariable int customerId) {
         customerService.deleteCustomer(customerId);
-        return ApiResponse.builder().code(2000).message("Xóa người dùng thành công").build();
+        return ApiResponse.success("Xóa người dùng thành công");
     }
 
 
