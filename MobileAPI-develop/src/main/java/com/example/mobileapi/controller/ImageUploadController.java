@@ -1,5 +1,6 @@
 package com.example.mobileapi.controller;
 
+import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.UrlResponse;
 import com.example.mobileapi.service.ImageUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,15 +18,18 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping("/api/cloudinary")
 @RequiredArgsConstructor
-@FieldDefaults(makeFinal = true)
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 @Tag(name = "ImageUpload", description = "Image Upload API")
 public class ImageUploadController {
-    @Autowired
     ImageUploadService imageUploadService;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UrlResponse> uploadImage(@RequestParam("file") MultipartFile file) {
-        return ResponseEntity.ok(imageUploadService.uploadImage(file));
+    public ApiResponse<UrlResponse> uploadImage(@RequestParam("file") MultipartFile file) {
+
+        return ApiResponse.<UrlResponse>builder()
+                .code(200)
+                .data(imageUploadService.uploadImage(file))
+                .build();
     }
 
 
