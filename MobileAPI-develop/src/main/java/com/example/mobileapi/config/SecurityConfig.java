@@ -1,6 +1,5 @@
 package com.example.mobileapi.config;
 
-import com.example.mobileapi.repository.InvalidateTokenRepository;
 import com.example.mobileapi.util.JwtUtil;
 import com.nimbusds.jose.JWSAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,8 +21,12 @@ import org.springframework.security.web.SecurityFilterChain;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
+import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
@@ -36,7 +39,7 @@ import java.util.List;
 public class SecurityConfig {
     JwtUtil jwtUtil;
 
-    final String[] ACCEPTED_ENDPOINT = {
+    String[] acceptedEndpoint = {
             "/api/v1/auth/**", "/v2/api-docs", "/v3/api-docs", "/v3/api-docs/**",
             "/swagger-resources", "/swagger-resources/**",
             "/configuration/ui", "/configuration/security",
@@ -49,7 +52,7 @@ public class SecurityConfig {
         httpSecurity
                 .authorizeHttpRequests(
                         request ->
-                                request.requestMatchers(ACCEPTED_ENDPOINT)
+                                request.requestMatchers(acceptedEndpoint)
                                         .permitAll()
                                         .anyRequest()
                                         .authenticated());
@@ -62,6 +65,17 @@ public class SecurityConfig {
                                 .authenticationEntryPoint(new SecurityExceptionHandler()));
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
+    }
+
+    @Bean
+    CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 
     @Bean
@@ -78,6 +92,7 @@ public class SecurityConfig {
     //decode token de kiem tra hop le hay khong
     @Bean
     public JwtDecoder jwtDecoder() {
+        String jwtError = "jwtError";
         RSAPublicKey publicKey = jwtUtil.loadPublicKey();
 
         // Cấu hình JWT Processor với thuật toán RS512
@@ -95,25 +110,22 @@ public class SecurityConfig {
         return token -> {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             if (jwtUtil.isLogout(token)) {
-                request.setAttribute("jwtError", "LOGOUT");
+                request.setAttribute(jwtError, "LOGOUT");
             }
             try {
-//                if (iVTokenRepo.existsById(token)) {
-//                    request.setAttribute("jwtError", "TOKEN_REVOKED");
-//                }
                 return decoder.decode(token);
             } catch (JwtException e) {
 
 
                 String errorMessage = e.getMessage().toLowerCase();
                 if (errorMessage.contains("expired")) {
-                    request.setAttribute("jwtError", "EXPIRED");
+                    request.setAttribute(jwtError, "EXPIRED");
                 } else if (errorMessage.contains("signature")) {
-                    request.setAttribute("jwtError", "INVALID_SIGNATURE");
+                    request.setAttribute(jwtError, "INVALID_SIGNATURE");
                 } else if (errorMessage.contains("unsupported")) {
-                    request.setAttribute("jwtError", "UNSUPPORTED");
+                    request.setAttribute(jwtError, "UNSUPPORTED");
                 } else {
-                    request.setAttribute("jwtError", "INVALID");
+                    request.setAttribute(jwtError, "INVALID");
                 }
 
 
