@@ -1,8 +1,10 @@
 package com.example.mobileapi.config;
 
-import com.example.mobileapi.repository.InvalidateTokenRepository;
 import com.example.mobileapi.util.JwtUtil;
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
+import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,9 +21,9 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import com.nimbusds.jose.proc.SecurityContext;
-import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
-import com.nimbusds.jwt.proc.DefaultJWTProcessor;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -34,34 +36,45 @@ import java.util.List;
 @EnableMethodSecurity
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class SecurityConfig {
+
     JwtUtil jwtUtil;
 
-    final String[] ACCEPTED_ENDPOINT = {
+    String[] acceptedEndpoint = {
             "/api/v1/auth/**", "/v2/api-docs", "/v3/api-docs", "/v3/api-docs/**",
             "/swagger-resources", "/swagger-resources/**",
             "/configuration/ui", "/configuration/security",
             "/swagger-ui/**", "/webjars/**", "/swagger-ui.html",
             "/api/auth/login", "/api/customer/introspect", "/api/customer", "/api/test/**",
-            "/authenticate"};
+            "/authenticate", "/graphiql", "/graphql","/api/graphql/product"
+    };
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .authorizeHttpRequests(
-                        request ->
-                                request.requestMatchers(ACCEPTED_ENDPOINT)
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated());
-        httpSecurity.oauth2ResourceServer(
-                oauth2 ->
-                        oauth2.jwt(
-                                        jwtConfigurer ->
-                                                jwtConfigurer.decoder(jwtDecoder())
-                                                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                                .authenticationEntryPoint(new SecurityExceptionHandler()));
-        httpSecurity.csrf(AbstractHttpConfigurer::disable);
+                .authorizeHttpRequests(request ->
+                        request.requestMatchers(acceptedEndpoint)
+                                .permitAll()
+                                .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(jwtConfigurer ->
+                                jwtConfigurer.decoder(jwtDecoder())
+                                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        ).authenticationEntryPoint(new SecurityExceptionHandler())
+                )
+                .csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
+    }
+
+    @Bean
+    CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedMethod("*");
+        config.addAllowedHeader("*");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
     }
 
     @Bean
@@ -70,14 +83,13 @@ public class SecurityConfig {
         jGA.setAuthorityPrefix("ROLE_");
         JwtAuthenticationConverter jAC = new JwtAuthenticationConverter();
         jAC.setJwtGrantedAuthoritiesConverter(jGA);
-
-
         return jAC;
     }
 
-    //decode token de kiem tra hop le hay khong
+    // Decode token để kiểm tra hợp lệ hoặc thiết lập các thông tin lỗi qua request attribute
     @Bean
     public JwtDecoder jwtDecoder() {
+        String jwtError = "jwtError";
         RSAPublicKey publicKey = jwtUtil.loadPublicKey();
 
         // Cấu hình JWT Processor với thuật toán RS512
@@ -91,37 +103,28 @@ public class SecurityConfig {
 
         NimbusJwtDecoder decoder = new NimbusJwtDecoder(jwtProcessor);
 
-        // Trả về một JwtDecoder wrapper để bắt lỗi khi decode token
+        // Trả về một JwtDecoder wrapper để bắt lỗi khi decode token và set attribute cho request
         return token -> {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             if (jwtUtil.isLogout(token)) {
-                request.setAttribute("jwtError", "LOGOUT");
+                request.setAttribute(jwtError, "LOGOUT");
             }
             try {
-//                if (iVTokenRepo.existsById(token)) {
-//                    request.setAttribute("jwtError", "TOKEN_REVOKED");
-//                }
                 return decoder.decode(token);
             } catch (JwtException e) {
-
-
                 String errorMessage = e.getMessage().toLowerCase();
                 if (errorMessage.contains("expired")) {
-                    request.setAttribute("jwtError", "EXPIRED");
+                    request.setAttribute(jwtError, "EXPIRED");
                 } else if (errorMessage.contains("signature")) {
-                    request.setAttribute("jwtError", "INVALID_SIGNATURE");
+                    request.setAttribute(jwtError, "INVALID_SIGNATURE");
                 } else if (errorMessage.contains("unsupported")) {
-                    request.setAttribute("jwtError", "UNSUPPORTED");
+                    request.setAttribute(jwtError, "UNSUPPORTED");
                 } else {
-                    request.setAttribute("jwtError", "INVALID");
+                    request.setAttribute(jwtError, "INVALID");
                 }
-
-
                 // Ném lại exception để ngăn không cho request tiếp tục xử lý
                 throw e;
             }
         };
     }
-
-
 }

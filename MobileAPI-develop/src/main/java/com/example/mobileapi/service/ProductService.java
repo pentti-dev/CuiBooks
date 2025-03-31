@@ -10,7 +10,7 @@ public interface ProductService {
     void updateProduct(int id, ProductRequestDTO productRequestDTO);
     void deleteProduct(int id);
     List<ProductResponseDTO> getAllProducts();
-    ProductResponseDTO getProductById(int id);
+    ProductResponseDTO getProductById(Integer id);
     List<ProductResponseDTO> findByCategoryId(Integer categoryId);
 
     List<ProductResponseDTO> getProductByName(String nameProduct);

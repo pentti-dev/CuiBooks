@@ -6,7 +6,7 @@ import lombok.Getter;
 @Builder
 @Getter
 public class ProductResponseDTO {
-    private int id;
+    private Integer id;
     private String name;
     private String img;
     private Integer price;

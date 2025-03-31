@@ -2,7 +2,6 @@ package com.example.mobileapi.service;
 
 import com.example.mobileapi.dto.request.CartRequestDTO;
 import com.example.mobileapi.dto.response.CartResponseDTO;
-import com.example.mobileapi.model.Cart;
 
 public interface CartService {
     int saveCart(CartRequestDTO cartRequestDTO);
@@ -13,5 +12,5 @@ public interface CartService {
 
     CartResponseDTO getCartByUsername(String username);
 
-    int getQuantityCartItemInCart(int cartId);
+    Integer getQuantityCartItemInCart(int cartId);
 }

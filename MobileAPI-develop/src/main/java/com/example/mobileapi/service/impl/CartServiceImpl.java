@@ -109,7 +109,7 @@ public class CartServiceImpl implements CartService {
         return cartRepository.findCartByCustomer_Username(username).orElse(null);
     }
 
-    public int getQuantityCartItemInCart(int cartId) {
+    public Integer getQuantityCartItemInCart(int cartId) {
         Cart cart = getByCartId(cartId);
         if (cart == null) {
             return 0;
