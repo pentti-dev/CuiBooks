@@ -69,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO getProductById(int id) {
+    public ProductResponseDTO getProductById(Integer id) {
         Product product = getById(id);
         return ProductResponseDTO.builder()
                 .categoryName(product.getCategory().getName())

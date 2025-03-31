@@ -2,6 +2,9 @@ package com.example.mobileapi.config;
 
 import com.example.mobileapi.util.JwtUtil;
 import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.proc.SecurityContext;
+import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
+import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,15 +21,11 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import com.nimbusds.jose.proc.SecurityContext;
-import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
-import com.nimbusds.jwt.proc.DefaultJWTProcessor;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
@@ -37,6 +36,7 @@ import java.util.List;
 @EnableMethodSecurity
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class SecurityConfig {
+
     JwtUtil jwtUtil;
 
     String[] acceptedEndpoint = {
@@ -45,25 +45,24 @@ public class SecurityConfig {
             "/configuration/ui", "/configuration/security",
             "/swagger-ui/**", "/webjars/**", "/swagger-ui.html",
             "/api/auth/login", "/api/customer/introspect", "/api/customer", "/api/test/**",
-            "/authenticate"};
+            "/authenticate", "/graphiql", "/graphql","/api/graphql/product"
+    };
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .authorizeHttpRequests(
-                        request ->
-                                request.requestMatchers(acceptedEndpoint)
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated());
-        httpSecurity.oauth2ResourceServer(
-                oauth2 ->
-                        oauth2.jwt(
-                                        jwtConfigurer ->
-                                                jwtConfigurer.decoder(jwtDecoder())
-                                                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
-                                .authenticationEntryPoint(new SecurityExceptionHandler()));
-        httpSecurity.csrf(AbstractHttpConfigurer::disable);
+                .authorizeHttpRequests(request ->
+                        request.requestMatchers(acceptedEndpoint)
+                                .permitAll()
+                                .anyRequest().authenticated()
+                )
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(jwtConfigurer ->
+                                jwtConfigurer.decoder(jwtDecoder())
+                                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
+                        ).authenticationEntryPoint(new SecurityExceptionHandler())
+                )
+                .csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
     }
 
@@ -84,12 +83,10 @@ public class SecurityConfig {
         jGA.setAuthorityPrefix("ROLE_");
         JwtAuthenticationConverter jAC = new JwtAuthenticationConverter();
         jAC.setJwtGrantedAuthoritiesConverter(jGA);
-
-
         return jAC;
     }
 
-    //decode token de kiem tra hop le hay khong
+    // Decode token để kiểm tra hợp lệ hoặc thiết lập các thông tin lỗi qua request attribute
     @Bean
     public JwtDecoder jwtDecoder() {
         String jwtError = "jwtError";
@@ -106,7 +103,7 @@ public class SecurityConfig {
 
         NimbusJwtDecoder decoder = new NimbusJwtDecoder(jwtProcessor);
 
-        // Trả về một JwtDecoder wrapper để bắt lỗi khi decode token
+        // Trả về một JwtDecoder wrapper để bắt lỗi khi decode token và set attribute cho request
         return token -> {
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             if (jwtUtil.isLogout(token)) {
@@ -115,8 +112,6 @@ public class SecurityConfig {
             try {
                 return decoder.decode(token);
             } catch (JwtException e) {
-
-
                 String errorMessage = e.getMessage().toLowerCase();
                 if (errorMessage.contains("expired")) {
                     request.setAttribute(jwtError, "EXPIRED");
@@ -127,13 +122,9 @@ public class SecurityConfig {
                 } else {
                     request.setAttribute(jwtError, "INVALID");
                 }
-
-
                 // Ném lại exception để ngăn không cho request tiếp tục xử lý
                 throw e;
             }
         };
     }
-
-
 }

@@ -1,14 +1,17 @@
 package com.example.mobileapi.dto.request;
 
+import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 
-import java.io.Serializable;
 @Getter
-public class ProductRequestDTO implements Serializable {
-    private String name;
-    private String img;
-    private int price;
-    private String categoryName;
-    private String detail;
+@Builder
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+public class ProductRequestDTO {
+    String name;
+    String img;
+    int price;
+    String detail;
+    String categoryName;
 
 }
