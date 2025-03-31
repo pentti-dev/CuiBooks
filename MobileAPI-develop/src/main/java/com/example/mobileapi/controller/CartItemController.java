@@ -1,6 +1,7 @@
 package com.example.mobileapi.controller;
 
 import com.example.mobileapi.dto.request.CartItemRequestDTO;
+import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.service.CartItemService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -14,22 +15,27 @@ public class CartItemController {
     private final CartItemService cartItemService;
 
     @PostMapping
-    public int saveCartItem(@RequestBody CartItemRequestDTO cartItemRequestDTO) {
-        return cartItemService.saveCartItem(cartItemRequestDTO);
+    public ApiResponse<Void> saveCartItem(@RequestBody CartItemRequestDTO cartItemRequestDTO) {
+        cartItemService.saveCartItem(cartItemRequestDTO);
+        return ApiResponse.success();
     }
 
     @PutMapping("/updatequantity/{cartItemId}")
-    public void updateCartItem(@PathVariable("cartItemId") int cartItemId, @RequestParam int quantity) {
+    public ApiResponse<Void> updateCartItem(@PathVariable("cartItemId") int cartItemId, @RequestParam int quantity) {
         cartItemService.updateCartItemQuantity(cartItemId, quantity);
+        return ApiResponse.success();
     }
 
     @DeleteMapping("/{cartItemId}")
-    public void deleteCartItem(@PathVariable("cartItemId") int cartItemId) {
+    public ApiResponse<Void> deleteCartItem(@PathVariable("cartItemId") int cartItemId) {
         cartItemService.deleteCartItem(cartItemId);
+
+        return ApiResponse.success();
     }
 
     @DeleteMapping("/cartId/{cartId}")
-    public void deleteCartItemByCartId(@PathVariable("cartId") int cartId) {
+    public ApiResponse<Void> deleteCartItemByCartId(@PathVariable("cartId") int cartId) {
         cartItemService.deleteCartItemByCartId(cartId);
+        return ApiResponse.success();
     }
 }
