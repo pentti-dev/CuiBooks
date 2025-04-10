@@ -161,7 +161,7 @@ public class JwtUtil {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             String jwtID = signedJWT.getJWTClaimsSet().getJWTID();
-            log.error("Token is logout: " + jwtID);
+            log.warn("Token is logout: " + jwtID);
             return invalidateTokenRepository.existsById(jwtID);
         } catch (Exception e) {
             log.warn("Error extracting expiration time from token", e);
