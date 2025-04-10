@@ -17,7 +17,7 @@ import java.lang.reflect.Parameter;
 @Component
 @RequiredArgsConstructor
 public class TokenAspect {
-    @Around("@annotation(org.springframework.web.bind.annotation.GetMapping) && execution(* *(.., @com.example.mobileapi.annotation.GetToken (*), ..))")
+    @Around("within(@org.springframework.web.bind.annotation.RestController *) && execution(* *(.., @com.example.mobileapi.annotation.GetToken (*), ..))")
     public Object injectToken(ProceedingJoinPoint joinPoint) throws Throwable {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = attributes.getRequest();

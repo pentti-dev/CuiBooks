@@ -8,29 +8,31 @@ import lombok.experimental.FieldDefaults;
 
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 @Controller
 @RequiredArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+@PreAuthorize("hasRole('ADMIN')")
 public class ProductMutationResolver {
 
     ProductService productService;
 
     @MutationMapping
-    public int addProduct(@Argument("product") ProductRequestDTO product) {
-        // Chuyển đổi ProductInput thành ProductRequestDTO
+    int addProduct(@Argument("product") ProductRequestDTO product) {
         return productService.saveProduct(product);
     }
 
     @MutationMapping
-    public ProductResponseDTO updateProduct(@Argument int id, @Argument("product") ProductRequestDTO product) {
+    ProductResponseDTO updateProduct(@Argument int id, @Argument("product") ProductRequestDTO product) {
         productService.updateProduct(id, product);
         return productService.getProductById(id);
     }
 
+
     @MutationMapping
-    public String deleteProduct(@Argument int id) {
+    String deleteProduct(@Argument int id) {
         productService.deleteProduct(id);
         return "Xóa sản phẩm thành công";
     }

@@ -6,7 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,34 +20,63 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Integer id;
+    Integer id;
 
     @Column(nullable = false)
-    private String name;
+    String name;
 
     @Column(nullable = false)
-    private String img;
+    String img;
 
     @Column(nullable = false)
-    private int price;
+    int price;
+
 
     @Lob
     @Column(columnDefinition = "TEXT")
-    private String detail;
+    String detail;
+
+    @Column(nullable = false)
+    String supplier;//nhà cung cấp
+
+    @Column(nullable = false)
+    String author;//tác giả
+
+    @Column(nullable = false)
+    Integer publishYear;//năm xuất bản
+
+    @Column(nullable = false)
+    String publisher;//nhà xuất bản
+
+    @Column(nullable = false)
+    String language;//ngôn ngữ
+
+    @Column(nullable = false)
+    Byte weight;//trọng lượng
+
+    @Column(nullable = false)
+    String size;//kích thước
+
+    @Column(nullable = false)
+    Integer pageNumber;//số trang
+
+    @Column(nullable = false)
+    String form;//hình thức
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
+    Category category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<CartItem> cartItems;
+    List<CartItem> cartItems;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<OrderDetail> orderDetails = new ArrayList<>();
+    List<OrderDetail> orderDetails = new ArrayList<>();
 }
 

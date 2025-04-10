@@ -11,7 +11,7 @@ public interface AuthenticationService {
 
     LoginResponse login(LoginRequest loginRequest) throws AppException;
 
-    void logout(String auth);
+    void logout(String auth) throws AppException;
 
     IntrospectResponse introspect(IntrospectRequest request) throws Exception;
 

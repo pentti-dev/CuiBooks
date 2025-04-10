@@ -26,7 +26,7 @@ public class SecurityExceptionHandler implements AuthenticationEntryPoint, Acces
         response.setCharacterEncoding("UTF-8");
 
         ApiResponse<?> apiResponse = ApiResponse.builder()
-                .code(errorCode.getErrorCode())
+                .code(errorCode.getCode())
                 .message(errorCode.getMessage())
                 .build();
 

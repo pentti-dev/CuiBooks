@@ -1,39 +1,46 @@
-# Định nghĩa kiểu cho Product
+
+type Category {
+    id: ID!
+    name: String!
+
+
+}
+
 type Product {
-    id: Int!
+    id: ID!
     name: String!
     img: String!
     price: Int!
     detail: String
-    categoryName: String!  # Có thể ánh xạ từ entity Category (hoặc dùng kiểu riêng nếu cần)
+    category: Category!
+
 }
 
-# Input type để tạo mới hoặc update Product
+
 input ProductInput {
     name: String!
     img: String!
     price: Int!
     detail: String
-    categoryName: String!
+    categoryId: ID!  #
 }
-
-# Các truy vấn (query)
+# Lay sam pham
 type Query {
-    # Lấy danh sách tất cả sản phẩm
     products: [Product!]!
 
-    # Lấy sản phẩm theo id
-    productById(id: Int!): Product
+    productById(id: ID!): Product
+
+    productsByCategoryId(categoryId: ID!): [Product!]!
+
+    productsByName(name: String!): [Product!]!
 }
 
-# Các thao tác thay đổi dữ liệu (mutation)
+# Them xoa sua
 type Mutation {
-    # Thêm sản phẩm mới, trả về id của sản phẩm vừa tạo
-    addProduct(product: ProductInput!): Int!
+    addProduct(product: ProductInput!): Product!
 
-    # Cập nhật sản phẩm theo id
-    updateProduct(id: Int!, product: ProductInput!): Product
+    updateProduct(id: ID!, product: ProductInput!): Product
 
-    # Xóa sản phẩm theo id, trả về thông báo thành công
-    deleteProduct(id: Int!): String
+    deleteProduct(id: ID!): Boolean!
 }
+

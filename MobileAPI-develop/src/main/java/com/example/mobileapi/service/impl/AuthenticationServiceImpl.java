@@ -49,7 +49,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public void logout(String token) {
+    public void logout(String token) throws AppException {
+        if (token == null || token.isEmpty()) {
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
         String jwtID = jwtUtil.getJwtIDFromToken(token);
         invalidateTokenRepository.save(InvalidateToken.builder()
                 .id(jwtID)
@@ -60,26 +63,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public IntrospectResponse introspect(IntrospectRequest request) {
-//        try {
-//            JWSVerifier verifier = new RSASSAVerifier(jwtUtil.loadPublicKey());
-//
-//            var token = request.getToken();
-//            SignedJWT signedJWT = SignedJWT.parse(token);
-//
-//            Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
-//
-//            var verify = signedJWT.verify(verifier);
-//
-//            return IntrospectResponse.builder()
-//                    .valid(verify && expirationTime.after(new Date()))
-//                    .build();
-//        } catch (JOSEException e) {
-//            throw new RuntimeException(e);
-//        } catch (ParseException e) {
-//            throw new RuntimeException(e);
-//        } catch (Exception e) {
-//            throw new RuntimeException(e);
-//        }
         return null;
     }
 }
