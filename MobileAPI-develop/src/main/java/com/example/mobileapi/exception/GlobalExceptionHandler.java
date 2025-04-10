@@ -21,7 +21,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ApiResponse.<Void>builder()
                                 .message(errorCode.getMessage())
-                                .code(errorCode.getErrorCode())
+                                .code(errorCode.getCode())
                                 .build());
 
     }
@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ApiResponse.<Void>builder()
                                 .message(errorCode.getMessage())
-                                .code(errorCode.getErrorCode())
+                                .code(errorCode.getCode())
                                 .build());
     }
 
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ApiResponse.<Void>builder()
                                 .message(errorCode.getMessage())
-                                .code(errorCode.getErrorCode())
+                                .code(errorCode.getCode())
                                 .build());
 
 
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
                 .body(
                         ApiResponse.<Void>builder()
                                 .message(errorCode.getMessage())
-                                .code(errorCode.getErrorCode())
+                                .code(errorCode.getCode())
                                 .build());
 
 

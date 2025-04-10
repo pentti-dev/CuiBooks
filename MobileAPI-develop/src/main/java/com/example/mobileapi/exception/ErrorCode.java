@@ -76,6 +76,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 4401, "Người dùng không tồn tại."),
 
     DUPLICATE_ENTRY(HttpStatus.CONFLICT, 4500, "Dữ liệu đã tồn tại."),
+    INVALID_CART(HttpStatus.BAD_REQUEST, 4501, "Giỏ hàng không hợp lệ."),
 
     /**
      * ========== LỖI HỆ THỐNG ==========
@@ -92,7 +93,7 @@ public enum ErrorCode {
 
     HttpStatus httpStatus;
 
-    int errorCode;
+    int code;
 
     String message;
 }
