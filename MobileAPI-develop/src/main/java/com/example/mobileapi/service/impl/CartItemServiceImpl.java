@@ -21,7 +21,7 @@ public class CartItemServiceImpl implements CartItemService {
     private final ProductServiceImpl productServiceImpl;
 
     @Override
-    public int saveCartItem(CartItemRequestDTO cartItem) {
+    public Integer saveCartItem(CartItemRequestDTO cartItem) {
         int cartId = cartItem.getCartId();
         int productId = cartItem.getProductId();
 

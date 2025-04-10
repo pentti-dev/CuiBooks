@@ -1,10 +1,14 @@
 package com.example.mobileapi.controller;
 
 import com.example.mobileapi.dto.request.OrderDetailSaveRequest;
+import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
 import com.example.mobileapi.service.OrderDetailService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,36 +17,51 @@ import java.util.List;
 @RequestMapping("/api/order-detail")
 @RequiredArgsConstructor
 @Tag(name = "OrderDetail", description = "OrderDetail API")
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderDetailController {
-    private final OrderDetailService orderDetailService;
+    OrderDetailService orderDetailService;
 
     @PostMapping
-    public OrderDetailResponseDTO saveOrderDetail(OrderDetailSaveRequest orderDetailRequestDTO) {
-        return orderDetailService.saveOrderDetail(orderDetailRequestDTO);
+    public ApiResponse<OrderDetailResponseDTO> saveOrderDetail(OrderDetailSaveRequest orderDetailRequestDTO) {
+        return ApiResponse.<OrderDetailResponseDTO>builder()
+                .data(orderDetailService.saveOrderDetail(orderDetailRequestDTO))
+                .build();
+
     }
 
     @PutMapping("/{id}")
-    public OrderDetailResponseDTO updateOrderDetail(@PathVariable int id, OrderDetailSaveRequest orderDetailRequestDTO) {
-        return orderDetailService.updateOrderDetail(id, orderDetailRequestDTO);
+    public ApiResponse<OrderDetailResponseDTO> updateOrderDetail(@PathVariable int id, OrderDetailSaveRequest orderDetailRequestDTO) {
+        return ApiResponse.<OrderDetailResponseDTO>builder()
+                .data(orderDetailService.updateOrderDetail(id, orderDetailRequestDTO))
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    public void deleteOrderDetail(@PathVariable int id) {
+    public ApiResponse<Void> deleteOrderDetail(@PathVariable int id) {
         orderDetailService.deleteOrderDetail(id);
+        return ApiResponse.success("Xóa chi tiết đơn hàng thành công!");
     }
 
     @GetMapping("/id/{id}")
-    public OrderDetailResponseDTO getOrderDetailById(@PathVariable int id) {
-        return orderDetailService.findOrderDetailById(id);
+    public ApiResponse<OrderDetailResponseDTO> getOrderDetailById(@PathVariable int id) {
+        return ApiResponse.<OrderDetailResponseDTO>builder()
+                .data(orderDetailService.findOrderDetailById(id))
+                .build();
+
     }
 
     @GetMapping("/orderId/{orderId}")
-    public List<OrderDetailResponseDTO> getOrderDetailByOrderId(@PathVariable int orderId) {
-        return orderDetailService.findOrderDetailByOrderId(orderId);
+    public ApiResponse<List<OrderDetailResponseDTO>> getOrderDetailByOrderId(@PathVariable int orderId) {
+        return ApiResponse.<List<OrderDetailResponseDTO>>builder()
+                .data(orderDetailService.findOrderDetailByOrderId(orderId))
+                .build();
     }
 
     @GetMapping("/productId/{productId}")
-    public OrderDetailResponseDTO getOrderDetailByProductId(@PathVariable int productId) {
-        return orderDetailService.findOrderDetailByProductId(productId);
+    public ApiResponse<OrderDetailResponseDTO> getOrderDetailByProductId(@PathVariable int productId) {
+        return ApiResponse.<OrderDetailResponseDTO>builder()
+                .data(orderDetailService.findOrderDetailByProductId(productId))
+                .build();
+
     }
 }

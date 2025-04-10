@@ -1,11 +1,13 @@
 package com.example.mobileapi.controller;
 
 import com.example.mobileapi.dto.request.ProductRequestDTO;
-import com.example.mobileapi.dto.response.CustomerResponseDTO;
+import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,46 +16,62 @@ import java.util.List;
 @RequestMapping("/api/product")
 @RequiredArgsConstructor
 @Tag(name = "Product", description = "Product API")
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class ProductController {
-    private final ProductService productService;
+    ProductService productService;
 
     @PostMapping
-    public int addProduct(@RequestBody ProductRequestDTO product) {
-        return productService.saveProduct(product);
+    public ApiResponse<Integer> addProduct(@RequestBody ProductRequestDTO product) {
+        return ApiResponse.<Integer>builder()
+                .data(productService.saveProduct(product))
+                .build();
     }
 
     @PutMapping("/{productId}")
-    public void updateProduct(@PathVariable int productId, @RequestBody ProductRequestDTO product) {
+    public ApiResponse<Void> updateProduct(@PathVariable int productId, @RequestBody ProductRequestDTO product) {
         productService.updateProduct(productId, product);
+        return ApiResponse.success("Cập nhật sản phẩm thành công");
     }
 
     @DeleteMapping("/{productId}")
-    public void deleteCustomer(@PathVariable int productId) {
+    public ApiResponse<Void> deleteCustomer(@PathVariable int productId) {
         productService.deleteProduct(productId);
+        return ApiResponse.success("Xóa sản phẩm thành công");
     }
 
     @GetMapping("/{productId}")
-    public ProductResponseDTO getCustomer(@PathVariable int productId) {
-        return productService.getProductById(productId);
+    public ApiResponse<ProductResponseDTO> getCustomer(@PathVariable int productId) {
+        return ApiResponse.<ProductResponseDTO>builder()
+                .data(productService.getProductById(productId))
+                .build();
     }
 
     @GetMapping("/list")
-    public List<ProductResponseDTO> getProducts() {
-        return productService.getAllProducts();
+    public ApiResponse<List<ProductResponseDTO>> getProducts() {
+        return ApiResponse.<List<ProductResponseDTO>>builder()
+                .data(productService.getAllProducts())
+                .build();
     }
 
     @GetMapping("/list/{categoryId}")
-    public List<ProductResponseDTO> getProductsByCategoryId(@PathVariable int categoryId) {
-        return productService.findByCategoryId(categoryId);
+    public ApiResponse<List<ProductResponseDTO>> getProductsByCategoryId(@PathVariable int categoryId) {
+        return ApiResponse.<List<ProductResponseDTO>>builder()
+                .data(productService.findByCategoryId(categoryId))
+                .build();
     }
 
     @GetMapping("/list/findByName/{name}")
-    public List<ProductResponseDTO> getProductsByName(@PathVariable String name) {
-        return productService.findByNameContainingIgnoreCase(name);
+    public ApiResponse<List<ProductResponseDTO>> getProductsByName(@PathVariable String name) {
+        return ApiResponse.<List<ProductResponseDTO>>builder()
+                .data(productService.findByNameContainingIgnoreCase(name))
+                .build();
+
     }
 
     @GetMapping("/search")
-    public List<ProductResponseDTO> getProductByName(@RequestParam String name) {
-        return productService.getProductByName(name);
+    public ApiResponse<List<ProductResponseDTO>> getProductByName(@RequestParam String name) {
+        return ApiResponse.<List<ProductResponseDTO>>builder()
+                .data(productService.getProductByName(name))
+                .build();
     }
 }

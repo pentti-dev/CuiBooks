@@ -3,28 +3,30 @@ package com.example.mobileapi.service.impl;
 import com.example.mobileapi.dto.request.CartRequestDTO;
 import com.example.mobileapi.dto.response.CartItemResponseDTO;
 import com.example.mobileapi.dto.response.CartResponseDTO;
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.model.Cart;
 import com.example.mobileapi.model.CartItem;
 import com.example.mobileapi.repository.CartRepository;
-import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.CartService;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class CartServiceImpl implements CartService {
-    private final CartRepository cartRepository;
-    private final CustomerServiceImpl customerServiceImpl;
-    private final ProductServiceImpl productServiceImpl;
+    CartRepository cartRepository;
+    CustomerServiceImpl customerServiceImpl;
+    ProductServiceImpl productServiceImpl;
 
     @Override
-    public int saveCart(CartRequestDTO cartRequestDTO) {
+    public Integer saveCart(CartRequestDTO cartRequestDTO) {
         Cart cart = Cart.builder()
                 .customer(customerServiceImpl.getCustomerById(cartRequestDTO.getCustomerId()))
                 .build();
@@ -32,15 +34,15 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartResponseDTO getCart(int cartId) {
+    public CartResponseDTO getCart(int cartId) throws AppException {
         Cart cart = getByCartId(cartId);
         if (cart == null) {
-            return null; // Or throw an exception if preferred
+            throw new AppException(ErrorCode.INVALID_CART);
         }
 
         List<CartItemResponseDTO> cartItemResponseDTOs = cart.getCartItems().stream()
                 .map(this::convertToCartItemResponseDTO)
-                .collect(Collectors.toList());
+                .toList();
 
         return CartResponseDTO.builder()
                 .id(cart.getId())
@@ -70,7 +72,7 @@ public class CartServiceImpl implements CartService {
 
         List<CartItemResponseDTO> cartItemResponseDTOs = cart.getCartItems().stream()
                 .map(this::convertToCartItemResponseDTO)
-                .collect(Collectors.toList());
+                .toList();
 
         return CartResponseDTO.builder()
                 .id(cart.getId())
@@ -92,7 +94,7 @@ public class CartServiceImpl implements CartService {
 
         List<CartItemResponseDTO> cartItemResponseDTOs = cart.getCartItems().stream()
                 .map(this::convertToCartItemResponseDTO)
-                .collect(Collectors.toList());
+                .toList();
 
         return CartResponseDTO.builder()
                 .id(cart.getId())

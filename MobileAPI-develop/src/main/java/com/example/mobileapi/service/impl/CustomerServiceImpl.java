@@ -7,7 +7,6 @@ import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.CustomerMapper;
 import com.example.mobileapi.model.Customer;
-import com.example.mobileapi.repository.CartRepository;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.EmailService;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Random;
 
 @Service
 @Slf4j
@@ -33,7 +33,7 @@ public class CustomerServiceImpl implements CustomerService {
     BCryptPasswordEncoder passwordEncoder; // Đổi tên cho rõ ràng
     JwtUtil jwtUtil;
     CustomerMapper customerMapper;
-    CartRepository cartRepository;
+    Random random = new Random();
 
     @Override
     public int saveCustomer(CustomerRequestDTO request) {
@@ -44,8 +44,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .build();
-        Integer id = customerRepository.save(customer).getId();
-        return id;
+        return customerRepository.save(customer).getId();
     }
 
 
@@ -57,15 +56,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerResponseDTO getCustomer(int customerId) {
         Customer customer = getCustomerById(customerId);
-
-//        return CustomerResponseDTO.builder()
-//                .username(customer.getUsername())
-//                .phone(customer.getPhone())
-//                .email(customer.getEmail())
-//                .fullname(customer.getFullname())
-//                .id(customer.getId())
-//                .role(Role.role(customer.isRole()))
-//                .build();
 
         return customerMapper.toCustomerResponse(customer);
     }
@@ -92,14 +82,10 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public CustomerResponseDTO updateCustomerById(int customerId, CustomerRequestDTO request) {
-        Customer customer = null;
-        try {
-            customer = customerRepository.findById(customerId)
-                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        } catch (AppException e) {
-            throw new RuntimeException(e);
-        }
+    public CustomerResponseDTO updateCustomerById(int customerId, CustomerRequestDTO request) throws AppException {
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         customer.setFullname(request.getFullname());
         customer.setEmail(request.getEmail());
         customer.setPhone(request.getPhone());
@@ -109,7 +95,7 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public void resetPassword(String username, String resetCode, String newPassword) {
+    public void resetPassword(String username, String resetCode, String newPassword) throws AppException {
         Customer customer = getCustomerByUserName(username);
         if (customer != null && resetCode.equals(customer.getResetCode())) {
             customer.setPassword(passwordEncoder.encode(newPassword)); // Sử dụng passwordEncoder
@@ -120,18 +106,14 @@ public class CustomerServiceImpl implements CustomerService {
                     "Xác nhận Đặt Lại Mật Khẩu",
                     "Mật khẩu của bạn đã được đặt lại thành công.");
         } else {
-            try {
-                throw new AppException(ErrorCode.INVALID_RESET_CODE);
-            } catch (AppException e) {
-                throw new RuntimeException(e);
-            }
+            throw new AppException(ErrorCode.INVALID_RESET_CODE);
         }
     }
 
     @Override
-    public void initPasswordReset(String username) {
+    public void initPasswordReset(String username) throws AppException {
         Customer customer = customerRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy customer"));
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if (customer != null) {
             String resetCode = generateResetCode();
             customer.setResetCode(resetCode);
@@ -143,7 +125,7 @@ public class CustomerServiceImpl implements CustomerService {
                     "Yêu cầu Đặt Lại Mật Khẩu",
                     "Mã xác nhận đặt lại mật khẩu của bạn là: " + resetCode);
         } else {
-            throw new IllegalArgumentException("Không tìm thấy khách hàng với username: " + username);
+            throw new AppException(ErrorCode.USER_NOT_FOUND);
         }
     }
 
@@ -166,26 +148,23 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @PostAuthorize("returnObject.username ==authentication.name")
-    public CustomerResponseDTO getCustomerProfile(String token) {
+    public CustomerResponseDTO getCustomerProfile(String token) throws AppException {
         String username = jwtUtil.getUserNameFormToken(token);
         return customerMapper.toCustomerResponse(getCustomerByUserName(username));
 
     }
 
-    Customer getCustomerByUserName(String username) {
-        try {
-            return customerRepository.findByUsername(username)
-                    .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        } catch (AppException e) {
-            throw new RuntimeException(e);
-        }
+
+    Customer getCustomerByUserName(String username) throws AppException {
+        return customerRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
     private String generateResetCode() {
         // Tạo một mã ngẫu nhiên chứa các ký tự chữ và số
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         StringBuilder sb = new StringBuilder();
-        java.util.Random random = new java.util.Random();
+
         for (int i = 0; i < 6; i++) {
             sb.append(chars.charAt(random.nextInt(chars.length())));
         }
