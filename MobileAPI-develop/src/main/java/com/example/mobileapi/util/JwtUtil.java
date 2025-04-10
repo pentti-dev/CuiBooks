@@ -149,7 +149,7 @@ public class JwtUtil {
     public Date getExpirationTimeFromToken(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
-            log.error(token);
+            log.error("Expiration time: {}", signedJWT.getJWTClaimsSet().getExpirationTime());
             return signedJWT.getJWTClaimsSet().getExpirationTime();
         } catch (Exception e) {
             log.warn("Error extracting expiration time from token", e);
@@ -161,7 +161,6 @@ public class JwtUtil {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             String jwtID = signedJWT.getJWTClaimsSet().getJWTID();
-            log.warn("Token is logout: " + jwtID);
             return invalidateTokenRepository.existsById(jwtID);
         } catch (Exception e) {
             log.warn("Error extracting expiration time from token", e);

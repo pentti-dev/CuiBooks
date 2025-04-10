@@ -4,14 +4,11 @@ import com.example.mobileapi.annotation.GetToken;
 import com.example.mobileapi.dto.request.IntrospectRequest;
 import com.example.mobileapi.dto.request.LoginRequest;
 import com.example.mobileapi.dto.response.ApiResponse;
+import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.service.AuthenticationService;
-import com.example.mobileapi.service.CartService;
-import com.example.mobileapi.service.CustomerService;
-import com.example.mobileapi.service.impl.CustomerServiceImpl;
-import com.example.mobileapi.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -46,10 +43,15 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ApiResponse logout(@Parameter(hidden = true) @GetToken String token) {
-
-        authenticationService.logout(token);
-        return ApiResponse.builder().code(2000).message("Đăng xuất thành công!").build();
+    public ApiResponse<Void> logout(@Parameter(hidden = true) @GetToken String token) {
+        try {
+            log.info("Token length: {}", token.length());
+            authenticationService.logout(token);
+            return ApiResponse.success("Đăng xuất thành công");
+        } catch (AppException e) {
+            throw new RuntimeException(e);
+        }
     }
+
 
 }
