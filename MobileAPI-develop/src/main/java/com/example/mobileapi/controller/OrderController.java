@@ -4,13 +4,16 @@ import com.example.mobileapi.common.OrderMethod;
 import com.example.mobileapi.common.OrderStatus;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
+import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,60 +22,36 @@ import java.util.List;
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
 @Tag(name = "Order", description = "Order API")
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
+@PreAuthorize("hasRole('USER')")
 public class OrderController {
-    private final OrderService orderService;
+    OrderService orderService;
 
+    @Operation(summary = "Lưu đơn hàng")
     @PostMapping
-    public int saveOrder(@RequestParam OrderMethod method, @RequestParam OrderStatus status, @RequestBody OrderRequestDTO orderRequestDTO) {
+    public ApiResponse<Integer> saveOrder(@RequestParam OrderMethod method, @RequestParam OrderStatus status, @RequestBody OrderRequestDTO orderRequestDTO) {
         orderRequestDTO.setPaymentMethod(method.getValue());
         orderRequestDTO.setStatus(status.getValue());
-        return orderService.saveOrder(orderRequestDTO);
+
+        return ApiResponse.<Integer>builder()
+                .code(HttpStatus.OK.value())
+                .data(orderService.saveOrder(orderRequestDTO))
+                .build();
     }
 
-    @PutMapping("/order/{orderId}")
-    public void editOrder(@RequestBody OrderEditRequestDTO orderRequestDTO, @PathVariable("orderId") int orderId) {
-        orderService.editOrder(orderId, orderRequestDTO);
-    }
-
+    @Operation(summary = "Lấy danh sách đơn hàng theo ID khách hàng")
     @GetMapping("/customer/{customerId}")
-    public List<OrderResponseDTO> getOrderByCustomerId(@PathVariable int customerId) {
-        return orderService.getOrderByCustomerId(customerId);
+    public ApiResponse<List<OrderResponseDTO>> getOrderByCustomerId(@PathVariable int customerId) {
+        return ApiResponse.<List<OrderResponseDTO>>builder()
+                .data(orderService.getOrderByCustomerId(customerId))
+                .build();
     }
 
-    @GetMapping("/list")
-    public List<OrderResponseDTO> getAllOrders() {
-        return orderService.getAllOrders();
-    }
-
-    @DeleteMapping("/{orderId}")
-    public void deleteOrder(@PathVariable("orderId") int orderId) {
-        orderService.deleteOrder(orderId);
-    }
-
-    @GetMapping("/revenue")
-    public List<MonthlyRevenueResponse> getOrderRevenue() {
-        return orderService.getMonthlyRevenue();
-    }
-
-    @GetMapping("/{status}")
-    public List<OrderResponseDTO> getOrderByStatus(@PathVariable OrderStatus status) {
-        return orderService.getOrdersByStatus(status.getValue());
-    }
-
-    @PutMapping("/status/{status}&&{orderId}")
-    public ResponseEntity<String> changeOrderStatus(@PathVariable("status") OrderStatus status,
-                                                    @PathVariable("orderId") int orderId) {
-        try {
-            orderService.changeOrderStatus(orderId, status.getValue());
-            return ResponseEntity.ok("Cập nhật trạng thái thành công!");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Lỗi: " + e.getMessage());
-        }
-    }
-
+    @Operation(summary = "Lấy danh sách đơn hàng theo trạng thái và ID khách hàng")
     @GetMapping("/client/{status}&&{customerId}")
-    public List<OrderResponseDTO> getOrderByStatusAndCustomerId(@PathVariable String status, @PathVariable int customerId) {
-        return orderService.getOrdersByStatusAndCustomerId(status, customerId);
+    public ApiResponse<List<OrderResponseDTO>> getOrderByStatusAndCustomerId(@PathVariable String status, @PathVariable int customerId) {
+        return ApiResponse.<List<OrderResponseDTO>>builder()
+                .data(orderService.getOrdersByStatusAndCustomerId(status, customerId))
+                .build();
     }
 }
