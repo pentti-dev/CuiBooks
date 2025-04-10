@@ -27,4 +27,15 @@ public class ProductQueryResolver {
     public ProductResponseDTO productById(@Argument Integer id) {
         return productService.getProductById(id);
     }
+
+    @QueryMapping
+    public List<ProductResponseDTO> productsByName(@Argument String name) {
+        return productService.getProductByName(name);
+    }
+
+    @QueryMapping
+    public List<ProductResponseDTO> productsByCategoryId(@Argument Integer categoryId) {
+        return productService.findByCategoryId(categoryId);
+    }
+
 }

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -93,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
                         .id(product.getId())
                         .detail(product.getDetail())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
 
     }
 
@@ -109,7 +108,7 @@ public class ProductServiceImpl implements ProductService {
                         .id(product.getId())
                         .detail(product.getDetail())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
