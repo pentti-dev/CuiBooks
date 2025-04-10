@@ -38,6 +38,7 @@ import java.util.List;
 public class SecurityConfig {
 
     JwtUtil jwtUtil;
+    SecurityExceptionHandler exceptionHandler;
 
     String[] acceptedEndpoint = {
             "/api/v1/auth/**", "/v2/api-docs", "/v3/api-docs", "/v3/api-docs/**",
@@ -45,11 +46,13 @@ public class SecurityConfig {
             "/configuration/ui", "/configuration/security",
             "/swagger-ui/**", "/webjars/**", "/swagger-ui.html",
             "/api/auth/login", "/api/customer/introspect", "/api/customer", "/api/test/**",
-            "/authenticate", "/graphiql", "/graphql","/api/graphql/product"
+            "/authenticate", "/graphiql", "/graphql", "/api/graphql/product"
     };
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+
         httpSecurity
                 .authorizeHttpRequests(request ->
                         request.requestMatchers(acceptedEndpoint)
@@ -60,11 +63,17 @@ public class SecurityConfig {
                         oauth2.jwt(jwtConfigurer ->
                                 jwtConfigurer.decoder(jwtDecoder())
                                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        ).authenticationEntryPoint(new SecurityExceptionHandler())
+                        )
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(exceptionHandler)
+                        .accessDeniedHandler(exceptionHandler)
                 )
                 .csrf(AbstractHttpConfigurer::disable);
+
         return httpSecurity.build();
     }
+
 
     @Bean
     CorsFilter corsFilter() {
