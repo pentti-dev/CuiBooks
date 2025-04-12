@@ -77,7 +77,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public boolean checkEmail(String email) {
-        return customerRepository.existsByEmail(email).isPresent();
+        return customerRepository.existsByEmail(email);
     }
 
 

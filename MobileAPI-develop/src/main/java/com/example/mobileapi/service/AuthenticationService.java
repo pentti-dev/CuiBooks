@@ -6,6 +6,8 @@ import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.repository.CustomerRepository;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 
 public interface AuthenticationService {
 

@@ -45,7 +45,7 @@ public class SecurityConfig {
             "/swagger-resources", "/swagger-resources/**",
             "/configuration/ui", "/configuration/security",
             "/swagger-ui/**", "/webjars/**", "/swagger-ui.html",
-            "/api/auth/login","/api/auth/logout", "/api/customer/introspect", "/api/customer", "/api/test/**",
+            "/api/auth/**", "/api/customer/introspect", "/api/test/**",
             "/authenticate", "/graphiql", "/graphql", "/api/graphql/product"
     };
 

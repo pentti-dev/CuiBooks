@@ -34,19 +34,6 @@ public class CustomerController {
 
     }
 
-    @PostMapping
-    public ApiResponse<Void> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
-        if (customerService.checkUsername(customer.getUsername())) {
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
-        } else if (customerService.checkEmail(customer.getEmail())) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
-        }
-        int userId = customerService.saveCustomer(customer);
-        CartRequestDTO cartRequestDTO = new CartRequestDTO();
-        cartRequestDTO.setCustomerId(userId);
-        cartService.saveCart(cartRequestDTO);
-        return ApiResponse.success("Thêm người dùng thành công");
-    }
 
     @PutMapping("/{customerId}")
     public ApiResponse<Void> updateCustomer(@PathVariable int customerId, @RequestBody CustomerRequestDTO customer) {

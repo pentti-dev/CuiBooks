@@ -7,6 +7,7 @@ import com.example.mobileapi.model.Product;
 import com.example.mobileapi.repository.ProductRepository;
 import com.example.mobileapi.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,20 +17,21 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class ProductServiceImpl implements ProductService {
-    private final ProductRepository productRepository;
-    private final CategoryServiceImpl categoryService;
+    ProductRepository productRepository;
+    CategoryServiceImpl categoryService;
 
     @Override
-    public int saveProduct(ProductRequestDTO productRequestDTO) {
-        Product product = Product.builder()
+    public Integer saveProduct(ProductRequestDTO productRequestDTO) {
+
+        return productRepository.save(Product.builder()
                 .name(productRequestDTO.getName())
                 .price(productRequestDTO.getPrice())
                 .img(productRequestDTO.getImg())
                 .category(categoryService.getByName(productRequestDTO.getCategoryName()))
                 .detail(productRequestDTO.getDetail())
-                .build();
-        return productRepository.save(product).getId();
+                .build()).getId();
     }
 
     @Override

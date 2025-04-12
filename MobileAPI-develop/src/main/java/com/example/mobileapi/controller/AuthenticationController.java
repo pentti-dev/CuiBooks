@@ -1,6 +1,8 @@
 package com.example.mobileapi.controller;
 
 import com.example.mobileapi.annotation.GetToken;
+import com.example.mobileapi.dto.request.CartRequestDTO;
+import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.IntrospectRequest;
 import com.example.mobileapi.dto.request.LoginRequest;
 import com.example.mobileapi.dto.response.ApiResponse;
@@ -8,9 +10,13 @@ import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.AuthenticationService;
+import com.example.mobileapi.service.CartService;
+import com.example.mobileapi.service.CustomerService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +32,8 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
 
     AuthenticationService authenticationService;
+    CustomerService customerService;
+    CartService cartService;
 
     @PostMapping("/login")
     public ApiResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest) throws AppException {
@@ -53,5 +61,18 @@ public class AuthenticationController {
         }
     }
 
+    @PostMapping("/register")
+    public ApiResponse<Void> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+        if (customerService.checkUsername(customer.getUsername())) {
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        } else if (customerService.checkEmail(customer.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+        int userId = customerService.saveCustomer(customer);
+        CartRequestDTO cartRequestDTO = new CartRequestDTO();
+        cartRequestDTO.setCustomerId(userId);
+        cartService.saveCart(cartRequestDTO);
+        return ApiResponse.success("Đăng ký tài khoản thành công");
+    }
 
 }
