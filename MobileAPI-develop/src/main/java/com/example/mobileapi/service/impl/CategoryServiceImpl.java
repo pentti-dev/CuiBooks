@@ -6,6 +6,7 @@ import com.example.mobileapi.model.Category;
 import com.example.mobileapi.repository.CategoryRepository;
 import com.example.mobileapi.service.CategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +16,10 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class CategoryServiceImpl implements CategoryService {
 
-    private final CategoryRepository categoryRepository;
+    CategoryRepository categoryRepository;
 
     @Override
     public int saveCategory(CategoryRequestDTO category) {

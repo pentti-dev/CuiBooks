@@ -6,7 +6,7 @@ import com.example.mobileapi.dto.response.ProductResponseDTO;
 import java.util.List;
 
 public interface ProductService {
-    int saveProduct(ProductRequestDTO productRequestDTO);
+    Integer saveProduct(ProductRequestDTO productRequestDTO);
     void updateProduct(int id, ProductRequestDTO productRequestDTO);
     void deleteProduct(int id);
     List<ProductResponseDTO> getAllProducts();
