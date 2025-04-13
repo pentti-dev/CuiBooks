@@ -66,7 +66,7 @@ public class CustomerController {
         return ApiResponse.<Boolean>builder().data(customerService.checkUsername(username)).build();
     }
 
-
+    @PreAuthorize("permitAll()")
     @PostMapping("/resetPassword/{username}")
     public ApiResponse<Void> resetPassword(
             @PathVariable String username,
@@ -83,6 +83,7 @@ public class CustomerController {
     }
 
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/initPasswordReset/{username}")
     public ApiResponse<Void> initPasswordReset(@PathVariable String username) {
         try {
@@ -93,7 +94,6 @@ public class CustomerController {
 
         return ApiResponse.success("Gửi mã xác nhận thành công");
     }
-
 
     @PatchMapping("/changePassword/{customerId}")
     public ApiResponse<Void> changePassword(@PathVariable int customerId, @RequestBody ChangePasswordDto dto) throws AppException {
