@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1118281e-dd66-4965-9c3b-2cb59cb8657b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/aa6e6ecd-3d9e-419e-a98e-216eda1c9269.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/dataSources/aa6e6ecd-3d9e-419e-a98e-216eda1c9269/storage_v2/_src_/schema/mobile.opBKwA.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/jarRepositories.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/controller/CustomerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/controller/CustomerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/util/JwtUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/util/JwtUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/resources/application.yaml" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;PhamThiNgocHoa&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:NgocTai-NLUStudent/WebEco.git&quot;,
+    &quot;accountId&quot;: &quot;d9536fcf-9da2-4f35-8624-e56cd42fa1a0&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2uWrHe3UCezcs0G3QzW7FD0RDvC" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;Spring Boot.MobileApiApplication.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;NgocHoa&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Study/HK2_Nam3/TTLTW/DoAn&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration name="MobileApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="MobileAPI" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.mobileapi.MobileApiApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23339.11" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23339.11" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1118281e-dd66-4965-9c3b-2cb59cb8657b" name="Changes" comment="" />
+      <created>1742375084628</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1742375084628</updated>
+      <workItem from="1742375085758" duration="2712000" />
+      <workItem from="1742437957076" duration="8865000" />
+      <workItem from="1742830309700" duration="5757000" />
+      <workItem from="1742980296645" duration="7055000" />
+      <workItem from="1743040597406" duration="3505000" />
+      <workItem from="1743082408868" duration="729000" />
+      <workItem from="1743083153114" duration="1245000" />
+      <workItem from="1743090032792" duration="5519000" />
+      <workItem from="1743149361431" duration="5309000" />
+      <workItem from="1743312368406" duration="2427000" />
+      <workItem from="1743495765637" duration="5157000" />
+      <workItem from="1743861473981" duration="887000" />
+      <workItem from="1743910080606" duration="332000" />
+      <workItem from="1743955265239" duration="1014000" />
+      <workItem from="1744272927485" duration="1189000" />
+      <workItem from="1744356798671" duration="189000" />
+      <workItem from="1744356998186" duration="10585000" />
+      <workItem from="1744438842522" duration="1241000" />
+      <workItem from="1744529206595" duration="1848000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>
