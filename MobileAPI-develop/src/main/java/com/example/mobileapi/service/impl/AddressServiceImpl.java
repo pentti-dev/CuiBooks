@@ -2,6 +2,8 @@ package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.dto.request.CreateAddressDto;
 import com.example.mobileapi.dto.request.UpdateAddressDto;
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.model.Address;
 import com.example.mobileapi.repository.AddressRepository;
 import com.example.mobileapi.repository.CustomerRepository;
@@ -26,26 +28,26 @@ public class AddressServiceImpl implements AddressService {
 
 
     @Override
-    public Address createAddress(CreateAddressDto dto) {
+    public Address createAddress(CreateAddressDto dto) throws AppException {
         Address address = Address.builder()
                 .address(dto.getAddress())
                 .numberPhone(dto.getNumberPhone())
                 .receiver(dto.getReceiver())
                 .note(dto.getNote())
-                .customer(customerRepository.findById(dto.getCustomerId()).orElseThrow(() -> new EntityNotFoundException("Customer not found")))
+                .customer(customerRepository.findById(dto.getCustomerId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)))
                 .isDefault(false)
                 .build();
         return addressRepository.save(address);
     }
 
     @Override
-    public Address updateAddress(Integer id, UpdateAddressDto dto) {
-        Address address = addressRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Address not found"));
+    public Address updateAddress(Integer id, UpdateAddressDto dto) throws AppException {
+        Address address = addressRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
         address.setAddress(dto.getAddress());
         address.setNumberPhone(dto.getNumberPhone());
         address.setReceiver(dto.getReceiver());
         address.setNote(dto.getNote());
-        address.setCustomer(customerRepository.findById(dto.getCustomerId()).orElseThrow(() -> new EntityNotFoundException("Customer not found")));
+        address.setCustomer(customerRepository.findById(dto.getCustomerId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)));
         return addressRepository.save(address);
     }
 
@@ -55,8 +57,8 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Address getAddress(Integer id) {
-        return addressRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Address not found"));
+    public Address getAddress(Integer id) throws AppException {
+        return addressRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
     }
 
     @Override

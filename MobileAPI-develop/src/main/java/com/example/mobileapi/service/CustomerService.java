@@ -8,7 +8,7 @@ import com.example.mobileapi.exception.AppException;
 import java.util.List;
 
 public interface CustomerService {
-    int saveCustomer(CustomerRequestDTO request);
+    int saveCustomer(CustomerRequestDTO request) throws AppException;
 
 
     void deleteCustomer(int customerId);

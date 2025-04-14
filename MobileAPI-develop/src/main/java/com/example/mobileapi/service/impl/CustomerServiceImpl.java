@@ -1,19 +1,24 @@
 package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.config.BCryptPasswordEncoder;
+import com.example.mobileapi.dto.request.CartRequestDTO;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
+import com.example.mobileapi.event.CustomerCreatedEvent;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.CustomerMapper;
 import com.example.mobileapi.model.Customer;
 import com.example.mobileapi.repository.CustomerRepository;
+import com.example.mobileapi.service.CartService;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.EmailService;
 import com.example.mobileapi.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,9 +39,15 @@ public class CustomerServiceImpl implements CustomerService {
     JwtUtil jwtUtil;
     CustomerMapper customerMapper;
     Random random = new Random();
+    ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    public int saveCustomer(CustomerRequestDTO request) {
+    public int saveCustomer(CustomerRequestDTO request) throws AppException {
+        if (checkUsername(request.getUsername())) {
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        } else if (checkEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
         Customer customer = Customer.builder()
                 .fullname(request.getFullname())
                 .username(request.getUsername())
@@ -44,7 +55,9 @@ public class CustomerServiceImpl implements CustomerService {
                 .email(request.getEmail())
                 .phone(request.getPhone())
                 .build();
-        return customerRepository.save(customer).getId();
+        Integer customerId = customerRepository.save(customer).getId();
+        applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, customerId));
+        return customerId;
     }
 
 
@@ -77,7 +90,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public boolean checkEmail(String email) {
-        return customerRepository.existsByEmail(email).isPresent();
+        return customerRepository.existsByEmail(email);
     }
 
 

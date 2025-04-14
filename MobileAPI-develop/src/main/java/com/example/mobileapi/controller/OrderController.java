@@ -2,10 +2,8 @@ package com.example.mobileapi.controller;
 
 import com.example.mobileapi.common.OrderMethod;
 import com.example.mobileapi.common.OrderStatus;
-import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
-import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,6 +48,7 @@ public class OrderController {
     @Operation(summary = "Lấy danh sách đơn hàng theo trạng thái và ID khách hàng")
     @GetMapping("/client/{status}&&{customerId}")
     public ApiResponse<List<OrderResponseDTO>> getOrderByStatusAndCustomerId(@PathVariable String status, @PathVariable int customerId) {
+
         return ApiResponse.<List<OrderResponseDTO>>builder()
                 .data(orderService.getOrdersByStatusAndCustomerId(status, customerId))
                 .build();
