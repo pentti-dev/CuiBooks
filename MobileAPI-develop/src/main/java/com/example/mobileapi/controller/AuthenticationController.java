@@ -63,15 +63,7 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ApiResponse<Void> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
-        if (customerService.checkUsername(customer.getUsername())) {
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
-        } else if (customerService.checkEmail(customer.getEmail())) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
-        }
-        int userId = customerService.saveCustomer(customer);
-        CartRequestDTO cartRequestDTO = new CartRequestDTO();
-        cartRequestDTO.setCustomerId(userId);
-        cartService.saveCart(cartRequestDTO);
+        customerService.saveCustomer(customer);
         return ApiResponse.success("Đăng ký tài khoản thành công");
     }
 
