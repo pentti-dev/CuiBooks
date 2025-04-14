@@ -1,8 +1,10 @@
 package com.example.mobileapi.exception;
 
 import com.example.mobileapi.dto.response.ApiResponse;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailParseException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,6 +54,30 @@ public class GlobalExceptionHandler {
                                 .build());
 
 
+    }
+
+    @ExceptionHandler(value = MailParseException.class)
+    ResponseEntity<ApiResponse<Void>> handlingMailParseException(MailParseException e) {
+        ErrorCode errorCode = ErrorCode.ERROR_DURING_SEND_EMAIL;
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(
+                        ApiResponse.<Void>builder()
+                                .message(errorCode.getMessage())
+                                .code(errorCode.getCode())
+                                .build());
+    }
+
+    @ExceptionHandler(value = MessagingException.class)
+    ResponseEntity<ApiResponse<Void>> handlingMessagingException(MessagingException e) {
+        ErrorCode errorCode = ErrorCode.ERROR_DURING_SEND_EMAIL;
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(
+                        ApiResponse.<Void>builder()
+                                .message(errorCode.getMessage())
+                                .code(errorCode.getCode())
+                                .build());
     }
 
     @ExceptionHandler(value = RuntimeException.class)
