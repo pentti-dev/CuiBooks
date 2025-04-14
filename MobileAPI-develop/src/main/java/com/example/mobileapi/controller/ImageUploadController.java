@@ -3,6 +3,7 @@ package com.example.mobileapi.controller;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.UrlResponse;
 import com.example.mobileapi.service.ImageUploadService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ImageUploadController {
     ImageUploadService imageUploadService;
 
+    @Operation(summary = "Upload image to Cloudinary")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<UrlResponse> uploadImage(@RequestParam("file") MultipartFile file) {
 

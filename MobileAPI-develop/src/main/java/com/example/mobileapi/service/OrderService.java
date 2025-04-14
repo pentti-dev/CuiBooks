@@ -4,6 +4,7 @@ import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
 import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
+import com.example.mobileapi.exception.AppException;
 
 import java.util.List;
 
@@ -20,13 +21,13 @@ public interface OrderService {
 
     List<OrderResponseDTO> getAllOrders();
 
-    void editOrder(int id, OrderEditRequestDTO orderEditRequestDTO);
+    void editOrder(int id, OrderEditRequestDTO orderEditRequestDTO) throws AppException;
 
     List<MonthlyRevenueResponse> getMonthlyRevenue();
 
     List<OrderResponseDTO> getOrdersByStatus(String status);
 
-    void changeOrderStatus(int orderId, String status);
+    void changeOrderStatus(int orderId, String status) throws AppException;
 
     List<OrderResponseDTO> getOrdersByStatusAndCustomerId(String status, int customerId);
 }

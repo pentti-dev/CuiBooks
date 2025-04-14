@@ -6,14 +6,17 @@ import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
 import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.model.Order;
 import com.example.mobileapi.model.OrderDetail;
 import com.example.mobileapi.repository.OrderRepository;
 import com.example.mobileapi.repository.CustomerRepository;
-import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -21,19 +24,20 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class OrderServiceImpl implements OrderService {
-    private final OrderRepository orderRepository;
-    private final CustomerRepository customerRepository;
-    private final CustomerServiceImpl customerService;
-    private final ProductServiceImpl productService;
+    OrderRepository orderRepository;
+    CustomerRepository customerRepository;
+    CustomerServiceImpl customerService;
+    ProductServiceImpl productService;
 
     @Override
+    @PostAuthorize("returnObject.username ==authentication.name")
     public int saveOrder(OrderRequestDTO orderRequestDTO) {
         Order order = Order.builder()
                 .customer(customerRepository.findById(orderRequestDTO.getCustomerId()).orElse(null))
@@ -46,7 +50,7 @@ public class OrderServiceImpl implements OrderService {
                 .paymentMethod(orderRequestDTO.getPaymentMethod())
                 .orderDetails(orderRequestDTO.getOrderDetails().stream()
                         .map(this::convertToOrderDetailEntity)
-                        .collect(Collectors.toList()))
+                        .collect(Collectors.toCollection(ArrayList::new)))
                 .build();
 
         order.getOrderDetails().forEach(orderDetail -> orderDetail.setOrder(order));
@@ -79,7 +83,7 @@ public class OrderServiceImpl implements OrderService {
             order.setStatus(orderRequestDTO.getStatus());
             order.setOrderDetails(orderRequestDTO.getOrderDetails().stream()
                     .map(this::convertToOrderDetailEntity)
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toCollection(ArrayList::new)));
             order.getOrderDetails().forEach(orderDetail -> orderDetail.setOrder(order));
             orderRepository.save(order);
         }
@@ -93,25 +97,24 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderResponseDTO> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
+        log.warn("List of orders: {}", orders);
         if (orders.isEmpty()) {
             return Collections.emptyList(); // Return an empty list if no orders found
         }
 
         return orders.stream()
                 .map(this::convertToOrderResponseDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     @Override
-    public void editOrder(int id, OrderEditRequestDTO orderEditRequestDTO) {
-        Order order = orderRepository.findById(id).orElse(null);
-        if (order != null) {
-            order.setAddress(orderEditRequestDTO.getAddress());
-            order.setNumberPhone(orderEditRequestDTO.getPhone());
-            order.setStatus(orderEditRequestDTO.getStatus());
-            order.setReceiver(orderEditRequestDTO.getFullname());
-            orderRepository.save(order);
-        }
+    public void editOrder(int id, OrderEditRequestDTO orderEditRequestDTO) throws AppException {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        order.setAddress(orderEditRequestDTO.getAddress());
+        order.setNumberPhone(orderEditRequestDTO.getPhone());
+        order.setStatus(orderEditRequestDTO.getStatus());
+        order.setReceiver(orderEditRequestDTO.getFullname());
+        orderRepository.save(order);
     }
 
     @Override
@@ -137,16 +140,14 @@ public class OrderServiceImpl implements OrderService {
         }
         return orders.stream()
                 .map(this::convertToOrderResponseDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
 
     @Override
-    public void changeOrderStatus(int orderId, String status) {
-        Order order = orderRepository.findById(orderId).orElse(null);
-        if (order != null) {
-            order.setStatus(status);
-        }
+    public void changeOrderStatus(int orderId, String status) throws AppException {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        order.setStatus(status);
         orderRepository.save(order);
     }
 
@@ -158,7 +159,7 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderResponseDTO.stream()
                 .map(this::convertToOrderResponseDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
 
@@ -170,7 +171,7 @@ public class OrderServiceImpl implements OrderService {
 
         return orders.stream()
                 .map(this::convertToOrderResponseDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private Order getOrderById(int orderId) {
@@ -180,7 +181,7 @@ public class OrderServiceImpl implements OrderService {
     private OrderResponseDTO convertToOrderResponseDTO(Order order) {
         List<OrderDetailResponseDTO> orderDetailDTOs = order.getOrderDetails().stream()
                 .map(this::convertToOrderDetailResponseDTO)
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(ArrayList::new));
 
         return OrderResponseDTO.builder()
                 .id(order.getId())
