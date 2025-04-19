@@ -1,10 +1,10 @@
 package com.example.mobileapi.dto.request;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-@Getter
+@Data
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ProductRequestDTO {
@@ -12,6 +12,14 @@ public class ProductRequestDTO {
     String img;
     int price;
     String detail;
-    String categoryName;
-
+    String supplier;
+    String author;
+    Integer publishYear;
+    String publisher;
+    String language;
+    Byte weight;
+    String size;
+    Integer pageNumber;
+    String form;
+    Integer categoryId;
 }

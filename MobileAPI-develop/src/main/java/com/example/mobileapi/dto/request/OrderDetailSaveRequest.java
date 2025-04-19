@@ -1,10 +1,14 @@
 package com.example.mobileapi.dto.request;
 
-import lombok.Data;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDetailSaveRequest {
-    private Integer productId;
-    private Integer orderId;
-    private Integer quantity;
+    Integer productId;
+    Integer orderId;
+    Integer quantity;
 }

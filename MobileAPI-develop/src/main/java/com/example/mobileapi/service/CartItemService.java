@@ -2,11 +2,12 @@ package com.example.mobileapi.service;
 
 import com.example.mobileapi.dto.request.CartItemRequestDTO;
 import com.example.mobileapi.dto.response.CartItemResponseDTO;
+import com.example.mobileapi.exception.AppException;
 
 public interface CartItemService {
     Integer saveCartItem(CartItemRequestDTO cartItem);
 
-    CartItemResponseDTO getCartItem(int cartItemId);
+    CartItemResponseDTO getCartItem(int cartItemId) throws AppException;
 
     void deleteCartItem(int cartItemId);
 

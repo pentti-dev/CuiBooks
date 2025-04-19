@@ -1,17 +1,15 @@
 package com.example.mobileapi.config;
 
 
-import com.example.mobileapi.model.Customer;
+import com.example.mobileapi.entity.Customer;
 import com.example.mobileapi.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.stereotype.Component;
 
 @Configuration
 @RequiredArgsConstructor

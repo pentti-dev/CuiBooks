@@ -26,9 +26,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 
 import java.security.interfaces.RSAPublicKey;
 import java.util.List;
@@ -48,9 +45,8 @@ public class SecurityConfig {
             "/swagger-resources", "/swagger-resources/**",
             "/configuration/ui", "/configuration/security",
             "/swagger-ui/**", "/webjars/**", "/swagger-ui.html",
-            "/api/auth/**", "/api/customer/introspect", "/api/test/**",
-            "/api/customer/initPasswordReset/**","/api/customer/resetPassword/**",
-            "/authenticate", "/graphiql", "/graphql", "/api/graphql/product"
+            "/api/auth/**", "/api/customer/introspect", "/api/test/**"
+            , "/graphiql", "/graphql", "/api/graphql/product"
     };
 
     @Bean

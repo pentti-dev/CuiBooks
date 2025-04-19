@@ -3,10 +3,11 @@ package com.example.mobileapi.service.impl;
 import com.example.mobileapi.config.BCryptPasswordEncoder;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
+import com.example.mobileapi.event.CustomerCreatedEvent;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.CustomerMapper;
-import com.example.mobileapi.model.Customer;
+import com.example.mobileapi.entity.Customer;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.EmailService;
@@ -14,6 +15,7 @@ import com.example.mobileapi.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,19 +36,32 @@ public class CustomerServiceImpl implements CustomerService {
     JwtUtil jwtUtil;
     CustomerMapper customerMapper;
     Random random = new Random();
+    ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    public int saveCustomer(CustomerRequestDTO request) {
-        Customer customer = Customer.builder()
-                .fullname(request.getFullname())
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword())) // Sử dụng passwordEncoder
-                .email(request.getEmail())
-                .phone(request.getPhone())
-                .build();
-        return customerRepository.save(customer).getId();
+    @Transactional
+    public CustomerResponseDTO saveCustomer(CustomerRequestDTO request) throws AppException {
+        if (checkUsername(request.getUsername())) {
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        } else if (checkEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+        // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
+        request.setPassword(passwordEncoder.encode(request.getPassword())); // Sử dụng passwordEncoder
+
+        Customer customer = customerRepository.save(customerMapper.toCustomer(request));
+        applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, customer.getId()));
+        return customerMapper.toCustomerResponse(customer);
     }
 
+    private void checkIfUserExists(String username, String email) throws AppException {
+        if (checkUsername(username)) {
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        }
+        if (checkEmail(email)) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+    }
 
     @Override
     public void deleteCustomer(int customerId) {
@@ -82,14 +97,14 @@ public class CustomerServiceImpl implements CustomerService {
 
 
     @Override
-    public CustomerResponseDTO updateCustomerById(int customerId, CustomerRequestDTO request) throws AppException {
-
+    @Transactional
+    public CustomerResponseDTO updateCustomer(int customerId, CustomerRequestDTO request) throws AppException {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        customer.setFullname(request.getFullname());
-        customer.setEmail(request.getEmail());
-        customer.setPhone(request.getPhone());
-        customerRepository.save(customer);
+
+        // Cập nhật thông tin từ DTO
+        customerMapper.updateCustomerFromDto(request, customer);
+
         return customerMapper.toCustomerResponse(customer);
     }
 
@@ -177,5 +192,9 @@ public class CustomerServiceImpl implements CustomerService {
         } catch (AppException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public Integer getCustomerIdByUsername(String username) {
+        return customerRepository.findIdByUsername(username);
     }
 }

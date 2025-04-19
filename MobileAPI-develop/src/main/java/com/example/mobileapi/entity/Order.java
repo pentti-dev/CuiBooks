@@ -1,11 +1,14 @@
-package com.example.mobileapi.model;
+package com.example.mobileapi.entity;
 
+import com.example.mobileapi.entity.enums.OrderMethod;
+import com.example.mobileapi.entity.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -16,34 +19,35 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
-    private Integer id;
+    Integer id;
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "customer_id", nullable = false)
-    private Customer customer;
+    Customer customer;
 
-    private LocalDateTime orderDate;
+    LocalDateTime orderDate;
 
     @Column(name = "total_amount", nullable = false)
-    private Integer totalAmount; // Đảm bảo rằng tên trường này trùng khớp với tên trong cơ sở dữ liệu
+    Integer totalAmount; // Đảm bảo rằng tên trường này trùng khớp với tên trong cơ sở dữ liệu
 
-    private String address;
+    String address;
 
-    private String numberPhone;
-
-    private String paymentMethod;
-
-    private String status;
+    String numberPhone;
+    @Enumerated(EnumType.STRING)
+    OrderMethod paymentMethod;
+    @Enumerated(EnumType.STRING)
+    OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
-    private List<OrderDetail> orderDetails = new ArrayList<>();
+    List<OrderDetail> orderDetails = new ArrayList<>();
 
-    private String receiver;
+    String receiver;
 
     @Override
     public boolean equals(Object o) {

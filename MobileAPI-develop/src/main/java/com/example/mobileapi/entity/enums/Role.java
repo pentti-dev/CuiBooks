@@ -1,4 +1,4 @@
-package com.example.mobileapi.model.enums;
+package com.example.mobileapi.entity.enums;
 
 public enum Role {
     ADMIN(true),

@@ -1,7 +1,7 @@
 package com.example.mobileapi.util;
 
-import com.example.mobileapi.model.Customer;
-import com.example.mobileapi.model.enums.Role;
+import com.example.mobileapi.entity.Customer;
+import com.example.mobileapi.entity.enums.Role;
 import com.example.mobileapi.repository.InvalidateTokenRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
@@ -10,11 +10,9 @@ import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.nio.file.Files;

@@ -2,7 +2,8 @@ package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.dto.request.CartItemRequestDTO;
 import com.example.mobileapi.dto.response.CartItemResponseDTO;
-import com.example.mobileapi.model.CartItem;
+import com.example.mobileapi.entity.CartItem;
+import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.repository.CartItemRepository;
 import com.example.mobileapi.service.CartItemService;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +46,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public CartItemResponseDTO getCartItem(int cartItemId) {
+    public CartItemResponseDTO getCartItem(int cartItemId) throws AppException {
         CartItem cartItem = getByCartId(cartItemId);
         return CartItemResponseDTO.builder()
                 .id(cartItem.getId())
@@ -89,10 +90,16 @@ public class CartItemServiceImpl implements CartItemService {
 
     public List<CartItemResponseDTO> getCartItemsByCartId(int cartId) {
         List<CartItem> cartItems = cartItemRepository.findByCartId(cartId);
-        return cartItems.stream().map(cartItem -> CartItemResponseDTO.builder()
-                .id(cartItem.getId())
-                .product(productServiceImpl.getProductById(cartItem.getProduct().getId()))
-                .quantity(cartItem.getQuantity())
-                .build()).collect(Collectors.toList());
+        return cartItems.stream().map(cartItem -> {
+            try {
+                return CartItemResponseDTO.builder()
+                        .id(cartItem.getId())
+                        .product(productServiceImpl.getProductById(cartItem.getProduct().getId()))
+                        .quantity(cartItem.getQuantity())
+                        .build();
+            } catch (AppException e) {
+                throw new RuntimeException(e);
+            }
+        }).collect(Collectors.toList());
     }
 }

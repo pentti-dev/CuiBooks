@@ -1,4 +1,4 @@
-package com.example.mobileapi.model;
+package com.example.mobileapi.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -44,7 +44,7 @@ public class Customer {
     @Column(name = "reset_code")
     String resetCode;
 
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Order> orders = new ArrayList<>();
 
     @Override

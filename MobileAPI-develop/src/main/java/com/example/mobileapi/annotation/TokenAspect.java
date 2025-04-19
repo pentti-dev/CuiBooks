@@ -1,6 +1,5 @@
-package com.example.mobileapi.aspect;
+package com.example.mobileapi.annotation;
 
-import com.example.mobileapi.annotation.GetToken;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.ProceedingJoinPoint;

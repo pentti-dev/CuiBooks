@@ -1,7 +1,6 @@
 package com.example.mobileapi.controller;
 
-import com.example.mobileapi.common.OrderStatus;
-import com.example.mobileapi.dto.request.CartRequestDTO;
+import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
@@ -9,10 +8,9 @@ import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.exception.AppException;
-import com.example.mobileapi.exception.ErrorCode;
-import com.example.mobileapi.service.CartService;
-import com.example.mobileapi.service.CustomerService;
+import com.example.mobileapi.service.AdminService;
 import com.example.mobileapi.service.OrderService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,58 +30,54 @@ import java.util.List;
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
-    CustomerService customerService;
-    CartService cartService;
+    AdminService adminService;
 
+    @Operation(summary = "Lấy số lượng người dùng")
     @GetMapping("/customers")
     public ApiResponse<List<CustomerResponseDTO>> getCustomers() {
 
         return ApiResponse.<List<CustomerResponseDTO>>builder()
-                .data(customerService.getAllCustomers())
+                .data(adminService.getAllCustomers())
                 .build();
     }
 
+    @Operation(summary = "Lấy thông tin người dùng theo ID")
     @GetMapping("/customer/{customerId}")
     public ApiResponse<CustomerResponseDTO> getCustomer(@PathVariable int customerId) {
         return ApiResponse.<CustomerResponseDTO>builder()
-                .data(customerService.getCustomer(customerId))
+                .data(adminService.getCustomerById(customerId))
                 .build();
     }
 
+    @Operation(summary = "Thêm người dùng")
     @PostMapping("/customer")
-    public ApiResponse<Void> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
-        if (customerService.checkUsername(customer.getUsername())) {
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
-        } else if (customerService.checkEmail(customer.getEmail())) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
-        }
-        int userId = customerService.saveCustomer(customer);
-        CartRequestDTO cartRequestDTO = new CartRequestDTO();
-        cartRequestDTO.setCustomerId(userId);
-        cartService.saveCart(cartRequestDTO);
-        return ApiResponse.success("Thêm người dùng thành công");
+    public ApiResponse<CustomerResponseDTO> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+
+        adminService.addCustomer(customer);
+        return ApiResponse.<CustomerResponseDTO>builder()
+                .data(adminService.addCustomer(customer))
+                .build();
     }
 
+    @Operation(summary = "Cập nhật thông tin người dùng")
     @PutMapping("/customer/{customerId}")
-    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable int customerId, @RequestBody CustomerRequestDTO customer) {
-        try {
-            return ApiResponse.<CustomerResponseDTO>builder()
-                    .data(customerService.updateCustomerById(customerId, customer))
-                    .build();
-        } catch (AppException e) {
-            throw new RuntimeException(e);
-        }
+    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable int customerId, @RequestBody CustomerRequestDTO customer) throws AppException {
+        return ApiResponse.<CustomerResponseDTO>builder()
+                .data(adminService.updateCustomer(customerId, customer))
+                .build();
     }
 
+    @Operation(summary = "Xóa người dùng")
     @DeleteMapping("/customer/{customerId}")
     public ApiResponse<Void> deleteCustomer(@PathVariable int customerId) {
-        customerService.deleteCustomer(customerId);
+        adminService.deleteCustomer(customerId);
         return ApiResponse.success("Xóa người dùng thành công");
     }
 
     OrderService orderService;
 
     @GetMapping("/order/revenue")
+    @Operation(summary = "Lấy doanh thu theo tháng")
     public ApiResponse<List<MonthlyRevenueResponse>> getOrderRevenue() {
 
         return ApiResponse.<List<MonthlyRevenueResponse>>builder()
@@ -92,11 +86,13 @@ public class AdminController {
     }
 
     @DeleteMapping("/order/{orderId}")
+    @Operation(summary = "Hủy đơn hàng")
     public ApiResponse<Void> deleteOrder(@PathVariable("orderId") int orderId) {
         orderService.deleteOrder(orderId);
         return ApiResponse.success("Hủy đơn hàng thành công");
     }
 
+    @Operation(summary = "Lấy danh sách đơn hàng")
     @GetMapping("/order/list")
     public ApiResponse<List<OrderResponseDTO>> getAllOrders() {
 
@@ -105,11 +101,15 @@ public class AdminController {
                 .build();
 
     }
+
+    @Operation(summary = "Lấy đơn hàng theo ID")
     @PutMapping("/order/{orderId}")
-    public ApiResponse<Void> editOrder(@RequestBody OrderEditRequestDTO orderRequestDTO, @PathVariable("orderId") int orderId) {
+    public ApiResponse<Void> editOrder(@RequestBody OrderEditRequestDTO orderRequestDTO, @PathVariable("orderId") int orderId) throws AppException {
         orderService.editOrder(orderId, orderRequestDTO);
         return ApiResponse.success("Cập nhật đơn hàng thành công");
     }
+
+    @Operation(summary = "Lấy danh sách đơn hàng theo trạng thái")
     @GetMapping("/{status}")
     public ApiResponse<List<OrderResponseDTO>> getOrderByStatus(@PathVariable OrderStatus status) {
         return ApiResponse.<List<OrderResponseDTO>>builder()
@@ -117,11 +117,13 @@ public class AdminController {
                 .build();
 
     }
+
+    @Operation(summary = "Cập nhật trạng thái đơn hàng")
     @PutMapping("/status/{status}&&{orderId}")
     public ApiResponse<Void> changeOrderStatus(@PathVariable("status") OrderStatus status,
                                                @PathVariable("orderId") int orderId) {
         try {
-            orderService.changeOrderStatus(orderId, status.getValue());
+            orderService.changeOrderStatus(orderId, status);
             return ApiResponse.success("Cập nhật trạng thái đơn hàng thành công");
         } catch (Exception e) {
             return ApiResponse.<Void>builder()

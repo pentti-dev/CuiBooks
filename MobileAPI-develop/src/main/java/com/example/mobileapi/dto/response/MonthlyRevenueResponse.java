@@ -1,17 +1,14 @@
 package com.example.mobileapi.dto.response;
 
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@Getter
 public class MonthlyRevenueResponse {
     int month;
     long revenue;
 
-    public MonthlyRevenueResponse(int month, long revenue) {
-        this.month = month;
-        this.revenue = revenue;
-    }
+
 }

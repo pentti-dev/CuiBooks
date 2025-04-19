@@ -48,6 +48,8 @@ public enum ErrorCode {
     WRONG_OLD_PASSWORD(HttpStatus.BAD_REQUEST, 4117, "Mật khẩu cũ không chính xác."),
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, 4118, "Mật khẩu không chính xác."),
 
+    ERROR_DURING_SEND_EMAIL(HttpStatus.INTERNAL_SERVER_ERROR, 4119, "Lỗi trong quá trình gửi email."),
+
     /**
      * ========== LỖI XÁC THỰC ==========
      */
@@ -77,6 +79,13 @@ public enum ErrorCode {
 
     DUPLICATE_ENTRY(HttpStatus.CONFLICT, 4500, "Dữ liệu đã tồn tại."),
     INVALID_CART(HttpStatus.BAD_REQUEST, 4501, "Giỏ hàng không hợp lệ."),
+    INVALID_ORDER(HttpStatus.BAD_REQUEST, 4502, "Đơn hàng không hợp lệ."),
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, 4503, "Đơn hàng không tồn tại."),
+    ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, 4504, "Địa chỉ không tồn tại."),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 4505, "Danh mục không tồn tại."),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, 4506, "Sản phẩm không tồn tại."),
+    ORDER_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND, 4507, "Chi tiết đơn hàng không tồn tại."),
+    CATEGORY_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, 4508, "Không tìm thấy danh mục với ID đã cho."),
 
     /**
      * ========== LỖI HỆ THỐNG ==========

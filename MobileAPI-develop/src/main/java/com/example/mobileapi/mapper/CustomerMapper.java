@@ -2,11 +2,12 @@ package com.example.mobileapi.mapper;
 
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
-import com.example.mobileapi.model.Cart;
-import com.example.mobileapi.model.Customer;
-import com.example.mobileapi.model.enums.Role;
+import com.example.mobileapi.entity.Cart;
+import com.example.mobileapi.entity.Customer;
+import com.example.mobileapi.entity.enums.Role;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
 @Mapper(componentModel = "spring")
@@ -27,4 +28,6 @@ public interface CustomerMapper {
     static Integer cartToCartId(Cart cart) {
         return (cart != null) ? cart.getId() : null;
     }
+
+    void updateCustomerFromDto(CustomerRequestDTO dto, @MappingTarget Customer entity);
 }

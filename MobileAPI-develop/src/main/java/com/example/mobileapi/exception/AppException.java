@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Setter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
-public class AppException extends Exception {
+public class AppException extends RuntimeException {
     ErrorCode errorCode;
 
     public AppException(ErrorCode errorCode) {

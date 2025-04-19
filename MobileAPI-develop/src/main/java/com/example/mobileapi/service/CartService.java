@@ -7,9 +7,9 @@ import com.example.mobileapi.exception.AppException;
 public interface CartService {
     Integer saveCart(CartRequestDTO cartRequestDTO);
 
-    CartResponseDTO getCart(int cartId) throws AppException;
+    CartResponseDTO getCartById(int cartId) throws AppException;
 
-    CartResponseDTO getCartByCustomerId(int id);
+    CartResponseDTO getCartByCustomerId(int id) throws AppException;
 
     CartResponseDTO getCartByUsername(String username);
 

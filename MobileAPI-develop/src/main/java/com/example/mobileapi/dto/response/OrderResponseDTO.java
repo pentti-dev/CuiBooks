@@ -1,24 +1,24 @@
 package com.example.mobileapi.dto.response;
 
+import com.example.mobileapi.entity.enums.OrderStatus;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
-@Data
 @Builder
 @Getter
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class OrderResponseDTO {
-    private Integer id;
-    private CustomerResponseDTO customerDTO;
-    private LocalDateTime orderDate;
-    private Integer totalAmount;
-    private String address;
-    private String numberPhone;
-    private String status;
-    private String receiver;
-    private List<OrderDetailResponseDTO> orderDetails;
+    Integer id;
+    CustomerResponseDTO customerDTO;
+    LocalDateTime orderDate;
+    Integer totalAmount;
+    String address;
+    String numberPhone;
+    OrderStatus status;
+    String receiver;
+    List<OrderDetailResponseDTO> orderDetails;
 }

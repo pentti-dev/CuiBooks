@@ -1,6 +1,6 @@
 package com.example.mobileapi.repository;
 
-import com.example.mobileapi.model.Customer;
+import com.example.mobileapi.entity.Customer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -23,4 +23,7 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     int getQuantityByCustomerId(@Param("customerId") int customerId);
 
     boolean existsByEmail(String email);
+
+    @Query("SELECT u.id FROM Customer u WHERE u.username = :username")
+    Integer findIdByUsername(String username);
 }

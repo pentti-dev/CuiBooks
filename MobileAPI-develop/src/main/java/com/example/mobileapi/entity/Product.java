@@ -1,5 +1,7 @@
-package com.example.mobileapi.model;
+package com.example.mobileapi.entity;
 
+import com.example.mobileapi.entity.enums.BookForm;
+import com.example.mobileapi.entity.enums.Language;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,11 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Table(name = "products")
 @Entity
@@ -54,7 +53,8 @@ public class Product {
     String publisher;//nhà xuất bản
 
     @Column(nullable = false)
-    String language;//ngôn ngữ
+    @Enumerated(EnumType.STRING)
+    Language language;//ngôn ngữ
 
     @Column(nullable = false)
     Byte weight;//trọng lượng
@@ -66,7 +66,8 @@ public class Product {
     Integer pageNumber;//số trang
 
     @Column(nullable = false)
-    String form;//hình thức
+    @Enumerated(EnumType.STRING)
+    BookForm form;//hình thức
 
     @ManyToOne
     @JsonBackReference

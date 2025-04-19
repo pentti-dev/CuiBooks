@@ -1,11 +1,16 @@
 package com.example.mobileapi.dto.request;
 
-import lombok.Data;
+import com.example.mobileapi.entity.enums.OrderStatus;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class OrderEditRequestDTO {
-    private String fullname;
-    private String address;
-    private String status;
-    private String phone;
+    String fullname;
+    String address;
+    OrderStatus status;
+    String phone;
 }

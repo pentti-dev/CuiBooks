@@ -1,37 +1,47 @@
 package com.example.mobileapi.service.impl;
 
-import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
 import com.example.mobileapi.dto.request.OrderDetailSaveRequest;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
-import com.example.mobileapi.model.Order;
-import com.example.mobileapi.model.OrderDetail;
-import com.example.mobileapi.model.Product;
+import com.example.mobileapi.entity.Order;
+import com.example.mobileapi.entity.OrderDetail;
+import com.example.mobileapi.entity.Product;
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
+import com.example.mobileapi.mapper.OrderDetailMapper;
+import com.example.mobileapi.mapper.ProductMapper;
 import com.example.mobileapi.repository.OrderDetailRepository;
 import com.example.mobileapi.repository.OrderRepository;
 import com.example.mobileapi.repository.ProductRepository;
 import com.example.mobileapi.service.OrderDetailService;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Or;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderDetailServiceImpl implements OrderDetailService {
-    private final OrderDetailRepository orderDetailRepository;
-    private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
+    OrderDetailRepository orderDetailRepository;
+    OrderRepository orderRepository;
+    ProductRepository productRepository;
+    OrderDetailMapper orderDetailMapper;
+    ProductMapper productMapper;
 
 
     @Override
-    public OrderDetailResponseDTO saveOrderDetail(OrderDetailSaveRequest requestDTO) {
-        Order order = orderRepository.findById(requestDTO.getOrderId()).orElse(null);
-        Product product = productRepository.findById(requestDTO.getProductId()).orElse(null);
+    @Transactional
+    public OrderDetailResponseDTO saveOrderDetail(OrderDetailSaveRequest requestDTO) throws AppException {
+        Order order = orderRepository.findById(
+                requestDTO.getOrderId()).orElseThrow(
+                () -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        Product product = productRepository.findById(
+                requestDTO.getProductId()).orElseThrow(
+                () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
         orderDetailRepository.save(OrderDetail.builder()
                 .order(order)
                 .product(product)
@@ -40,36 +50,37 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         return OrderDetailResponseDTO.builder()
                 .orderId(order.getId())
-                .productResponseDTO(ProductResponseDTO.builder()
-                        .id(product.getId())
-                        .name(product.getName())
-                        .img(product.getImg())
-                        .categoryName(product.getCategory().getName())
-                        .price(product.getPrice())
-                        .build())
+                .productResponseDTO(productMapper.toProductResponseDTO(product))
                 .quantity(requestDTO.getQuantity())
                 .build();
     }
 
     @Override
-    public OrderDetailResponseDTO updateOrderDetail(int id, OrderDetailSaveRequest requestDTO) {
-        OrderDetail orderDetail = orderDetailRepository.findById(id).orElse(null);
-        Order order = orderRepository.findById(requestDTO.getOrderId()).orElse(null);
-        Product product = productRepository.findById(requestDTO.getProductId()).orElse(null);
+    @Transactional
+    public OrderDetailResponseDTO updateOrderDetail(int id, OrderDetailSaveRequest requestDTO) throws AppException {
+        OrderDetail orderDetail = orderDetailRepository.findById(id)
+                .orElseThrow(
+                        () -> new AppException(ErrorCode.ORDER_DETAIL_NOT_FOUND));
+
+        Order order = orderRepository.findById(
+                        requestDTO.getOrderId())
+                .orElseThrow(
+                        () -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        Product product = productRepository.findById(
+                        requestDTO.getProductId())
+
+                .orElseThrow(
+                        () -> new AppException(ErrorCode.PRODUCT_NOT_FOUND));
+
         orderDetail.setOrder(order);
         orderDetail.setProduct(product);
         orderDetail.setQuantity(requestDTO.getQuantity());
-        return OrderDetailResponseDTO.builder()
-                .orderId(order.getId())
-                .productResponseDTO(ProductResponseDTO.builder()
-                        .id(product.getId())
-                        .name(product.getName())
-                        .img(product.getImg())
-                        .categoryName(product.getCategory().getName())
-                        .price(product.getPrice())
-                        .build())                .quantity(requestDTO.getQuantity())
-                .build();
+
+        OrderDetail saved = orderDetailRepository.save(orderDetail);
+
+        return orderDetailMapper.toOrderDetailResponseDTO(saved);
     }
+
 
     @Override
     public void deleteOrderDetail(int id) {
@@ -79,17 +90,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     @Override
     public OrderDetailResponseDTO findOrderDetailById(int id) {
         OrderDetail orderDetail = orderDetailRepository.findById(id).orElse(null);
-        Product product = productRepository.findById(orderDetail.getProduct().getId()).orElse(null);
-        return OrderDetailResponseDTO.builder()
-                .productResponseDTO(ProductResponseDTO.builder()
-                        .id(product.getId())
-                        .name(product.getName())
-                        .img(product.getImg())
-                        .categoryName(product.getCategory().getName())
-                        .price(product.getPrice())
-                        .build())                .orderId(orderDetail.getOrder().getId())
-                .quantity(orderDetail.getQuantity())
-                .build();
+        return orderDetailMapper.toOrderDetailResponseDTO(orderDetail);
     }
 
     @Override
@@ -97,34 +98,13 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
         List<OrderDetail> orderDetails = orderDetailRepository.findOrderByOrderId(orderId);
 
-        return orderDetails.stream()
-                .map(orderDetail -> OrderDetailResponseDTO.builder()
-                        .orderId(orderDetail.getOrder().getId())
-                        .productResponseDTO(ProductResponseDTO.builder()
-                                .id(orderDetail.getProduct().getId())
-                                .price(orderDetail.getProduct().getPrice())
-                                .categoryName(orderDetail.getProduct().getCategory().getName())
-                                .name(orderDetail.getProduct().getName())
-                                .img(orderDetail.getProduct().getImg())
-                                .build())
-                        .quantity(orderDetail.getQuantity())
-                        .build())
-                .collect(Collectors.toList());
+        return orderDetailMapper.toOrderDetailResponseDTOList(orderDetails);
     }
 
 
     @Override
     public OrderDetailResponseDTO findOrderDetailByProductId(int productId) {
         OrderDetail orderDetail = orderDetailRepository.findOrderByProductId(productId);
-        return OrderDetailResponseDTO.builder()
-                .orderId(orderDetail.getOrder().getId())
-                .productResponseDTO(ProductResponseDTO.builder()
-                        .id(orderDetail.getProduct().getId())
-                        .price(orderDetail.getProduct().getPrice())
-                        .categoryName(orderDetail.getProduct().getCategory().getName())
-                        .name(orderDetail.getProduct().getName())
-                        .img(orderDetail.getProduct().getImg())
-                        .build())                .quantity(orderDetail.getQuantity())
-                .build();
+        return orderDetailMapper.toOrderDetailResponseDTO(orderDetail);
     }
 }
