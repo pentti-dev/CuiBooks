@@ -1,6 +1,6 @@
 package com.example.mobileapi.dto.response;
 
-import com.example.mobileapi.model.enums.Role;
+import com.example.mobileapi.entity.enums.Role;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.*;

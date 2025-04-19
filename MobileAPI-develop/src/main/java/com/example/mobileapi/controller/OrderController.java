@@ -1,10 +1,10 @@
 package com.example.mobileapi.controller;
 
-import com.example.mobileapi.common.OrderMethod;
-import com.example.mobileapi.common.OrderStatus;
+import com.example.mobileapi.entity.enums.OrderMethod;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
+import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,9 +27,9 @@ public class OrderController {
 
     @Operation(summary = "Lưu đơn hàng")
     @PostMapping
-    public ApiResponse<Integer> saveOrder(@RequestParam OrderMethod method, @RequestParam OrderStatus status, @RequestBody OrderRequestDTO orderRequestDTO) {
-        orderRequestDTO.setPaymentMethod(method.getValue());
-        orderRequestDTO.setStatus(status.getValue());
+    public ApiResponse<Integer> createOrder(@RequestParam OrderMethod method,
+                                            @RequestBody OrderRequestDTO orderRequestDTO) throws AppException {
+        orderRequestDTO.setPaymentMethod(method);
 
         return ApiResponse.<Integer>builder()
                 .code(HttpStatus.OK.value())

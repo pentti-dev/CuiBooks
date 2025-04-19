@@ -1,6 +1,6 @@
 package com.example.mobileapi.controller;
 
-import com.example.mobileapi.common.OrderStatus;
+import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
@@ -51,17 +51,19 @@ public class AdminController {
 
     @Operation(summary = "Thêm người dùng")
     @PostMapping("/customer")
-    public ApiResponse<Void> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+    public ApiResponse<CustomerResponseDTO> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
 
         adminService.addCustomer(customer);
-        return ApiResponse.success("Thêm người dùng thành công");
+        return ApiResponse.<CustomerResponseDTO>builder()
+                .data(adminService.addCustomer(customer))
+                .build();
     }
 
     @Operation(summary = "Cập nhật thông tin người dùng")
     @PutMapping("/customer/{customerId}")
     public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable int customerId, @RequestBody CustomerRequestDTO customer) throws AppException {
         return ApiResponse.<CustomerResponseDTO>builder()
-                .data(adminService.updateCustomerWithID(customerId, customer))
+                .data(adminService.updateCustomer(customerId, customer))
                 .build();
     }
 
@@ -121,7 +123,7 @@ public class AdminController {
     public ApiResponse<Void> changeOrderStatus(@PathVariable("status") OrderStatus status,
                                                @PathVariable("orderId") int orderId) {
         try {
-            orderService.changeOrderStatus(orderId, status.getValue());
+            orderService.changeOrderStatus(orderId, status);
             return ApiResponse.success("Cập nhật trạng thái đơn hàng thành công");
         } catch (Exception e) {
             return ApiResponse.<Void>builder()

@@ -1,6 +1,6 @@
 package com.example.mobileapi.service;
 
-import com.example.mobileapi.dto.request.CartRequestDTO;
+import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
@@ -15,9 +15,9 @@ public interface AdminService {
 
     CustomerResponseDTO getCustomerById(int customerId);
 
-    int addCustomer(CustomerRequestDTO customer) throws AppException;
+    CustomerResponseDTO addCustomer(CustomerRequestDTO customer) throws AppException;
 
-    CustomerResponseDTO updateCustomerWithID(int customerId, CustomerRequestDTO customer) throws AppException;
+    CustomerResponseDTO updateCustomer(int customerId, CustomerRequestDTO customer) throws AppException;
 
     void deleteCustomer(int customerId);
 
@@ -29,7 +29,7 @@ public interface AdminService {
 
     List<OrderResponseDTO> getOrdersByStatus(String status);
 
-    void changeOrderStatus(int orderId, String status) throws AppException;
+    void changeOrderStatus(int orderId, OrderStatus status) throws AppException;
 
     List<MonthlyRevenueResponse> getMonthlyRevenue();
 

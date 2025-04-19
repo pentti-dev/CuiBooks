@@ -1,18 +1,18 @@
 package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.dto.request.CartRequestDTO;
-import com.example.mobileapi.dto.response.CartItemResponseDTO;
 import com.example.mobileapi.dto.response.CartResponseDTO;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
-import com.example.mobileapi.model.Cart;
-import com.example.mobileapi.model.CartItem;
+import com.example.mobileapi.entity.Cart;
+import com.example.mobileapi.entity.CartItem;
+import com.example.mobileapi.mapper.CartItemMapper;
 import com.example.mobileapi.repository.CartRepository;
 import com.example.mobileapi.service.CartService;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,7 +24,7 @@ import java.util.List;
 public class CartServiceImpl implements CartService {
     CartRepository cartRepository;
     CustomerServiceImpl customerServiceImpl;
-    ProductServiceImpl productServiceImpl;
+    CartItemMapper cartItemMapper;
 
     @Override
     public Integer saveCart(CartRequestDTO cartRequestDTO) {
@@ -35,20 +35,16 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartResponseDTO getCart(int cartId) throws AppException {
+    public CartResponseDTO getCartById(int cartId) throws AppException {
         Cart cart = getByCartId(cartId);
         if (cart == null) {
             throw new AppException(ErrorCode.INVALID_CART);
         }
-
-        List<CartItemResponseDTO> cartItemResponseDTOs = cart.getCartItems().stream()
-                .map(this::convertToCartItemResponseDTO)
-                .toList();
-
+        List<CartItem> cartItems = cart.getCartItems();
         return CartResponseDTO.builder()
-                .id(cart.getId())
+                .id(cartId)
                 .customerId(cart.getCustomer().getId())
-                .cartItems(cartItemResponseDTOs)
+                .cartItems(cartItemMapper.toCartItemResponseDTOList(cartItems))
                 .build();
     }
 
@@ -56,29 +52,19 @@ public class CartServiceImpl implements CartService {
         return cartRepository.findById(cartId).orElse(null);
     }
 
-    private CartItemResponseDTO convertToCartItemResponseDTO(CartItem cartItem) {
-        return CartItemResponseDTO.builder()
-                .id(cartItem.getId())
-                .product(productServiceImpl.getProductById(cartItem.getProduct().getId()))
-                .quantity(cartItem.getQuantity())
-                .build();
-    }
 
     @Override
-    public CartResponseDTO getCartByCustomerId(int customerId) {
+    public CartResponseDTO getCartByCustomerId(int customerId) throws AppException {
         Cart cart = getByCustomerId(customerId);
         if (cart == null) {
-            return null; // Or throw an exception if preferred
+            throw new AppException(ErrorCode.INVALID_CART);
         }
 
-        List<CartItemResponseDTO> cartItemResponseDTOs = cart.getCartItems().stream()
-                .map(this::convertToCartItemResponseDTO)
-                .toList();
-
+        List<CartItem> cartItems = cart.getCartItems();
         return CartResponseDTO.builder()
                 .id(cart.getId())
                 .customerId(cart.getCustomer().getId())
-                .cartItems(cartItemResponseDTOs)
+                .cartItems(cartItemMapper.toCartItemResponseDTOList(cartItems))
                 .build();
     }
 
@@ -86,21 +72,18 @@ public class CartServiceImpl implements CartService {
      * @param username username khach hang
      * @return gio hang cua khach hang
      */
+    @SneakyThrows
     @Override
     public CartResponseDTO getCartByUsername(String username) {
         Cart cart = getByUsername(username);
         if (cart == null) {
-            return null; // Or throw an exception if preferred
+            throw new AppException(ErrorCode.INVALID_CART);
         }
-
-        List<CartItemResponseDTO> cartItemResponseDTOs = cart.getCartItems().stream()
-                .map(this::convertToCartItemResponseDTO)
-                .toList();
-
+        List<CartItem> cartItems = cart.getCartItems();
         return CartResponseDTO.builder()
                 .id(cart.getId())
                 .customerId(cart.getCustomer().getId())
-                .cartItems(cartItemResponseDTOs)
+                .cartItems(cartItemMapper.toCartItemResponseDTOList(cartItems))
                 .build();
     }
 

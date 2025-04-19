@@ -1,6 +1,6 @@
 package com.example.mobileapi.repository;
 
-import com.example.mobileapi.model.Address;
+import com.example.mobileapi.entity.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -2,7 +2,10 @@ package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.dto.request.CategoryRequestDTO;
 import com.example.mobileapi.dto.response.CategoryResponseDTO;
-import com.example.mobileapi.model.Category;
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
+import com.example.mobileapi.mapper.CategoryMapper;
+import com.example.mobileapi.entity.Category;
 import com.example.mobileapi.repository.CategoryRepository;
 import com.example.mobileapi.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -20,23 +23,24 @@ import java.util.List;
 public class CategoryServiceImpl implements CategoryService {
 
     CategoryRepository categoryRepository;
+    CategoryMapper categoryMapper;
 
     @Override
-    public int saveCategory(CategoryRequestDTO category) {
-        Category cate = Category.builder()
-                .name(category.getName())
-                .img(category.getImg())
-                .build();
-        categoryRepository.save(cate);
-        return cate.getId();
+    public CategoryResponseDTO saveCategory(CategoryRequestDTO dto) {
+        Category category = categoryMapper.toCategory(dto);
+        return categoryMapper.toCategoryResponseDTO(category);
     }
 
     @Override
-    public void updateCategory(int id, CategoryRequestDTO category) {
-        Category cate = getById(id);
-        cate.setName(category.getName());
-        cate.setImg(category.getImg());
-        categoryRepository.save(cate);
+    public CategoryResponseDTO updateCategory(int id, CategoryRequestDTO dto) throws AppException {
+        if (!categoryRepository.existsById(dto.getId())) {
+            throw new AppException(ErrorCode.CATEGORY_NOT_FOUND);
+
+        }
+        Category entity = categoryMapper.toCategory(dto);
+        entity.setId(id);
+        return categoryMapper.toCategoryResponseDTO(
+                categoryRepository.save(entity));
     }
 
     @Override
@@ -45,12 +49,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponseDTO getCategory(int id) {
-        Category cate = getById(id);
+    public CategoryResponseDTO getCategory(int id) throws AppException {
+        Category category = categoryRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         return CategoryResponseDTO.builder()
-                .id(cate.getId())
-                .name(cate.getName())
-                .img(cate.getImg())
+                .id(category.getId())
+                .name(category.getName())
+                .img(category.getImg())
                 .build();
     }
 
@@ -68,12 +73,20 @@ public class CategoryServiceImpl implements CategoryService {
         return categoriesResponseDTO;
     }
 
-    public Category getById(int id) {
-        return categoryRepository.findById(id).orElse(null);
+    @Override
+    public CategoryResponseDTO getCategoryById(int categoryId) throws AppException {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() ->
+                        new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+        return categoryMapper.toCategoryResponseDTO(category);
+    }
+
+    @Override
+    public Category getCategoryByName(String name) throws AppException {
+        return
+                categoryRepository.findByName(name)
+                        .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
 
-    public Category getByName(String name) {
-        return categoryRepository.findByName(name);
-    }
 }

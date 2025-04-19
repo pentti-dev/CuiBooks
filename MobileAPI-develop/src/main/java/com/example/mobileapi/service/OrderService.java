@@ -1,5 +1,6 @@
 package com.example.mobileapi.service;
 
+import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
 import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
@@ -9,7 +10,7 @@ import com.example.mobileapi.exception.AppException;
 import java.util.List;
 
 public interface OrderService {
-    int saveOrder(OrderRequestDTO orderRequestDTO);
+    int saveOrder(OrderRequestDTO orderRequestDTO) throws AppException;
 
     OrderResponseDTO getOrder(int orderId);
 
@@ -27,7 +28,7 @@ public interface OrderService {
 
     List<OrderResponseDTO> getOrdersByStatus(String status);
 
-    void changeOrderStatus(int orderId, String status) throws AppException;
+    void changeOrderStatus(int orderId, OrderStatus status) throws AppException;
 
     List<OrderResponseDTO> getOrdersByStatusAndCustomerId(String status, int customerId);
 }

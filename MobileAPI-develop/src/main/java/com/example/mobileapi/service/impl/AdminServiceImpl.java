@@ -1,5 +1,6 @@
 package com.example.mobileapi.service.impl;
 
+import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
@@ -32,13 +33,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public int addCustomer(CustomerRequestDTO customer) throws AppException {
+    public CustomerResponseDTO addCustomer(CustomerRequestDTO customer) throws AppException {
         return customerService.saveCustomer(customer);
     }
 
     @Override
-    public CustomerResponseDTO updateCustomerWithID(int customerId, CustomerRequestDTO customer) throws AppException {
-        return customerService.updateCustomerById(customerId, customer);
+    public CustomerResponseDTO updateCustomer(int customerId, CustomerRequestDTO customer) throws AppException {
+        return customerService.updateCustomer(customerId, customer);
     }
 
     @Override
@@ -72,7 +73,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void changeOrderStatus(int orderId, String status) throws AppException {
+    public void changeOrderStatus(int orderId, OrderStatus status) throws AppException {
         orderService.changeOrderStatus(orderId, status);
 
     }

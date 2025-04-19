@@ -1,15 +1,14 @@
 package com.example.mobileapi.dto.response;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.FieldDefaults;
 
 @Builder
 @Getter
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class CategoryResponseDTO {
-    private Integer id;
-    private String name;
-    private String img;
+    Integer id;
+    String name;
+    String img;
 }

@@ -8,7 +8,7 @@ import com.example.mobileapi.exception.AppException;
 import java.util.List;
 
 public interface CustomerService {
-    int saveCustomer(CustomerRequestDTO request) throws AppException;
+    CustomerResponseDTO saveCustomer(CustomerRequestDTO request) throws AppException;
 
 
     void deleteCustomer(int customerId);
@@ -22,7 +22,7 @@ public interface CustomerService {
     boolean checkEmail(String email);
 
 
-    CustomerResponseDTO updateCustomerById(int customerId, CustomerRequestDTO request) throws AppException;
+    CustomerResponseDTO updateCustomer(int customerId, CustomerRequestDTO request) throws AppException;
 
 
     void resetPassword(String username, String resetCode, String newPassword) throws AppException;

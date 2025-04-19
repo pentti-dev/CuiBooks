@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
 @Builder
-@Data
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class UrlResponse {
     String url;

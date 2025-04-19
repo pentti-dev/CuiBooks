@@ -1,9 +1,43 @@
+# ———————————————————————————
+# ENUM DEFINITIONS
+# ———————————————————————————
+enum Language {
+    ENGLISH
+    VIETNAMESE
+    FRENCH
+    SPANISH
+    GERMAN
+    CHINESE
+    JAPANESE
+    KOREAN
+    RUSSIAN
+    ARABIC
+    PORTUGUESE
+    ITALIAN
+    HINDI
+}
 
+enum BookForm {
+    HARDCOVER
+    PAPERBACK
+    EBOOK
+    AUDIOBOOK
+    LEATHER_BOUND
+    SPIRAL_BOUND
+    BOARD_BOOK
+    COMBO
+    LIMITED_EDITION
+}
+
+# ———————————————————————————
+# TYPE DEFINITIONS
+# ———————————————————————————
 type Category {
     id: ID!
     name: String!
-
-
+    img: String!
+    # Mối quan hệ một-nhiều với Product
+    products: [Product!]!
 }
 
 type Product {
@@ -12,35 +46,72 @@ type Product {
     img: String!
     price: Int!
     detail: String
+    supplier: String!
+    author: String!
+    publishYear: Int!
+    publisher: String!
+    language: Language!
+    weight: Int!        # đổi từ Byte -> Int
+    size: String!
+    pageNumber: Int!
+    form: BookForm!
+    # Quan hệ nhiều-một với Category
     category: Category!
-
 }
 
+# ———————————————————————————
+# INPUT DEFINITIONS
+# ———————————————————————————
+input CategoryInput {
+    id: ID!
+    name: String!
+    img: String!
+}
 
 input ProductInput {
     name: String!
     img: String!
     price: Int!
     detail: String
-    categoryId: ID!  #
+    supplier: String!
+    author: String!
+    publishYear: Int!
+    publisher: String!
+    language: Language!
+    weight: Int!
+    size: String!
+    pageNumber: Int!
+    form: BookForm!
+    categoryId: ID!
 }
-# Lay sam pham
+
+# ———————————————————————————
+# QUERY ROOT
+# ———————————————————————————
 type Query {
+    # Category queries
+    categories: [Category!]!
+    categoryById(id: ID!): Category
+
+    # Product queries
     products: [Product!]!
-
     productById(id: ID!): Product
-
     productsByCategoryId(categoryId: ID!): [Product!]!
-
     productsByName(name: String!): [Product!]!
 }
 
-# Them xoa sua
+# ———————————————————————————
+# MUTATION ROOT (ADMIN ONLY)
+# ———————————————————————————
 type Mutation {
-    addProduct(product: ProductInput!): Product!
+    # Category mutations
+    addCategory(input: CategoryInput!): Category!
+    updateCategory(id:ID!,input: CategoryInput!): Category!
+    deleteCategory(id: ID!): Boolean!
 
-    updateProduct(id: ID!, product: ProductInput!): Product
+    # Product mutations
 
+    addProduct(input: ProductInput!): Product!
+    updateProduct(id: ID!, input: ProductInput!): Product!
     deleteProduct(id: ID!): Boolean!
 }
-

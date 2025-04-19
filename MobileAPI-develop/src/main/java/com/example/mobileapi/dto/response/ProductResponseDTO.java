@@ -1,15 +1,27 @@
 package com.example.mobileapi.dto.response;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.experimental.FieldDefaults;
 
+@Data
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 @Builder
-@Getter
 public class ProductResponseDTO {
-    private Integer id;
-    private String name;
-    private String img;
-    private Integer price;
-    private String categoryName;
-    private String detail;
+    Integer id;
+    String name;
+    String img;
+    int price;
+    String detail;
+    String supplier;
+    String author;
+    Integer publishYear;
+    String publisher;
+    String language;
+    Byte weight;
+    String size;
+    Integer pageNumber;
+    String form;
+    Integer categoryId;
+    String categoryName;
 }

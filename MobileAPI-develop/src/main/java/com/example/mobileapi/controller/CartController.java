@@ -3,6 +3,7 @@ package com.example.mobileapi.controller;
 import com.example.mobileapi.dto.request.CartRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.CartResponseDTO;
+import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.service.CartService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class CartController {
     }
 
     @GetMapping("/{customerId}")
-    public ApiResponse<CartResponseDTO> getCartByCustomerId(@PathVariable int customerId) {
+    public ApiResponse<CartResponseDTO> getCartByCustomerId(@PathVariable int customerId) throws AppException {
         return ApiResponse.<CartResponseDTO>builder()
                 .data(cartService.getCartByCustomerId(customerId))
                 .build();

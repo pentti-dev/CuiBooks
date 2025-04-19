@@ -2,8 +2,11 @@ package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.dto.request.ProductRequestDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
-import com.example.mobileapi.model.Category;
-import com.example.mobileapi.model.Product;
+import com.example.mobileapi.entity.Category;
+import com.example.mobileapi.entity.Product;
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
+import com.example.mobileapi.mapper.ProductMapper;
 import com.example.mobileapi.repository.ProductRepository;
 import com.example.mobileapi.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -22,28 +25,20 @@ public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
     CategoryServiceImpl categoryService;
 
-    @Override
-    public Integer saveProduct(ProductRequestDTO productRequestDTO) {
+    ProductMapper productMapper;
 
-        return productRepository.save(Product.builder()
-                .name(productRequestDTO.getName())
-                .price(productRequestDTO.getPrice())
-                .img(productRequestDTO.getImg())
-                .category(categoryService.getByName(productRequestDTO.getCategoryName()))
-                .detail(productRequestDTO.getDetail())
-                .build()).getId();
+    @Override
+    public ProductResponseDTO saveProduct(ProductRequestDTO dto) {
+        return productMapper.toProductResponseDTO(productRepository.save(productMapper.toProduct(dto)));
+
     }
 
     @Override
-    public void updateProduct(int id, ProductRequestDTO productRequestDTO) {
-        Product product = getById(id);
-        Category category = categoryService.getByName(productRequestDTO.getCategoryName());
-        product.setCategory(category);
-        product.setDetail(productRequestDTO.getDetail());
-        product.setName(productRequestDTO.getName());
-        product.setPrice(productRequestDTO.getPrice());
-        product.setImg(productRequestDTO.getImg());
+    public ProductResponseDTO updateProduct(Integer id, ProductRequestDTO productRequestDTO) {
+        Product product = productMapper.toProduct(productRequestDTO);
+        product.setId(id);
         productRepository.save(product);
+        return productMapper.toProductResponseDTO(product);
     }
 
     @Override
@@ -53,81 +48,32 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponseDTO> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-        List<ProductResponseDTO> productResponseDTOS = new ArrayList<>();
-        for (Product product : products) {
-            productResponseDTOS.add(ProductResponseDTO.builder()
-                    .categoryName(product.getCategory().getName())
-                    .price(product.getPrice())
-                    .name(product.getName())
-                    .img(product.getImg())
-                    .id(product.getId())
-                    .detail(product.getDetail())
-
-                    .build());
-        }
-        return productResponseDTOS;
+        return productMapper.toProductResponseDTOList(productRepository.findAll());
     }
 
     @Override
-    public ProductResponseDTO getProductById(Integer id) {
-        Product product = getById(id);
-        return ProductResponseDTO.builder()
-                .categoryName(product.getCategory().getName())
-                .price(product.getPrice())
-                .name(product.getName())
-                .img(product.getImg())
-                .id(product.getId())
-                .detail(product.getDetail())
-                .build();
+    public ProductResponseDTO getProductById(Integer id) throws AppException {
+        return productMapper.toProductResponseDTO(productRepository.findById(id)
+                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND)));
     }
 
     @Override
     public List<ProductResponseDTO> findByCategoryId(Integer categoryId) {
         List<Product> products = productRepository.findByCategoryId(categoryId);
-        return products.stream()
-                .map(product -> ProductResponseDTO.builder()
-                        .categoryName(product.getCategory().getName())
-                        .price(product.getPrice())
-                        .name(product.getName())
-                        .img(product.getImg())
-                        .id(product.getId())
-                        .detail(product.getDetail())
-                        .build())
-                .toList();
+        return productMapper.toProductResponseDTOList(products);
 
     }
 
     @Override
     public List<ProductResponseDTO> getProductByName(String nameProduct) {
         List<Product> products = productRepository.findByNameContainingIgnoreCase(nameProduct);
-        return products.stream()
-                .map(product -> ProductResponseDTO.builder()
-                        .categoryName(product.getCategory().getName())
-                        .price(product.getPrice())
-                        .name(product.getName())
-                        .img(product.getImg())
-                        .id(product.getId())
-                        .detail(product.getDetail())
-                        .build())
-                .toList();
+        return productMapper.toProductResponseDTOList(products);
     }
 
     @Override
     public List<ProductResponseDTO> findByNameContainingIgnoreCase(String name) {
         List<Product> products = productRepository.findByNameContainingIgnoreCase(name);
-        List<ProductResponseDTO> productResponseDTOS = new ArrayList<>();
-        for (Product product : products) {
-            productResponseDTOS.add(ProductResponseDTO.builder()
-                    .categoryName(product.getCategory().getName())
-                    .price(product.getPrice())
-                    .name(product.getName())
-                    .img(product.getImg())
-                    .id(product.getId())
-                    .detail(product.getDetail())
-                    .build());
-        }
-        return productResponseDTOS;
+        return productMapper.toProductResponseDTOList(products);
     }
 
     public Product getById(int id) {

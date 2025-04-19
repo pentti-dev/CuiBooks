@@ -3,8 +3,10 @@ package com.example.mobileapi.controller;
 import com.example.mobileapi.dto.request.ProductRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
+import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.service.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,16 +23,18 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping
-    public ApiResponse<Integer> addProduct(@RequestBody ProductRequestDTO product) {
-        return ApiResponse.<Integer>builder()
+    public ApiResponse<ProductResponseDTO> addProduct(@RequestBody @Valid ProductRequestDTO product) {
+        return ApiResponse.<ProductResponseDTO>builder()
                 .data(productService.saveProduct(product))
                 .build();
     }
 
     @PutMapping("/{productId}")
-    public ApiResponse<Void> updateProduct(@PathVariable int productId, @RequestBody ProductRequestDTO product) {
-        productService.updateProduct(productId, product);
-        return ApiResponse.success("Cập nhật sản phẩm thành công");
+    public ApiResponse<ProductResponseDTO> updateProduct(@PathVariable int productId,
+                                                         @RequestBody @Valid ProductRequestDTO product) {
+        return ApiResponse.<ProductResponseDTO>builder()
+                .data(productService.updateProduct(productId, product))
+                .build();
     }
 
     @DeleteMapping("/{productId}")
@@ -40,7 +44,7 @@ public class ProductController {
     }
 
     @GetMapping("/{productId}")
-    public ApiResponse<ProductResponseDTO> getCustomer(@PathVariable int productId) {
+    public ApiResponse<ProductResponseDTO> getCustomer(@PathVariable int productId) throws AppException {
         return ApiResponse.<ProductResponseDTO>builder()
                 .data(productService.getProductById(productId))
                 .build();

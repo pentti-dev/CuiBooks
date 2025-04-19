@@ -1,27 +1,27 @@
 package com.example.mobileapi.dto.request;
 
+import com.example.mobileapi.entity.enums.OrderMethod;
+import com.example.mobileapi.entity.enums.OrderStatus;
 import io.swagger.v3.oas.annotations.Hidden;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
-@Data
 @Getter
 @Setter
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class OrderRequestDTO {
-    private Integer customerId;
-    private Integer totalAmount;
-    private String address;
-    private String numberPhone;
+    Integer customerId;//id khách hàng
+    Integer totalAmount;//tổng tiền
+    String address;//địa chỉ
+    String numberPhone;//số điện thoại
     @Hidden
-    private String status;
+    OrderStatus status;//trạng thái đơn hàng
     @Hidden
-    private String paymentMethod;
-    private String receiver;
-    private List<OrderDetailRequestDTO> orderDetails;
+    OrderMethod paymentMethod;//phương thức thanh toán
+    String receiver;// người nhận
+    List<OrderDetailRequestDTO> orderDetails;// danh sách chi tiết đơn hàng
 }
 

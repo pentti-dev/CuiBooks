@@ -1,15 +1,21 @@
 package com.example.mobileapi.dto.response;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.jackson.Jacksonized;
 
-@Data
+import static lombok.AccessLevel.PRIVATE;
+
+@Jacksonized
 @Builder
+@FieldDefaults(level = PRIVATE)
 @Getter
+@Setter
 public class OrderDetailResponseDTO {
-    private Integer id;
-    private Integer orderId;
-    private ProductResponseDTO productResponseDTO;
-    private Integer quantity;
+    Integer id;
+    Integer orderId;
+    ProductResponseDTO productResponseDTO;
+    Integer quantity;
 }

@@ -82,6 +82,10 @@ public enum ErrorCode {
     INVALID_ORDER(HttpStatus.BAD_REQUEST, 4502, "Đơn hàng không hợp lệ."),
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, 4503, "Đơn hàng không tồn tại."),
     ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, 4504, "Địa chỉ không tồn tại."),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 4505, "Danh mục không tồn tại."),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, 4506, "Sản phẩm không tồn tại."),
+    ORDER_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND, 4507, "Chi tiết đơn hàng không tồn tại."),
+    CATEGORY_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, 4508, "Không tìm thấy danh mục với ID đã cho."),
 
     /**
      * ========== LỖI HỆ THỐNG ==========

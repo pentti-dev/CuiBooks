@@ -3,8 +3,7 @@ package com.example.mobileapi.service;
 import com.example.mobileapi.dto.request.CreateAddressDto;
 import com.example.mobileapi.dto.request.UpdateAddressDto;
 import com.example.mobileapi.exception.AppException;
-import com.example.mobileapi.model.Address;
-import com.example.mobileapi.model.Customer;
+import com.example.mobileapi.entity.Address;
 
 import java.util.List;
 

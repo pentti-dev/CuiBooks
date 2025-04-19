@@ -4,11 +4,10 @@ import com.example.mobileapi.dto.request.CreateAddressDto;
 import com.example.mobileapi.dto.request.UpdateAddressDto;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
-import com.example.mobileapi.model.Address;
+import com.example.mobileapi.entity.Address;
 import com.example.mobileapi.repository.AddressRepository;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.AddressService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,6 +1,6 @@
 package com.example.mobileapi.repository;
 
-import com.example.mobileapi.model.CartItem;
+import com.example.mobileapi.entity.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

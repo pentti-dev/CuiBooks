@@ -3,6 +3,7 @@ package com.example.mobileapi.controller;
 import com.example.mobileapi.dto.request.OrderDetailSaveRequest;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
+import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.service.OrderDetailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +23,7 @@ public class OrderDetailController {
     OrderDetailService orderDetailService;
 
     @PostMapping
-    public ApiResponse<OrderDetailResponseDTO> saveOrderDetail(OrderDetailSaveRequest orderDetailRequestDTO) {
+    public ApiResponse<OrderDetailResponseDTO> saveOrderDetail(OrderDetailSaveRequest orderDetailRequestDTO) throws AppException {
         return ApiResponse.<OrderDetailResponseDTO>builder()
                 .data(orderDetailService.saveOrderDetail(orderDetailRequestDTO))
                 .build();
@@ -30,7 +31,7 @@ public class OrderDetailController {
     }
 
     @PutMapping("/{id}")
-    public ApiResponse<OrderDetailResponseDTO> updateOrderDetail(@PathVariable int id, OrderDetailSaveRequest orderDetailRequestDTO) {
+    public ApiResponse<OrderDetailResponseDTO> updateOrderDetail(@PathVariable int id, OrderDetailSaveRequest orderDetailRequestDTO) throws AppException {
         return ApiResponse.<OrderDetailResponseDTO>builder()
                 .data(orderDetailService.updateOrderDetail(id, orderDetailRequestDTO))
                 .build();

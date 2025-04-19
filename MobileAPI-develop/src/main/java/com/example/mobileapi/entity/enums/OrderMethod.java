@@ -1,4 +1,4 @@
-package com.example.mobileapi.common;
+package com.example.mobileapi.entity.enums;
 
 import lombok.Getter;
 

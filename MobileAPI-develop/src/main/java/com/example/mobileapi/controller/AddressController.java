@@ -3,7 +3,7 @@ package com.example.mobileapi.controller;
 import com.example.mobileapi.dto.request.CreateAddressDto;
 import com.example.mobileapi.dto.request.UpdateAddressDto;
 import com.example.mobileapi.exception.AppException;
-import com.example.mobileapi.model.Address;
+import com.example.mobileapi.entity.Address;
 import com.example.mobileapi.service.AddressService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;

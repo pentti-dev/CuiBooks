@@ -1,6 +1,7 @@
 package com.example.mobileapi.controller;
 
 import com.example.mobileapi.dto.response.CategoryResponseDTO;
+import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.service.CategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public CategoryResponseDTO getCategory(@PathVariable int categoryId) {
+    public CategoryResponseDTO getCategory(@PathVariable int categoryId) throws AppException {
         return categoryService.getCategory(categoryId);
     }
 }

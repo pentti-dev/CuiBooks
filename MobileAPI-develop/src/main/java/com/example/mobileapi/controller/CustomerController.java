@@ -26,37 +26,33 @@ import org.springframework.web.bind.annotation.*;
 public class CustomerController {
     CustomerService customerService;
 
-    @Operation(summary = "Lấy thông tin người dùng theo ID")
+    @Operation(summary = "Lấy so luong  dùng theo ID")
     @GetMapping("/quantity/{customerId}")
     public ApiResponse<Integer> getQuantity(@PathVariable("customerId") int customerId) {
-        return ApiResponse.<Integer>builder().data(customerService.getQuantityByCustomerId(customerId)).build();
+        return ApiResponse.<Integer>builder()
+                .data(customerService.getQuantityByCustomerId(customerId))
+                .build();
 
     }
 
     @Operation(summary = "Cập nhật thông tin người dùng")
     @PutMapping("/{customerId}")
-    public ApiResponse<Void> updateCustomer(@PathVariable int customerId, @Valid @RequestBody CustomerRequestDTO customer) {
-        try {
-            customerService.updateCustomerById(customerId, customer);
-            return ApiResponse.success("Cập nhật thông tin người dùng thành công");
-        } catch (AppException e) {
-            throw new RuntimeException(e);
-        }
+    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable int customerId, @Valid @RequestBody CustomerRequestDTO customer) throws AppException {
+
+        return ApiResponse.<CustomerResponseDTO>builder()
+                .data(customerService.updateCustomer(customerId, customer))
+                .build();
 
     }
 
     @Operation(summary = "Lấy thông tin người dùng bằng token")
     @GetMapping("/profile")
-    public ApiResponse<CustomerResponseDTO> getCustomerFromToken(@Parameter(hidden = true) @GetToken String token) {
+    public ApiResponse<CustomerResponseDTO> getCustomerFromToken(@Parameter(hidden = true) @GetToken String token) throws AppException {
 
 
-        try {
-            return ApiResponse.<CustomerResponseDTO>builder()
-                    .data(customerService.getCustomerProfile(token))
-                    .build();
-        } catch (AppException e) {
-            throw new RuntimeException(e);
-        }
+        return ApiResponse.<CustomerResponseDTO>builder()
+                .data(customerService.getCustomerProfile(token))
+                .build();
     }
 
     @Operation(summary = "Kiểm tra tên đăng nhập")

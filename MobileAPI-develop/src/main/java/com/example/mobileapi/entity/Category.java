@@ -1,4 +1,4 @@
-package com.example.mobileapi.model;
+package com.example.mobileapi.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

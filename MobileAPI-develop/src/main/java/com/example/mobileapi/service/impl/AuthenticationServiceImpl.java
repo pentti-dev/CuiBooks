@@ -7,8 +7,8 @@ import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
-import com.example.mobileapi.model.Customer;
-import com.example.mobileapi.model.InvalidateToken;
+import com.example.mobileapi.entity.Customer;
+import com.example.mobileapi.entity.InvalidateToken;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.repository.InvalidateTokenRepository;
 import com.example.mobileapi.service.AuthenticationService;
@@ -18,8 +18,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.sql.Date;
 
 @Service
 @Slf4j

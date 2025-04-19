@@ -1,5 +1,7 @@
 package com.example.mobileapi.service.impl;
 
+import com.example.mobileapi.entity.enums.OrderMethod;
+import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
 import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
@@ -8,15 +10,16 @@ import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
-import com.example.mobileapi.model.Order;
-import com.example.mobileapi.model.OrderDetail;
+import com.example.mobileapi.entity.Order;
+import com.example.mobileapi.entity.OrderDetail;
+import com.example.mobileapi.mapper.ProductMapper;
 import com.example.mobileapi.repository.OrderRepository;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -33,20 +36,22 @@ import java.util.stream.Collectors;
 public class OrderServiceImpl implements OrderService {
     OrderRepository orderRepository;
     CustomerRepository customerRepository;
-    CustomerServiceImpl customerService;
+    CustomerServiceImpl customerServiceImpl;
     ProductServiceImpl productService;
+    private final ProductMapper productMapper;
 
     @Override
-    @PostAuthorize("returnObject.username ==authentication.name")
-    public int saveOrder(OrderRequestDTO orderRequestDTO) {
+    @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #orderRequestDTO.customerId")
+    public int saveOrder(OrderRequestDTO orderRequestDTO) throws AppException {
+
         Order order = Order.builder()
-                .customer(customerRepository.findById(orderRequestDTO.getCustomerId()).orElse(null))
+                .customer(customerRepository.findById(orderRequestDTO.getCustomerId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)))
                 .orderDate(LocalDateTime.now())
                 .totalAmount(orderRequestDTO.getTotalAmount())
                 .address(orderRequestDTO.getAddress())
                 .numberPhone(orderRequestDTO.getNumberPhone())
                 .receiver(orderRequestDTO.getReceiver())
-                .status(orderRequestDTO.getStatus())
+                .status(determineDefaultStatus(orderRequestDTO.getPaymentMethod()))
                 .paymentMethod(orderRequestDTO.getPaymentMethod())
                 .orderDetails(orderRequestDTO.getOrderDetails().stream()
                         .map(this::convertToOrderDetailEntity)
@@ -57,6 +62,20 @@ public class OrderServiceImpl implements OrderService {
 
         return orderRepository.save(order).getId();
     }
+
+    public OrderStatus determineDefaultStatus(OrderMethod method) {
+        switch (method) {
+            case COD:
+                return OrderStatus.PENDING;
+            case VN_PAY:
+            case MOMO:
+            case ZALO_PAY:
+                return OrderStatus.PENDING_PAYMENT;
+            default:
+                return OrderStatus.PENDING;
+        }
+    }
+
 
     @Override
     public OrderResponseDTO getOrder(int orderId) {
@@ -90,6 +109,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #customerId")
     public List<OrderResponseDTO> getOrderByCustomerId(int customerId) {
         return getOrdersByCustomerId(customerId);
     }
@@ -126,7 +146,7 @@ public class OrderServiceImpl implements OrderService {
             int month = (int) row[0];
             BigDecimal value = (BigDecimal) row[1];
             long revenue = value.longValueExact();
-            responseList.add(new MonthlyRevenueResponse(month, revenue));
+            responseList.add(MonthlyRevenueResponse.builder().month(month).revenue(revenue).build());
         }
 
         return responseList;
@@ -145,13 +165,14 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public void changeOrderStatus(int orderId, String status) throws AppException {
+    public void changeOrderStatus(int orderId, OrderStatus status) throws AppException {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         order.setStatus(status);
         orderRepository.save(order);
     }
 
     @Override
+    @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #customerId")
     public List<OrderResponseDTO> getOrdersByStatusAndCustomerId(String status, int customerId) {
         List<Order> orderResponseDTO = orderRepository.findByStatusAndCustomerId(status, customerId);
         if (orderResponseDTO.isEmpty()) {
@@ -185,7 +206,7 @@ public class OrderServiceImpl implements OrderService {
 
         return OrderResponseDTO.builder()
                 .id(order.getId())
-                .customerDTO(customerService.getCustomer(order.getCustomer().getId()))
+                .customerDTO(customerServiceImpl.getCustomer(order.getCustomer().getId()))
                 .orderDate(order.getOrderDate())
                 .totalAmount(order.getTotalAmount()) // Ensure this matches your field in OrderResponseDTO
                 .address(order.getAddress())
@@ -201,7 +222,7 @@ public class OrderServiceImpl implements OrderService {
         return OrderDetailResponseDTO.builder()
                 .id(orderDetail.getId())
                 .orderId(orderDetail.getOrder().getId())
-                .productResponseDTO(productService.getProductById(orderDetail.getProduct().getId()))
+                .productResponseDTO(productMapper.toProductResponseDTO(orderDetail.getProduct()))
                 .quantity(orderDetail.getQuantity())
                 .build();
     }
