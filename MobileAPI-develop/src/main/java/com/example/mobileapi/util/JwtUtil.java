@@ -34,8 +34,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class JwtUtil {
 
-    static final String PRIVATE_KEY_PATH = "D:\\Study\\HK2_Nam4\\web\\DoAn\\MobileAPI-develop\\src\\main\\resources\\keys\\private_key.pem";
-    static final String PUBLIC_KEY_PATH = "D:\\Study\\HK2_Nam4\\web\\DoAn\\MobileAPI-develop\\src\\main\\resources\\keys\\public_key.pem";
+    static final String PRIVATE_KEY_PATH = "src/main/resources/keys/private_key.pem";
+    static final String PUBLIC_KEY_PATH = "src/main/resources/keys/public_key.pem";
     final InvalidateTokenRepository invalidateTokenRepository;
 
     RSAPrivateKey privateKey;

@@ -62,6 +62,7 @@ public class CustomerController {
         return ApiResponse.<Boolean>builder().data(customerService.checkUsername(username)).build();
     }
 
+    @PreAuthorize("permitAll()")
     @Operation(summary = "Thay đổi mật khẩu")
     @PostMapping("/resetPassword/{username}")
     public ApiResponse<Void> resetPassword(
@@ -78,6 +79,7 @@ public class CustomerController {
 
     }
 
+    @PreAuthorize("permitAll()")
     @Operation(summary = "Gửi mã xác nhận đặt lại mật khẩu")
     @PostMapping("/initPasswordReset/{username}")
     public ApiResponse<Void> initPasswordReset(@PathVariable String username) {
