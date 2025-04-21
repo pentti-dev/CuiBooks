@@ -37,8 +37,8 @@ public class EmailServiceImpl implements EmailService {
                     "<ul>" +
                     "<li><strong>Email:</strong> " + to + "</li>" +
                     "</ul>" +
-                    "<p>Để đặt lại mật khẩu, vui lòng nhấp vào liên kết dưới đây:</p>" +
-                    "<p><a href='#' style='color: #1E90FF;'>Đặt lại mật khẩu</a></p>" +
+                    "<p>Đây là mã để đặt lại mật khẩu:</p>" +
+                    "<h3 style='color: #2E8B57;'>" + text + "</h3>" +
                     "<p>Nếu bạn không yêu cầu thay đổi mật khẩu, vui lòng bỏ qua email này.</p>" +
                     "<hr>" +
                     "<p>Trân trọng,<br>Đội ngũ hỗ trợ</p>" +
