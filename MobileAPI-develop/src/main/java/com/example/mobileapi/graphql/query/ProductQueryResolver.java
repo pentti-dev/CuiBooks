@@ -1,7 +1,8 @@
 package com.example.mobileapi.graphql.query;
 
-import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Product;
+import com.example.mobileapi.entity.enums.BookForm;
+import com.example.mobileapi.entity.enums.Language;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.mapper.ProductMapper;
 import com.example.mobileapi.service.ProductService;
@@ -40,5 +41,17 @@ public class ProductQueryResolver {
     @QueryMapping
     public List<Product> productsByCategoryId(@Argument Integer categoryId) {
         return productMapper.toProductList(productService.findByCategoryId(categoryId));
+    }
+
+    @QueryMapping
+    public List<Product> filteredProducts(
+            @Argument String name,
+            @Argument Integer categoryId,
+            @Argument Language language,
+            @Argument Integer minPrice,
+            @Argument Integer maxPrice,
+            @Argument BookForm form
+    ) {
+        return productMapper.toProductList(productService.filterProducts(name, categoryId, language, minPrice, maxPrice, form));
     }
 }

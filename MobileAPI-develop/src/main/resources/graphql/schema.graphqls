@@ -98,6 +98,14 @@ type Query {
     productById(id: ID!): Product
     productsByCategoryId(categoryId: ID!): [Product!]!
     productsByName(name: String!): [Product!]!
+    filteredProducts(
+        name: String,
+        categoryId: Int,
+        language: Language,
+        minPrice: Int,
+        maxPrice: Int,
+        form: BookForm
+    ): [Product!]!
 }
 
 # ———————————————————————————
