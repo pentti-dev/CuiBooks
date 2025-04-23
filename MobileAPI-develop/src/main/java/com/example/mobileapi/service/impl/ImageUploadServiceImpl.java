@@ -4,7 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.example.mobileapi.dto.response.UrlResponse;
 import com.example.mobileapi.service.ImageUploadService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,10 +14,10 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class ImageUploadServiceImpl implements ImageUploadService {
 
-    @Autowired
-    private Cloudinary cloudinary;
+    Cloudinary cloudinary;
 
     @Override
     public UrlResponse uploadImage(MultipartFile file) {
