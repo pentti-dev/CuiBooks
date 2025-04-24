@@ -3,6 +3,7 @@ package com.example.mobileapi.config;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.exception.ErrorCode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,7 +31,8 @@ public class SecurityExceptionHandler implements AuthenticationEntryPoint, Acces
                 .message(errorCode.getMessage())
                 .build();
 
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper()
+                .registerModule(new JavaTimeModule());
         response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
         response.flushBuffer();
     }
@@ -39,25 +41,23 @@ public class SecurityExceptionHandler implements AuthenticationEntryPoint, Acces
      * Xử lý lỗi 401 - Unauthorized (Người dùng chưa xác thực)
      */
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
-        ErrorCode errorCode;
-        String jwtError = (String) request.getAttribute("jwtError");
+    public void commence(HttpServletRequest req, HttpServletResponse resp,
+                         AuthenticationException ex) throws IOException {
+        String jwtError = (String) req.getAttribute("jwtError");
         log.error("Unauthorized: {}", jwtError);
-
-        if (jwtError == null) errorCode = ErrorCode.UNAUTHORIZED;
-        else if (jwtError.equals("EXPIRED")) errorCode = ErrorCode.TOKEN_EXPIRED;
-        else if (jwtError.equals("INVALID")) errorCode = ErrorCode.INVALID_TOKEN;
-        else errorCode = ErrorCode.UNAUTHORIZED;
-
-        sendErrorResponse(response, errorCode);
+        ErrorCode code = switch (jwtError) {
+            case "EXPIRED" -> ErrorCode.TOKEN_EXPIRED;
+            case "INVALID_SIGNATURE", "UNSUPPORTED", "INVALID" -> ErrorCode.INVALID_TOKEN;
+            case "LOGOUT" -> ErrorCode.UNAUTHORIZED;
+            default -> ErrorCode.UNAUTHORIZED;
+        };
+        sendErrorResponse(resp, code);
     }
 
-    /**
-     * Xử lý lỗi 403 - Forbidden (Người dùng không có quyền truy cập)
-     */
     @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        log.error("Access Denied: {}", accessDeniedException.getMessage());
-        sendErrorResponse(response, ErrorCode.FORBIDDEN);
+    public void handle(HttpServletRequest req, HttpServletResponse resp,
+                       AccessDeniedException ex) throws IOException {
+        log.error("Access Denied: {}", ex.getMessage());
+        sendErrorResponse(resp, ErrorCode.FORBIDDEN);
     }
 }

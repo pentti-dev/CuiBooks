@@ -9,6 +9,7 @@ import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -84,7 +85,7 @@ public class JwtUtil {
                     .subject(customer.getUsername())
                     .issuer("ngoctaiphan")
                     .issueTime(new Date())
-                    .expirationTime(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))
+                    .expirationTime(Date.from(Instant.now().plus(30, ChronoUnit.SECONDS)))
                     .jwtID(UUID.randomUUID().toString())
                     .claim("scope", Role.role(customer.isRole()))
                     .build();
@@ -165,5 +166,14 @@ public class JwtUtil {
             return false;
         }
     }
+
+    public String resolveToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
+    }
+
 
 }
