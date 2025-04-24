@@ -16,14 +16,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ImageUploadServiceImpl implements ImageUploadService {
 
-    @Autowired
-    private Cloudinary cloudinary;
+    private final Cloudinary cloudinary;
 
     @Override
     public UrlResponse uploadImage(MultipartFile file) {
         try {
             Map<String, String> params = new HashMap<>();
-            params.put("folder", "Dynamic folders"); // Optional: Set a folder name in Cloudinary
+            params.put("folder", "Dynamic folders");
+
             Map<?, ?> result = cloudinary.uploader().upload(file.getBytes(), params);
             String cdnUrl = (String) result.get("secure_url");
 

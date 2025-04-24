@@ -4,7 +4,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/mobile
     username: root
-    password: 123
+    password:
     driverClassName: com.mysql.cj.jdbc.Driver
   jpa:
     properties:
@@ -50,9 +50,9 @@ openapi:
     version: 1.0.0
 
 cloudinary:
-  cloud-name: drvydie5q
-  api-key: 241959425679189
-  api-secret: efKXKXZgID6nX_5tPItvYZn35rY
+  cloud-name: dmdjbuvig
+  api-key: 652981452525434
+  api-secret: pgIYakDqMVAYHy9bo-vdyFl3k1o
 
   admin:
     username: admin
