@@ -72,7 +72,7 @@ public class ProductController {
 
     }
 
-    @GetMapping("/search")
+    @GetMapping("/categoty")
     public ApiResponse<List<ProductResponseDTO>> getProductByName(@RequestParam String name) {
         return ApiResponse.<List<ProductResponseDTO>>builder()
                 .data(productService.getProductByName(name))

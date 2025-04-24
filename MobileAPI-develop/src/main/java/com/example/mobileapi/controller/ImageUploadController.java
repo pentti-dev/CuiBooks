@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 @Tag(name = "ImageUpload", description = "Image Upload API")
 public class ImageUploadController {
-    ImageUploadService imageUploadService;
+    private ImageUploadService imageUploadService;
 
     @Operation(summary = "Upload image to Cloudinary")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
