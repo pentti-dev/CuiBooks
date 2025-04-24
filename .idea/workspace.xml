@@ -6,14 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1118281e-dd66-4965-9c3b-2cb59cb8657b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/config/CloudinaryConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/config/CloudinaryConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/controller/ImageUploadController.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/controller/ImageUploadController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/controller/ProductController.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/controller/ProductController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/dto/response/ApiResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/dto/response/ApiResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/dto/response/UrlResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/dto/response/UrlResponse.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/service/impl/ImageUploadServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/service/impl/ImageUploadServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/util/JwtUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/util/JwtUtil.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/controller/AdminController.java" beforeDir="false" afterPath="$PROJECT_DIR$/MobileAPI-develop/src/main/java/com/example/mobileapi/controller/AdminController.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -115,7 +108,8 @@
       <workItem from="1744529206595" duration="1848000" />
       <workItem from="1745246004373" duration="2938000" />
       <workItem from="1745332249886" duration="9125000" />
-      <workItem from="1745504324976" duration="6991000" />
+      <workItem from="1745504324976" duration="7748000" />
+      <workItem from="1745512851777" duration="3085000" />
     </task>
     <servers />
   </component>
