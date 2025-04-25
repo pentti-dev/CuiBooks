@@ -44,13 +44,16 @@ public class SecurityExceptionHandler implements AuthenticationEntryPoint, Acces
     public void commence(HttpServletRequest req, HttpServletResponse resp,
                          AuthenticationException ex) throws IOException {
         String jwtError = (String) req.getAttribute("jwtError");
-        log.error("Unauthorized: {}", jwtError);
-        ErrorCode code = switch (jwtError) {
-            case "EXPIRED" -> ErrorCode.TOKEN_EXPIRED;
-            case "INVALID_SIGNATURE", "UNSUPPORTED", "INVALID" -> ErrorCode.INVALID_TOKEN;
-            case "LOGOUT" -> ErrorCode.UNAUTHORIZED;
-            default -> ErrorCode.UNAUTHORIZED;
-        };
+        ErrorCode code;
+        if (jwtError == null) {
+            code = ErrorCode.UNAUTHORIZED;
+        } else {
+            code = switch (jwtError) {
+                case "EXPIRED", "LOGOUT" -> ErrorCode.TOKEN_EXPIRED;
+                case "INVALID_SIGNATURE", "UNSUPPORTED", "INVALID" -> ErrorCode.INVALID_TOKEN;
+                default -> ErrorCode.UNAUTHORIZED;
+            };
+        }
         sendErrorResponse(resp, code);
     }
 

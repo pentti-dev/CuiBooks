@@ -1,6 +1,8 @@
 package com.example.mobileapi.config;
 
+import com.example.mobileapi.config.props.JwtProperties;
 import com.example.mobileapi.util.JwtUtil;
+import com.example.mobileapi.util.KeyUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -40,8 +42,7 @@ import java.security.interfaces.RSAPublicKey;
 @EnableMethodSecurity
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class SecurityConfig {
-
-    JwtUtil jwtUtil;
+    JwtProperties props;
     SecurityExceptionHandler exceptionHandler;
 
     String[] acceptedEndpoint = {
@@ -106,7 +107,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        RSAPublicKey publicKey = jwtUtil.loadPublicKey();
+        RSAPublicKey publicKey = KeyUtil.parsePublicKey(props.keys().publicKey());
         return NimbusJwtDecoder
                 .withPublicKey(publicKey)
                 .signatureAlgorithm(SignatureAlgorithm.RS512)
@@ -123,11 +124,11 @@ public class SecurityConfig {
 
             @Override
             protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-                String token = jwtUtil.resolveToken(request);
+                String token = JwtUtil.resolveToken(request);
                 if (token != null) {
                     try {
                         jwtDecoder().decode(token);
-                        if (jwtUtil.isLogout(token)) request.setAttribute(ATTR, "LOGOUT");
+                        if (JwtUtil.isLogout(token)) request.setAttribute(ATTR, "LOGOUT");
 
 
                     } catch (JwtException e) {
