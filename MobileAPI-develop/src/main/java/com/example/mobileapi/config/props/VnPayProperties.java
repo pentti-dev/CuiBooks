@@ -1,4 +1,4 @@
-package com.example.mobileapi.config;
+package com.example.mobileapi.config.props;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import jakarta.validation.constraints.NotBlank;

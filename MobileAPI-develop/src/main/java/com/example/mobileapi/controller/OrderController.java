@@ -4,6 +4,7 @@ import com.example.mobileapi.entity.enums.OrderMethod;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
+import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,7 +48,7 @@ public class OrderController {
 
     @Operation(summary = "Lấy danh sách đơn hàng theo trạng thái và ID khách hàng")
     @GetMapping("/client/{status}&&{customerId}")
-    public ApiResponse<List<OrderResponseDTO>> getOrderByStatusAndCustomerId(@PathVariable String status, @PathVariable int customerId) {
+    public ApiResponse<List<OrderResponseDTO>> getOrderByStatusAndCustomerId(@PathVariable OrderStatus status, @PathVariable int customerId) {
 
         return ApiResponse.<List<OrderResponseDTO>>builder()
                 .data(orderService.getOrdersByStatusAndCustomerId(status, customerId))

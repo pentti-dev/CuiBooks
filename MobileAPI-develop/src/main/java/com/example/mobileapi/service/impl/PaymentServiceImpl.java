@@ -1,18 +1,19 @@
 package com.example.mobileapi.service.impl;
 
-import com.example.mobileapi.config.VnPayProperties;
+import com.example.mobileapi.config.props.VnPayProperties;
 import com.example.mobileapi.dto.response.PaymentResponse;
+import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
-import com.example.mobileapi.repository.OrderRepository;
+import com.example.mobileapi.service.OrderService;
 import com.example.mobileapi.service.PaymentService;
+import com.example.mobileapi.service.TransactionService;
 import com.example.mobileapi.util.VnPayUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -22,15 +23,15 @@ import java.util.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentServiceImpl implements PaymentService {
-    OrderRepository orderRepository;
+    OrderService orderService;
     VnPayProperties vnPayProperties;
     VnPayUtil vnPayUtil;
-
+    TransactionService transactionService;
 
     @Override
     public PaymentResponse createVNPayPayment(Integer orderId, Long price) throws AppException {
 
-        if (!orderRepository.existsById(orderId)) {
+        if (!orderService.existById(orderId)) {
             throw new AppException(ErrorCode.ORDER_NOT_FOUND);
         }
 
@@ -101,24 +102,19 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
     }
 
-    //    @Override
-//    public void setStatusOrder(Integer orderId, String status) {
-//        Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
-//        order.setStatus(status);
-//        ordersRepository.save(order);
-//    }
-//
-//    @Override
-//    public boolean notifyOrder(String vnp_ResponseCode, String vnp_TxnRef, String vnp_TransactionNo, String vnp_TransactionDate, String vnp_Amount) {
-//        if (vnp_ResponseCode.equals("00")) {
-//            setStatusOrder(vnp_TxnRef, PaymentStatus.THANH_TOAN_THANH_CONG.getMessage());
-//            transactionService.createTransaction(vnp_TransactionNo, vnp_TxnRef, vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
-//            return true;
-//        } else {
-//            transactionService.createTransaction(vnp_TransactionNo, vnp_TxnRef, vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
-//            setStatusOrder(vnp_TxnRef, PaymentStatus.THANH_TOAN_THAT_BAI.getMessage());
-//            return false;
-//        }
-//    }
+
+    @Override
+    public boolean notifyOrder(String vnp_ResponseCode, String vnp_TxnRef, String vnp_TransactionNo, String vnp_TransactionDate, String vnp_Amount) {
+        if (vnp_ResponseCode.equals("00")) {
+            orderService.changeOrderStatus(Integer.parseInt(vnp_TxnRef), OrderStatus.PAYMENT_SUCCESS);
+            transactionService.createTransaction(vnp_TransactionNo, vnp_TxnRef, vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
+            return true;
+        } else {
+            transactionService.createTransaction(vnp_TransactionNo, vnp_TxnRef, vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
+            orderService.changeOrderStatus(Integer.parseInt(vnp_TxnRef), OrderStatus.PAYMENT_FAILED);
+            return false;
+        }
+    }
+
 
 }

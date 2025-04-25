@@ -54,9 +54,7 @@ cloudinary:
   api-key: 241959425679189
   api-secret: efKXKXZgID6nX_5tPItvYZn35rY
 
-  admin:
-    username: admin
-    password: admin
+
 vnpay:
   tmn-code: C0LUS1XF
   hash-secret: MRSUPJYDQQV713GJPX8IVD1XAJIEVVJI
@@ -67,4 +65,12 @@ vnpay:
   currency-code: VND
   locale: vn
   bank-code: NCB
+jwt:
+  issuer: ngoctaiphan
+  audience: ngoctaiphan
+  expiration-minutes: 30
+  keys:
+    private-key: classpath:keys/private_key.pem
+    public-key: classpath:keys/public_key.pem
+
 

@@ -5,6 +5,7 @@ import com.example.mobileapi.dto.response.PaymentResponse;
 import com.example.mobileapi.service.PaymentService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -36,12 +38,33 @@ public class PaymentController {
                 .build();
     }
 
-//    @GetMapping("/callback")
-//    public ApiResponse<String> callback(@Parameter(hidden = true) HttpServletRequest request) {
-//        boolean ok = paymentService.verifyPaymentReturn(request);
-//        return ApiResponse.<String>builder()
-//                .message(ok ? "Payment validated" : "Validation error")
-//                .data(ok ? "Thanh toán thành công" : "Thanh toán thất bại")
-//                .build();
-//    }
+    @GetMapping("/notify")
+    public ApiResponse<?> notifyOrder(HttpServletResponse response,
+                                      @RequestParam String vnp_Amount,
+                                      @RequestParam String vnp_BankCode,
+                                      @RequestParam(required = false) String vnp_BankTranNo,
+                                      @RequestParam String vnp_CardType,
+                                      @RequestParam String vnp_OrderInfo,
+                                      @RequestParam String vnp_PayDate,
+                                      @RequestParam String vnp_ResponseCode,
+                                      @RequestParam String vnp_TmnCode,
+                                      @RequestParam String vnp_TransactionNo,
+                                      @RequestParam String vnp_TransactionStatus,
+                                      @RequestParam String vnp_TxnRef,
+                                      @RequestParam String vnp_SecureHash
+    ) {
+
+        // Gọi service với các tham số cần thiết
+        boolean isSuccess = paymentService.notifyOrder(
+                vnp_ResponseCode,
+                vnp_TxnRef,
+                vnp_TransactionNo,
+                vnp_PayDate,
+                vnp_Amount
+        );
+
+        return ApiResponse.<String>builder()
+                .message(isSuccess ? "Thanh toán thành công" : "Thanh toán thất bại")
+                .build();
+    }
 }
