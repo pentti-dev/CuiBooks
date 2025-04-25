@@ -1,3 +1,4 @@
+// ApiResponse.java
 package com.example.mobileapi.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -11,7 +12,7 @@ import java.time.Instant;
 @Setter
 @Getter
 @Builder
-@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     Integer code;
@@ -49,5 +50,4 @@ public class ApiResponse<T> {
                 .message(message)
                 .build();
     }
-
 }

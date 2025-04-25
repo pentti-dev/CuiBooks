@@ -119,7 +119,7 @@ public class AdminController {
     }
 
     @Operation(summary = "Cập nhật trạng thái đơn hàng")
-    @PutMapping("/status/{status}&&{orderId}")
+    @PutMapping("/status/{status}/{orderId}")
     public ApiResponse<Void> changeOrderStatus(@PathVariable("status") OrderStatus status,
                                                @PathVariable("orderId") int orderId) {
         try {
