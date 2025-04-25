@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.concurrent.CompletableFuture;
+
 @RestController
 @RequestMapping("/api/cloudinary")
 @RequiredArgsConstructor
@@ -24,12 +26,8 @@ public class ImageUploadController {
 
     @Operation(summary = "Upload image to Cloudinary")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<UrlResponse> uploadImage(@RequestParam("file") MultipartFile file) {
-
-        return ApiResponse.<UrlResponse>builder()
-                .code(200)
-                .data(imageUploadService.uploadImage(file))
-                .build();
+    public CompletableFuture<UrlResponse> uploadImage(@RequestParam("file") MultipartFile file) {
+        return imageUploadService.uploadImage(file);
     }
 
 
