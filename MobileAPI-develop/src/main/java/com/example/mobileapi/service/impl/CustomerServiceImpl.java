@@ -33,7 +33,6 @@ public class CustomerServiceImpl implements CustomerService {
     CustomerRepository customerRepository;
     EmailService emailService;
     BCryptPasswordEncoder passwordEncoder; // Đổi tên cho rõ ràng
-    JwtUtil jwtUtil;
     CustomerMapper customerMapper;
     Random random = new Random();
     ApplicationEventPublisher applicationEventPublisher;
@@ -164,7 +163,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @PostAuthorize("returnObject.username ==authentication.name")
     public CustomerResponseDTO getCustomerProfile(String token) throws AppException {
-        String username = jwtUtil.getUserNameFormToken(token);
+        String username = JwtUtil.getUserNameFromToken(token);
         return customerMapper.toCustomerResponse(getCustomerByUserName(username));
 
     }

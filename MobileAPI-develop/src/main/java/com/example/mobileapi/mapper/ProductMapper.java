@@ -16,8 +16,6 @@ public interface ProductMapper {
 
     ProductRequestDTO toProductRequestDTO(Product product);
 
-    @Mapping(source = "language.displayName", target = "language")
-    @Mapping(source = "form.displayName", target = "form")
     @Mapping(source = "category.id", target = "categoryId")
     @Mapping(source = "category.name", target = "categoryName")
     ProductResponseDTO toProductResponseDTO(Product product);

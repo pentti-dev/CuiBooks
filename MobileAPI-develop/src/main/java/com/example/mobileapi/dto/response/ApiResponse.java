@@ -1,9 +1,13 @@
 // ApiResponse.java
 package com.example.mobileapi.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.apache.http.HttpStatus;
+
+import java.time.Instant;
 
 @Setter
 @Getter
@@ -13,18 +17,22 @@ import lombok.experimental.FieldDefaults;
 public class ApiResponse<T> {
     Integer code;
     String message;
+    @Builder.Default
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    Instant timestamp = Instant.now();
     T data;
+
 
     public static <T> ApiResponse<T> success(String message) {
         return ApiResponse.<T>builder()
-                .code(200)
+                .code(HttpStatus.SC_OK)
                 .message(message)
                 .build();
     }
 
     public static <T> ApiResponse<T> success() {
         return ApiResponse.<T>builder()
-                .code(200)
+                .code(HttpStatus.SC_OK)
                 .build();
     }
 

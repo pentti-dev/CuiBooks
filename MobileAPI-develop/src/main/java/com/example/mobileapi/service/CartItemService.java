@@ -5,7 +5,7 @@ import com.example.mobileapi.dto.response.CartItemResponseDTO;
 import com.example.mobileapi.exception.AppException;
 
 public interface CartItemService {
-    Integer saveCartItem(CartItemRequestDTO cartItem);
+    Integer saveCartItem(CartItemRequestDTO cartItem) throws AppException;
 
     CartItemResponseDTO getCartItem(int cartItemId) throws AppException;
 

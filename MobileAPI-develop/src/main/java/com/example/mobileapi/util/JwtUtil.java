@@ -1,5 +1,6 @@
 package com.example.mobileapi.util;
 
+import com.example.mobileapi.config.props.JwtProperties;
 import com.example.mobileapi.entity.Customer;
 import com.example.mobileapi.entity.enums.Role;
 import com.example.mobileapi.repository.InvalidateTokenRepository;
@@ -8,102 +9,65 @@ import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import jakarta.annotation.PostConstruct;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.core.io.Resource;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 
 @Slf4j
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Component
-@RequiredArgsConstructor
-public class JwtUtil {
+public final class JwtUtil {
 
-    static final String PRIVATE_KEY_PATH = "D:\\Study\\HK2_Nam4\\web\\DoAn\\MobileAPI-develop\\src\\main\\resources\\keys\\private_key.pem";
-    static final String PUBLIC_KEY_PATH = "D:\\Study\\HK2_Nam4\\web\\DoAn\\MobileAPI-develop\\src\\main\\resources\\keys\\public_key.pem";
-    final InvalidateTokenRepository invalidateTokenRepository;
+    private static RSAPrivateKey privateKey;
+    private static RSAPublicKey publicKey;
+    private static JwtProperties jwtProps;
+    private static InvalidateTokenRepository blacklistRepo;
 
-    RSAPrivateKey privateKey;
-    RSAPublicKey publicKey;
-
-    @PostConstruct
-    public void init() {
-        this.privateKey = loadPrivateKey();
-        this.publicKey = loadPublicKey();
+    private JwtUtil() {
+        throw new UnsupportedOperationException("Utility class should not be instantiated");
     }
 
-    public RSAPrivateKey loadPrivateKey() {
-        return loadKey(PRIVATE_KEY_PATH, true);
+    // Gọi hàm này một lần tại thời điểm khởi tạo bean trong config
+    public static void init(JwtProperties props, InvalidateTokenRepository blacklist) {
+        jwtProps = props;
+        blacklistRepo = blacklist;
+        Resource privateKeyResource = props.keys().privateKey();
+        Resource publicKeyResource = props.keys().publicKey();
+
+        privateKey = KeyUtil.parsePrivateKey(privateKeyResource);
+        publicKey = KeyUtil.parsePublicKey(publicKeyResource);
     }
 
-    public RSAPublicKey loadPublicKey() {
-        return loadKey(PUBLIC_KEY_PATH, false);
-    }
+    public static String generateToken(Customer user) {
+        Instant now = Instant.now();
 
-    private <T> T loadKey(String keyPath, boolean isPrivateKey) {
         try {
-            String key = Files.readString(Paths.get(keyPath))
-                    .replace("-----BEGIN " + (isPrivateKey ? "PRIVATE" : "PUBLIC") + " KEY-----", "")
-                    .replace("-----END " + (isPrivateKey ? "PRIVATE" : "PUBLIC") + " KEY-----", "")
-                    .replaceAll("\\s", "");
-
-            byte[] decodedKey = Base64.getDecoder().decode(key);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-
-            if (isPrivateKey) {
-                PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decodedKey);
-                return (T) keyFactory.generatePrivate(spec);
-            } else {
-                X509EncodedKeySpec spec = new X509EncodedKeySpec(decodedKey);
-                return (T) keyFactory.generatePublic(spec);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("Error loading " + (isPrivateKey ? "private" : "public") + " key", e);
-        }
-    }
-
-    // 🛠 Tạo JWT token
-    public String generateToken(Customer customer) {
-        try {
-            JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                    .subject(customer.getUsername())
-                    .issuer("ngoctaiphan")
-                    .issueTime(new Date())
-                    .expirationTime(Date.from(Instant.now().plus(30, ChronoUnit.MINUTES)))
+            JWTClaimsSet claims = new JWTClaimsSet.Builder()
+                    .issuer(jwtProps.issuer())
+                    .subject(user.getUsername())
+                    .issueTime(Date.from(now))
+                    .expirationTime(Date.from(now.plus(jwtProps.expirationMinutes(), ChronoUnit.MINUTES)))
                     .jwtID(UUID.randomUUID().toString())
-                    .claim("scope", Role.role(customer.isRole()))
+                    .claim("scope", Role.role(user.isRole()))
                     .build();
 
-            SignedJWT signedJWT = new SignedJWT(
-                    new JWSHeader(JWSAlgorithm.RS512),
-                    jwtClaimsSet
-            );
+            JWSHeader header = new JWSHeader(JWSAlgorithm.RS512);
+            SignedJWT jwt = new SignedJWT(header, claims);
+            jwt.sign(new RSASSASigner(privateKey));
 
-            signedJWT.sign(new RSASSASigner(privateKey));
-            return signedJWT.serialize();
+            return jwt.serialize();
         } catch (JOSEException e) {
-            log.warn("Error signing token", e);
-            throw new RuntimeException("Error generating JWT token", e);
+            log.error("Error while generating JWT token", e);
+            throw new RuntimeException("JWT creation failed", e);
         }
     }
 
-    // 🛠 Xác thực JWT token
-    public boolean verifyToken(String token) {
+    public static boolean verifyToken(String token) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(token);
             Date expirationTime = signedJWT.getJWTClaimsSet().getExpirationTime();
@@ -115,8 +79,6 @@ public class JwtUtil {
                 log.warn("Expired token");
                 return false;
             }
-
-
             return isValid;
         } catch (Exception e) {
             log.warn("Error verifying token", e);
@@ -124,46 +86,48 @@ public class JwtUtil {
         }
     }
 
-    public String getUserNameFormToken(String token) {
+    public static String getUserNameFromToken(String token) {
         try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            return signedJWT.getJWTClaimsSet().getSubject();
+            return SignedJWT.parse(token).getJWTClaimsSet().getSubject();
         } catch (Exception e) {
             log.warn("Error extracting username from token", e);
             return null;
         }
     }
 
-    public String getJwtIDFromToken(String token) {
+    public static String getJwtIDFromToken(String token) {
         try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            return signedJWT.getJWTClaimsSet().getJWTID();
+            return SignedJWT.parse(token).getJWTClaimsSet().getJWTID();
         } catch (Exception e) {
             log.warn("Error extracting jwtID from token", e);
             return null;
         }
     }
 
-    public Date getExpirationTimeFromToken(String token) {
+    public static Date getExpirationTimeFromToken(String token) {
         try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            log.error("Expiration time: {}", signedJWT.getJWTClaimsSet().getExpirationTime());
-            return signedJWT.getJWTClaimsSet().getExpirationTime();
+            return SignedJWT.parse(token).getJWTClaimsSet().getExpirationTime();
         } catch (Exception e) {
             log.warn("Error extracting expiration time from token", e);
             return null;
         }
     }
 
-    public boolean isLogout(String token) {
+    public static boolean isLogout(String token) {
         try {
-            SignedJWT signedJWT = SignedJWT.parse(token);
-            String jwtID = signedJWT.getJWTClaimsSet().getJWTID();
-            return invalidateTokenRepository.existsById(jwtID);
+            String jwtID = SignedJWT.parse(token).getJWTClaimsSet().getJWTID();
+            return blacklistRepo.existsById(jwtID);
         } catch (Exception e) {
-            log.warn("Error extracting expiration time from token", e);
+            log.warn("Error checking token logout", e);
             return false;
         }
     }
 
+    public static String resolveToken(HttpServletRequest request) {
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+        return null;
+    }
 }

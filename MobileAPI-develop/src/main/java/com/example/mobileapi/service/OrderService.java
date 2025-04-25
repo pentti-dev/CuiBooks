@@ -26,9 +26,11 @@ public interface OrderService {
 
     List<MonthlyRevenueResponse> getMonthlyRevenue();
 
-    List<OrderResponseDTO> getOrdersByStatus(String status);
+    List<OrderResponseDTO> getOrdersByStatus(OrderStatus status);
 
     void changeOrderStatus(int orderId, OrderStatus status) throws AppException;
 
-    List<OrderResponseDTO> getOrdersByStatusAndCustomerId(String status, int customerId);
+    List<OrderResponseDTO> getOrdersByStatusAndCustomerId(OrderStatus status, int customerId);
+
+    boolean existById(Integer orderId);
 }

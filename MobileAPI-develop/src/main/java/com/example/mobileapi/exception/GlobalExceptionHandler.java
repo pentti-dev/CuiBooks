@@ -10,6 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Objects;
 
 @Slf4j
@@ -92,6 +93,21 @@ public class GlobalExceptionHandler {
                                 .code(errorCode.getCode())
                                 .build());
 
+
+    }
+
+    @ExceptionHandler(value = UnsupportedEncodingException.class)
+    ResponseEntity<ApiResponse<Void>> handlingUnsupportedEncodingException(UnsupportedEncodingException e) {
+
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        log.error(e.getMessage());
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(
+                        ApiResponse.<Void>builder()
+                                .message(errorCode.getMessage())
+                                .code(errorCode.getCode())
+                                .build());
 
     }
 }

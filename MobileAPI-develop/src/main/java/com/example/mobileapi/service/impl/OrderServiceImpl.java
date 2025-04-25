@@ -12,6 +12,7 @@ import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.entity.Order;
 import com.example.mobileapi.entity.OrderDetail;
+import com.example.mobileapi.mapper.OrderMapper;
 import com.example.mobileapi.mapper.ProductMapper;
 import com.example.mobileapi.repository.OrderRepository;
 import com.example.mobileapi.repository.CustomerRepository;
@@ -39,6 +40,7 @@ public class OrderServiceImpl implements OrderService {
     CustomerServiceImpl customerServiceImpl;
     ProductServiceImpl productService;
     private final ProductMapper productMapper;
+    private final OrderMapper orderMapper;
 
     @Override
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #orderRequestDTO.customerId")
@@ -67,9 +69,9 @@ public class OrderServiceImpl implements OrderService {
         switch (method) {
             case COD:
                 return OrderStatus.PENDING;
-            case VN_PAY:
-            case MOMO:
-            case ZALO_PAY:
+            case VN_PAY,
+                 MOMO,
+                 ZALO_PAY:
                 return OrderStatus.PENDING_PAYMENT;
             default:
                 return OrderStatus.PENDING;
@@ -153,14 +155,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<OrderResponseDTO> getOrdersByStatus(String status) {
+    public List<OrderResponseDTO> getOrdersByStatus(OrderStatus status) {
         List<Order> orders = orderRepository.findByStatus(status);
         if (orders.isEmpty()) {
             return Collections.emptyList();
         }
-        return orders.stream()
-                .map(this::convertToOrderResponseDTO)
-                .collect(Collectors.toCollection(ArrayList::new));
+        return orderMapper.toOrderResponseDTOList(orders);
     }
 
 
@@ -173,7 +173,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #customerId")
-    public List<OrderResponseDTO> getOrdersByStatusAndCustomerId(String status, int customerId) {
+    public List<OrderResponseDTO> getOrdersByStatusAndCustomerId(OrderStatus status, int customerId) {
         List<Order> orderResponseDTO = orderRepository.findByStatusAndCustomerId(status, customerId);
         if (orderResponseDTO.isEmpty()) {
             return Collections.emptyList();
@@ -181,6 +181,11 @@ public class OrderServiceImpl implements OrderService {
         return orderResponseDTO.stream()
                 .map(this::convertToOrderResponseDTO)
                 .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    @Override
+    public boolean existById(Integer orderId) {
+        return orderRepository.existsById(orderId);
     }
 
 

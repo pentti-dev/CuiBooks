@@ -4,15 +4,12 @@ import lombok.Getter;
 
 @Getter
 public enum OrderStatus {
-    PENDING_PAYMENT("Đang chờ thanh toán"),
-    PENDING("Đang chờ xử lý"),
-    SHIPPING("Đang giao hàng"),
-    DELIVERED("Đã giao hàng"),
-    CANCELLED("Đã hủy");
+    PENDING_PAYMENT,
+    PENDING,
+    SHIPPING,
+    DELIVERED,
+    CANCELLED,
+    PAYMENT_SUCCESS,
+    PAYMENT_FAILED;
 
-    private final String value;
-
-    OrderStatus(String value) {
-        this.value = value;
-    }
 }

@@ -4,9 +4,11 @@ import com.example.mobileapi.dto.request.CartItemRequestDTO;
 import com.example.mobileapi.dto.response.CartItemResponseDTO;
 import com.example.mobileapi.entity.CartItem;
 import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.repository.CartItemRepository;
 import com.example.mobileapi.service.CartItemService;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,15 +18,20 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class CartItemServiceImpl implements CartItemService {
-    private final CartItemRepository cartItemRepository;
-    private final CartServiceImpl cartServiceImpl;
-    private final ProductServiceImpl productServiceImpl;
+    CartItemRepository cartItemRepository;
+    CartServiceImpl cartServiceImpl;
+    ProductServiceImpl productServiceImpl;
 
     @Override
-    public Integer saveCartItem(CartItemRequestDTO cartItem) {
+    public Integer saveCartItem(CartItemRequestDTO cartItem) throws AppException {
         int cartId = cartItem.getCartId();
         int productId = cartItem.getProductId();
+        if (!productServiceImpl.existById(productId)) {
+            throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
+
 
         // Tìm CartItem dựa trên cartId và productId
         CartItem existingCartItem = cartItemRepository.findByCartIdAndProductId(cartId, productId);

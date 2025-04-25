@@ -1,7 +1,10 @@
 package com.example.mobileapi.config;
 
 import com.cloudinary.Cloudinary;
-import org.springframework.beans.factory.annotation.Value;
+import com.example.mobileapi.config.props.CloudinaryProperties;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,23 +12,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Configuration
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class CloudinaryConfig {
-
-    @Value("${cloudinary.cloud-name}")
-    private String cloudName;
-
-    @Value("${cloudinary.api-key}")
-    private String apiKey;
-
-    @Value("${cloudinary.api-secret}")
-    private String apiSecret;
+    CloudinaryProperties properties;
 
     @Bean
     public Cloudinary cloudinary() {
         Map<String, String> config = new HashMap<>();
-        config.put("cloud_name", cloudName);
-        config.put("api_key", apiKey);
-        config.put("api_secret", apiSecret);
+        config.put("cloud_name", properties.getCloudName());
+        config.put("api_key", properties.getApiKey());
+        config.put("api_secret", properties.getApiSecret());
         return new Cloudinary(config);
     }
 }
+

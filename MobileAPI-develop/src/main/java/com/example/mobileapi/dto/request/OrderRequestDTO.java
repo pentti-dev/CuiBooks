@@ -13,6 +13,7 @@ import java.util.List;
 @Setter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class OrderRequestDTO {
+    Integer id;
     Integer customerId;//id khách hàng
     Integer totalAmount;//tổng tiền
     String address;//địa chỉ
