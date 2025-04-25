@@ -1,5 +1,7 @@
 package com.example.mobileapi.dto.response;
 
+import com.example.mobileapi.entity.enums.BookForm;
+import com.example.mobileapi.entity.enums.Language;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -17,11 +19,11 @@ public class ProductResponseDTO {
     String author;
     Integer publishYear;
     String publisher;
-    String language;
+    Language language;
     Byte weight;
     String size;
     Integer pageNumber;
-    String form;
+    BookForm form;
     Integer categoryId;
     String categoryName;
 }
