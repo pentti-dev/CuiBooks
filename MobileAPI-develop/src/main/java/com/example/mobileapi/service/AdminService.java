@@ -1,5 +1,6 @@
 package com.example.mobileapi.service;
 
+import com.example.mobileapi.entity.Order;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
@@ -27,7 +28,7 @@ public interface AdminService {
 
     void editOrder(int orderId, OrderEditRequestDTO dto) throws AppException;
 
-    List<OrderResponseDTO> getOrdersByStatus(String status);
+    List<OrderResponseDTO> getOrdersByStatus(OrderStatus status);
 
     void changeOrderStatus(int orderId, OrderStatus status) throws AppException;
 

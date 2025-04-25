@@ -113,7 +113,7 @@ public class AdminController {
     @GetMapping("/{status}")
     public ApiResponse<List<OrderResponseDTO>> getOrderByStatus(@PathVariable OrderStatus status) {
         return ApiResponse.<List<OrderResponseDTO>>builder()
-                .data(orderService.getOrdersByStatus(status.getValue()))
+                .data(orderService.getOrdersByStatus(status))
                 .build();
 
     }

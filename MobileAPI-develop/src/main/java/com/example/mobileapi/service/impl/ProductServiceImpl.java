@@ -105,4 +105,8 @@ public class ProductServiceImpl implements ProductService {
     public Product getById(int id) {
         return productRepository.findById(id).orElse(null);
     }
+
+    public boolean existById(int id) {
+        return productRepository.existsById(id);
+    }
 }

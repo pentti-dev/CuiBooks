@@ -68,7 +68,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<OrderResponseDTO> getOrdersByStatus(String status) {
+    public List<OrderResponseDTO> getOrdersByStatus(OrderStatus status) {
         return orderService.getOrdersByStatus(status);
     }
 

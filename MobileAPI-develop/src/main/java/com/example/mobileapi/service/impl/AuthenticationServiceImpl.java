@@ -28,7 +28,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     CustomerRepository customerRepository;
     InvalidateTokenRepository invalidateTokenRepository;
     BCryptPasswordEncoder passwordEncoder;
-    JwtUtil jwtUtil;
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) throws AppException {
@@ -37,7 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if (passwordEncoder.matches(loginRequest.getPassword(), customer.getPassword())) { // Sử dụng passwordEncoder
 
-            var token = jwtUtil.generateToken(customer);
+            var token = JwtUtil.generateToken(customer);
             return LoginResponse.builder()
                     .token(token)
                     .build();
@@ -51,10 +50,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (token == null || token.isEmpty()) {
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
-        String jwtID = jwtUtil.getJwtIDFromToken(token);
+        String jwtID = JwtUtil.getJwtIDFromToken(token);
         invalidateTokenRepository.save(InvalidateToken.builder()
                 .id(jwtID)
-                .expiryTime(jwtUtil.getExpirationTimeFromToken(token))
+                .expiryTime(JwtUtil.getExpirationTimeFromToken(token))
                 .build());
 
     }
