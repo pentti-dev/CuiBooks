@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+
+import java.util.UUID;
 
 @Table(name = "order-details")
 @Entity
@@ -13,23 +16,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class OrderDetail {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
-    private Integer id;
+    UUID id;
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    Order order;
 
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    Product product;
 
-    private Integer quantity;
+    Integer quantity;
 
     @Override
     public boolean equals(Object o) {

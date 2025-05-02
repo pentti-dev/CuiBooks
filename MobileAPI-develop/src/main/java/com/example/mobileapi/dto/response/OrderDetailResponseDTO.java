@@ -6,6 +6,8 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.jackson.Jacksonized;
 
+import java.util.UUID;
+
 import static lombok.AccessLevel.PRIVATE;
 
 @Jacksonized
@@ -14,8 +16,8 @@ import static lombok.AccessLevel.PRIVATE;
 @Getter
 @Setter
 public class OrderDetailResponseDTO {
-    Integer id;
-    Integer orderId;
+    UUID id;
+    UUID orderId;
     ProductResponseDTO productResponseDTO;
     Integer quantity;
 }

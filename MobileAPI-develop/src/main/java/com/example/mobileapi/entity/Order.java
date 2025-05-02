@@ -22,9 +22,9 @@ import java.util.*;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
-    Integer id;
+    UUID id;
 
     @ManyToOne
     @JsonBackReference

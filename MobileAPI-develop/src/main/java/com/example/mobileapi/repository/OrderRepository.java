@@ -7,10 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface OrderRepository extends JpaRepository<Order, Integer> {
-    List<Order> findByCustomerId(int customerId);
+public interface OrderRepository extends JpaRepository<Order, UUID> {
+    List<Order> findByCustomerId(UUID customerId);
 
     @Query(value = "SELECT\n" +
             "    months.Month AS Month,\n" +
@@ -29,7 +30,7 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     List<Object[]> getMonthlyRevenue();
 
 
-    List<Order> findByStatusAndCustomerId(OrderStatus status, Integer customer_id);
+    List<Order> findByStatusAndCustomer_Id(OrderStatus status, UUID customerId);
 
     List<Order> findByStatus(OrderStatus status);
 }

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,9 +26,9 @@ public class CartItemServiceImpl implements CartItemService {
     ProductServiceImpl productServiceImpl;
 
     @Override
-    public Integer saveCartItem(CartItemRequestDTO cartItem) throws AppException {
-        int cartId = cartItem.getCartId();
-        int productId = cartItem.getProductId();
+    public UUID saveCartItem(CartItemRequestDTO cartItem) throws AppException {
+        UUID cartId = cartItem.getCartId();
+        UUID productId = cartItem.getProductId();
         if (!productServiceImpl.existById(productId)) {
             throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
         }
@@ -53,7 +54,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public CartItemResponseDTO getCartItem(int cartItemId) throws AppException {
+    public CartItemResponseDTO getCartItem(UUID  cartItemId) throws AppException {
         CartItem cartItem = getByCartId(cartItemId);
         return CartItemResponseDTO.builder()
                 .id(cartItem.getId())
@@ -63,19 +64,19 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public void deleteCartItem(int cartItemId) {
+    public void deleteCartItem(UUID  cartItemId) {
         cartItemRepository.deleteById(cartItemId);
     }
 
     @Override
-    public void updateCartItem(int id, CartItemRequestDTO cartItem) {
+    public void updateCartItem(UUID  id, CartItemRequestDTO cartItem) {
         CartItem cartI = getByCartId(id);
         cartI.setQuantity(cartItem.getQuantity());
         cartItemRepository.save(cartI);
     }
 
     @Override
-    public void updateCartItemQuantity(int cartItemId, int quantity) {
+    public void updateCartItemQuantity(UUID  cartItemId, int quantity) {
         CartItem cartI = getByCartId(cartItemId);
         cartI.setQuantity(cartI.getQuantity() + quantity);
         if (cartI.getQuantity() <= 0) {
@@ -87,15 +88,15 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public void deleteCartItemByCartId(int cartId) {
+    public void deleteCartItemByCartId(UUID  cartId) {
         cartItemRepository.deleteByCartId(cartId);
     }
 
-    public CartItem getByCartId(int cartItemId) {
+    public CartItem getByCartId(UUID  cartItemId) {
         return cartItemRepository.findById(cartItemId).orElse(null);
     }
 
-    public List<CartItemResponseDTO> getCartItemsByCartId(int cartId) {
+    public List<CartItemResponseDTO> getCartItemsByCartId(UUID  cartId) {
         List<CartItem> cartItems = cartItemRepository.findByCartId(cartId);
         return cartItems.stream().map(cartItem -> {
             try {

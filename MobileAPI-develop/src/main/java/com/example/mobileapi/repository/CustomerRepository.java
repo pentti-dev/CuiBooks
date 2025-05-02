@@ -7,9 +7,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface CustomerRepository extends JpaRepository<Customer, Integer> {
+public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     @Query("SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END FROM Customer u WHERE u.username = :username")
     boolean existsByUsername(@Param("username") String username);
 
@@ -20,10 +21,10 @@ public interface CustomerRepository extends JpaRepository<Customer, Integer> {
     Optional<Customer> findByUsername(String username);
 
     @Query("SELECT COALESCE(SUM(ci.quantity), 0) AS total_quantity " + "FROM CartItem ci " + "WHERE ci.cart.id IN (SELECT c.id FROM Cart c WHERE c.customer.id = :customerId)")
-    int getQuantityByCustomerId(@Param("customerId") int customerId);
+    int getQuantityByCustomerId(@Param("customerId") UUID customerId);
 
     boolean existsByEmail(String email);
 
     @Query("SELECT u.id FROM Customer u WHERE u.username = :username")
-    Integer findIdByUsername(String username);
+    UUID findIdByUsername(String username);
 }

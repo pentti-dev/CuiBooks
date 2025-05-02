@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Table(name = "categories")
 @Entity
@@ -19,9 +20,9 @@ import java.util.List;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class Category {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
-    Integer id;
+    UUID id;
 
     @Column(nullable = false)
     String name;

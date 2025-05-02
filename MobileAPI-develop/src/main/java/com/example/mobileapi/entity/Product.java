@@ -4,27 +4,26 @@ import com.example.mobileapi.entity.enums.BookForm;
 import com.example.mobileapi.entity.enums.Language;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-@Table(name = "products")
 @Entity
+@Table(name = "products")
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
-@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Product {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    Integer id;
+    UUID id;
 
     @Column(nullable = false)
     String name;
@@ -33,51 +32,52 @@ public class Product {
     String img;
 
     @Column(nullable = false)
-    int price;
-
+    BigDecimal price;
 
     @Lob
     @Column(columnDefinition = "TEXT")
     String detail;
 
     @Column(nullable = false)
-    String supplier;//nhà cung cấp
+    String supplier; // nhà cung cấp
 
     @Column(nullable = false)
-    String author;//tác giả
+    String author; // tác giả
 
     @Column(nullable = false)
-    Integer publishYear;//năm xuất bản
+    Integer publishYear; // năm xuất bản
 
     @Column(nullable = false)
-    String publisher;//nhà xuất bản
+    String publisher; // nhà xuất bản
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    Language language;//ngôn ngữ
+    @Column(nullable = false)
+    Language language; // ngôn ngữ
 
     @Column(nullable = false)
-    Byte weight;//trọng lượng
+    Integer weight; // trọng lượng (gram)
 
     @Column(nullable = false)
-    String size;//kích thước
+    String size; // kích thước
 
     @Column(nullable = false)
-    Integer pageNumber;//số trang
+    Integer pageNumber; // số trang
 
-    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    BookForm form;//hình thức
+    @Column(nullable = false)
+    BookForm form; // hình thức
 
-    @ManyToOne
-    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonBackReference
     Category category;
 
+    // Bắt buộc phải để kèm "= new ArrayList<>()" khi dùng @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    List<CartItem> cartItems;
+    @Builder.Default
+    List<CartItem> cartItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @Builder.Default
     List<OrderDetail> orderDetails = new ArrayList<>();
 }
-

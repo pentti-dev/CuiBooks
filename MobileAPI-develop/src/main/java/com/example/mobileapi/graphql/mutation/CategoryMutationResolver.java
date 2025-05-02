@@ -5,13 +5,15 @@ import com.example.mobileapi.dto.response.CategoryResponseDTO;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.service.CategoryService;
 import jakarta.validation.Valid;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.AccessLevel;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,13 +29,13 @@ public class CategoryMutationResolver {
     }
 
     @MutationMapping
-    public CategoryResponseDTO updateCategory(@Argument("id") int id, @Valid @Argument("input") CategoryRequestDTO category) throws AppException {
+    public CategoryResponseDTO updateCategory(@Argument("id") UUID id, @Valid @Argument("input") CategoryRequestDTO category) throws AppException {
         return categoryService.updateCategory(id, category);
 
     }
 
     @MutationMapping
-    public Boolean deleteCategory(@Argument int id) {
+    public Boolean deleteCategory(@Argument UUID id) {
         categoryService.deleteCategory(id);
         return Boolean.TRUE;
     }

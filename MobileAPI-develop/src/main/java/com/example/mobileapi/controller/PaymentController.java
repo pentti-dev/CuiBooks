@@ -3,7 +3,6 @@ package com.example.mobileapi.controller;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.PaymentResponse;
 import com.example.mobileapi.service.PaymentService;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.websocket.server.PathParam;
@@ -12,9 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
-import java.time.LocalDateTime;
+import java.math.BigDecimal;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -28,7 +27,7 @@ public class PaymentController {
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<PaymentResponse> createPayment(
-            @PathParam("price") Long price, @PathParam("orderId") Integer orderId
+            @PathParam("price") BigDecimal price, @PathParam("orderId") UUID orderId
     ) throws UnsupportedEncodingException {
 
         var resp = paymentService.createVNPayPayment(orderId, price);

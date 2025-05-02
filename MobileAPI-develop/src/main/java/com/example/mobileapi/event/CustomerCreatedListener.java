@@ -9,6 +9,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -20,7 +22,7 @@ public class CustomerCreatedListener {
     @EventListener
     public void hanldeCustomerCreate(CustomerCreatedEvent customerCreatedEvent) {
 
-        Integer customerId = customerCreatedEvent.getCustomerId();
+        UUID customerId = customerCreatedEvent.getCustomerId();
         log.info("⏳ Đang tạo giỏ hàng cho customer {}", customerId);
         cartService.saveCart(CartRequestDTO.builder().customerId(customerId).build());
         log.info("✅ Giỏ hàng đã được tạo cho customer {}", customerId);

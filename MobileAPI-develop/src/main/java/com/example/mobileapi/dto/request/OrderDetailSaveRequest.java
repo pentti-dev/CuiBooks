@@ -3,12 +3,14 @@ package com.example.mobileapi.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDetailSaveRequest {
-    Integer productId;
-    Integer orderId;
+    UUID productId;
+    UUID orderId;
     Integer quantity;
 }

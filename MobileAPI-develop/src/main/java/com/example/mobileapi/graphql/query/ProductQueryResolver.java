@@ -14,6 +14,7 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class ProductQueryResolver {
     }
 
     @QueryMapping
-    public Product productById(@Argument Integer id) throws AppException {
+    public Product productById(@Argument UUID id) throws AppException {
         return productMapper.toProduct(productService.getProductById(id));
     }
 
@@ -39,14 +40,14 @@ public class ProductQueryResolver {
     }
 
     @QueryMapping
-    public List<Product> productsByCategoryId(@Argument Integer categoryId) {
+    public List<Product> productsByCategoryId(@Argument UUID categoryId) {
         return productMapper.toProductList(productService.findByCategoryId(categoryId));
     }
 
     @QueryMapping
     public List<Product> filteredProducts(
             @Argument String name,
-            @Argument Integer categoryId,
+            @Argument UUID categoryId,
             @Argument Language language,
             @Argument Integer minPrice,
             @Argument Integer maxPrice,

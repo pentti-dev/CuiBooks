@@ -10,27 +10,28 @@ import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.exception.AppException;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AdminService {
     List<CustomerResponseDTO> getAllCustomers();
 
-    CustomerResponseDTO getCustomerById(int customerId);
+    CustomerResponseDTO getCustomerById(UUID customerId);
 
     CustomerResponseDTO addCustomer(CustomerRequestDTO customer) throws AppException;
 
-    CustomerResponseDTO updateCustomer(int customerId, CustomerRequestDTO customer) throws AppException;
+    CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO customer) throws AppException;
 
-    void deleteCustomer(int customerId);
+    void deleteCustomer(UUID customerId);
 
     List<OrderResponseDTO> getAllOrders();
 
-    void deleteOrder(int orderId);
+    void deleteOrder(UUID orderId);
 
-    void editOrder(int orderId, OrderEditRequestDTO dto) throws AppException;
+    void editOrder(UUID orderId, OrderEditRequestDTO dto) throws AppException;
 
     List<OrderResponseDTO> getOrdersByStatus(OrderStatus status);
 
-    void changeOrderStatus(int orderId, OrderStatus status) throws AppException;
+    void changeOrderStatus(UUID orderId, OrderStatus status) throws AppException;
 
     List<MonthlyRevenueResponse> getMonthlyRevenue();
 

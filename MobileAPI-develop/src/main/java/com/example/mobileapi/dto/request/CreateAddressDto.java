@@ -1,14 +1,19 @@
 package com.example.mobileapi.dto.request;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+
+import java.util.UUID;
 
 @Getter
 @Setter
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateAddressDto {
-    private String address;
-    private String numberPhone;
-    private String receiver;
-    private String note;
-    private Integer customerId;
+    String address;
+    String numberPhone;
+    String receiver;
+    String note;
+    UUID customerId;
 }

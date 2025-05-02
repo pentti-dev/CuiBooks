@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/category")
@@ -26,7 +27,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{categoryId}")
-    public CategoryResponseDTO getCategory(@PathVariable int categoryId) throws AppException {
+    public CategoryResponseDTO getCategory(@PathVariable UUID categoryId) throws AppException {
         return categoryService.getCategory(categoryId);
     }
 }

@@ -18,16 +18,16 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Customer {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, name = "id")
-    Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(nullable = false)
+    UUID id;
 
-    @Column(nullable = false, name = "fullname")
+    @Column(nullable = false)
     String fullname;
 
-    @Column(unique = true, nullable = false, name = "username")
+    @Column(unique = true, nullable = false)
     String username;
-    @Column(unique = true, length = 100, nullable = false, name = "email")
+    @Column(unique = true, length = 100, nullable = false)
     String email;
 
     @Column(nullable = false, name = "password")

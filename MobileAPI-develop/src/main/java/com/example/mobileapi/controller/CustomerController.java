@@ -1,7 +1,8 @@
 package com.example.mobileapi.controller;
 
 import com.example.mobileapi.annotation.GetToken;
-import com.example.mobileapi.dto.request.*;
+import com.example.mobileapi.dto.request.ChangePasswordDto;
+import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.exception.AppException;
@@ -16,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @Slf4j
 @RestController
 @RequestMapping("/api/customer")
@@ -28,7 +31,7 @@ public class CustomerController {
 
     @Operation(summary = "Lấy so luong  dùng theo ID")
     @GetMapping("/quantity/{customerId}")
-    public ApiResponse<Integer> getQuantity(@PathVariable("customerId") int customerId) {
+    public ApiResponse<Integer> getQuantity(@PathVariable("customerId") UUID customerId) {
         return ApiResponse.<Integer>builder()
                 .data(customerService.getQuantityByCustomerId(customerId))
                 .build();
@@ -37,7 +40,7 @@ public class CustomerController {
 
     @Operation(summary = "Cập nhật thông tin người dùng")
     @PutMapping("/{customerId}")
-    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable int customerId, @Valid @RequestBody CustomerRequestDTO customer) throws AppException {
+    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable UUID customerId, @Valid @RequestBody CustomerRequestDTO customer) throws AppException {
 
         return ApiResponse.<CustomerResponseDTO>builder()
                 .data(customerService.updateCustomer(customerId, customer))
@@ -94,7 +97,7 @@ public class CustomerController {
 
     @Operation(summary = "Thay đổi mật khẩu")
     @PatchMapping("/changePassword/{customerId}")
-    public ApiResponse<Void> changePassword(@PathVariable int customerId, @RequestBody ChangePasswordDto dto) throws AppException {
+    public ApiResponse<Void> changePassword(@PathVariable UUID customerId, @RequestBody ChangePasswordDto dto) throws AppException {
         customerService.changePassword(customerId, dto.getOldPassword(), dto.getNewPassword());
 
         return ApiResponse.success("Đổi mật khẩu thành công");

@@ -8,16 +8,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface OrderDetailRepository extends JpaRepository<OrderDetail, Integer> {
-    List<OrderDetail> findOrderByOrderId(int orderId);
+public interface OrderDetailRepository extends JpaRepository<OrderDetail, UUID> {
+    List<OrderDetail> findOrderByOrderId(UUID orderId);
 
-    OrderDetail findOrderByProductId(int productId);
+    OrderDetail findOrderByProductId(UUID productId);
 
     @Query("SELECT od.product FROM OrderDetail od WHERE od.order.id = :orderId")
-    Product findProductByOrderId(int orderId);
+    Product findProductByOrderId(UUID orderId);
 
     @Query("SELECT od.order FROM OrderDetail od WHERE od.id = :orderDetailId")
-    Order findOrderIdByOrderDetailId(int orderDetailId);
+    Order findOrderIdByOrderDetailId(UUID orderDetailId);
 }

@@ -7,12 +7,13 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Builder
 @Getter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class OrderResponseDTO {
-    Integer id;
+    UUID id;
     CustomerResponseDTO customerDTO;
     LocalDateTime orderDate;
     Integer totalAmount;

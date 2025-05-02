@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 @Table(name = "addresses")
 @Entity
 @Builder
@@ -14,9 +16,9 @@ import lombok.*;
 public class Address {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
-    private Integer id;
+    private UUID id;
 
     @Column(name = "address", nullable = false)
     private String address;

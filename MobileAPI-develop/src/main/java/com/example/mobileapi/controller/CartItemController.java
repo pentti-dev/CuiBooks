@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/cartItem")
 @RequiredArgsConstructor
@@ -21,20 +23,20 @@ public class CartItemController {
     }
 
     @PutMapping("/updatequantity/{cartItemId}")
-    public ApiResponse<Void> updateCartItem(@PathVariable("cartItemId") int cartItemId, @RequestParam int quantity) {
+    public ApiResponse<Void> updateCartItem(@PathVariable("cartItemId") UUID cartItemId, @RequestParam int quantity) {
         cartItemService.updateCartItemQuantity(cartItemId, quantity);
         return ApiResponse.success();
     }
 
     @DeleteMapping("/{cartItemId}")
-    public ApiResponse<Void> deleteCartItem(@PathVariable("cartItemId") int cartItemId) {
+    public ApiResponse<Void> deleteCartItem(@PathVariable("cartItemId") UUID cartItemId) {
         cartItemService.deleteCartItem(cartItemId);
 
         return ApiResponse.success();
     }
 
     @DeleteMapping("/cartId/{cartId}")
-    public ApiResponse<Void> deleteCartItemByCartId(@PathVariable("cartId") int cartId) {
+    public ApiResponse<Void> deleteCartItemByCartId(@PathVariable("cartId") UUID cartId) {
         cartItemService.deleteCartItemByCartId(cartId);
         return ApiResponse.success();
     }

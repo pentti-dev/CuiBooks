@@ -14,7 +14,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Transaction {
     @Id
-    Integer id;
+    String id;
 
     @ManyToOne
     @JsonIgnore

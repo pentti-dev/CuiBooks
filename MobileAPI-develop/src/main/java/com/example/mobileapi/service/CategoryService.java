@@ -7,19 +7,20 @@ import com.example.mobileapi.entity.Category;
 import com.example.mobileapi.exception.AppException;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface CategoryService {
     CategoryResponseDTO saveCategory(CategoryRequestDTO category);
 
-    CategoryResponseDTO updateCategory(int id, CategoryRequestDTO category) throws AppException;
+    CategoryResponseDTO updateCategory(UUID id, CategoryRequestDTO category) throws AppException;
 
-    void deleteCategory(int id);
+    void deleteCategory(UUID  id);
 
-    CategoryResponseDTO getCategory(int id) throws AppException;
+    CategoryResponseDTO getCategory(UUID  id) throws AppException;
 
     List<CategoryResponseDTO> getAllCategories();
 
-    CategoryResponseDTO getCategoryById(int categoryId) throws AppException;
+    CategoryResponseDTO getCategoryById(UUID  categoryId) throws AppException;
 
     Category getCategoryByName(String name) throws AppException;
 }

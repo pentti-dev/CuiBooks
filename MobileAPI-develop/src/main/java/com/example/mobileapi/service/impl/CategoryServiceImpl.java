@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -32,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponseDTO updateCategory(int id, CategoryRequestDTO dto) throws AppException {
+    public CategoryResponseDTO updateCategory(UUID id, CategoryRequestDTO dto) throws AppException {
         if (!categoryRepository.existsById(dto.getId())) {
             throw new AppException(ErrorCode.CATEGORY_NOT_FOUND);
 
@@ -44,12 +45,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void deleteCategory(int id) {
+    public void deleteCategory(UUID id) {
         categoryRepository.deleteById(id);
     }
 
     @Override
-    public CategoryResponseDTO getCategory(int id) throws AppException {
+    public CategoryResponseDTO getCategory(UUID id) throws AppException {
         Category category = categoryRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         return CategoryResponseDTO.builder()
@@ -74,7 +75,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponseDTO getCategoryById(int categoryId) throws AppException {
+    public CategoryResponseDTO getCategoryById(UUID categoryId) throws AppException {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() ->
                         new AppException(ErrorCode.CATEGORY_NOT_FOUND));

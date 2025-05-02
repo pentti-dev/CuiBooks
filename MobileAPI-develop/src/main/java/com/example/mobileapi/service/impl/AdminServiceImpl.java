@@ -15,6 +15,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
@@ -28,7 +29,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public CustomerResponseDTO getCustomerById(int customerId) {
+    public CustomerResponseDTO getCustomerById(UUID customerId) {
         return customerService.getCustomer(customerId);
     }
 
@@ -38,12 +39,12 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public CustomerResponseDTO updateCustomer(int customerId, CustomerRequestDTO customer) throws AppException {
+    public CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO customer) throws AppException {
         return customerService.updateCustomer(customerId, customer);
     }
 
     @Override
-    public void deleteCustomer(int customerId) {
+    public void deleteCustomer(UUID customerId) {
         customerService.deleteCustomer(customerId);
 
     }
@@ -56,13 +57,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void deleteOrder(int orderId) {
+    public void deleteOrder(UUID orderId) {
         orderService.deleteOrder(orderId);
 
     }
 
     @Override
-    public void editOrder(int orderId, OrderEditRequestDTO dto) throws AppException {
+    public void editOrder(UUID orderId, OrderEditRequestDTO dto) throws AppException {
         orderService.editOrder(orderId, dto);
 
     }
@@ -73,7 +74,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void changeOrderStatus(int orderId, OrderStatus status) throws AppException {
+    public void changeOrderStatus(UUID orderId, OrderStatus status) throws AppException {
         orderService.changeOrderStatus(orderId, status);
 
     }

@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
+import java.util.UUID;
 
 @Table(name = "carts")
 @Entity
@@ -15,9 +16,9 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Cart {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
-    Integer id;
+    UUID id;
 
 
     @OneToOne

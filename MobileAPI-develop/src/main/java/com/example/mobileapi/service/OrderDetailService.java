@@ -5,19 +5,20 @@ import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
 import com.example.mobileapi.exception.AppException;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface OrderDetailService {
     OrderDetailResponseDTO saveOrderDetail(OrderDetailSaveRequest requestDTO) throws AppException;
 
-    OrderDetailResponseDTO updateOrderDetail(int id, OrderDetailSaveRequest requestDTO) throws AppException;
+    OrderDetailResponseDTO updateOrderDetail(UUID id, OrderDetailSaveRequest requestDTO) throws AppException;
 
-    void deleteOrderDetail(int id);
+    void deleteOrderDetail(UUID id);
 
-    OrderDetailResponseDTO findOrderDetailById(int id);
+    OrderDetailResponseDTO findOrderDetailById(UUID id);
 
-    List<OrderDetailResponseDTO> findOrderDetailByOrderId(int orderId);
+    List<OrderDetailResponseDTO> findOrderDetailByOrderId(UUID orderId);
 
-    OrderDetailResponseDTO findOrderDetailByProductId(int productId);
+    OrderDetailResponseDTO findOrderDetailByProductId(UUID productId);
 
 
 }

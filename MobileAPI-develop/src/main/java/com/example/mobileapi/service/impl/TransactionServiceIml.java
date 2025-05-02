@@ -5,15 +5,17 @@ import com.example.mobileapi.service.OrderService;
 import com.example.mobileapi.service.TransactionService;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class TransactionServiceIml implements TransactionService {
     OrderService orderService;
 
     @Override
-    public TransactionResponse createTransaction(String id, String orderId, String responseCode, String transactionDate, String amount) {
+    public TransactionResponse createTransaction(String id, UUID orderId, String responseCode, String transactionDate, String amount) {
         return TransactionResponse.builder()
                 .id(id)
-                .orders(orderService.getOrder(Integer.parseInt(orderId)))
+                .orders(orderService.getOrder(orderId))
                 .responseCode(responseCode)
                 .transactionDate(transactionDate)
                 .amount(amount)

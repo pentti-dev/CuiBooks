@@ -4,17 +4,19 @@ import com.example.mobileapi.dto.request.CartItemRequestDTO;
 import com.example.mobileapi.dto.response.CartItemResponseDTO;
 import com.example.mobileapi.exception.AppException;
 
+import java.util.UUID;
+
 public interface CartItemService {
-    Integer saveCartItem(CartItemRequestDTO cartItem) throws AppException;
+    UUID saveCartItem(CartItemRequestDTO cartItem) throws AppException;
 
-    CartItemResponseDTO getCartItem(int cartItemId) throws AppException;
+    CartItemResponseDTO getCartItem(UUID  cartItemId) throws AppException;
 
-    void deleteCartItem(int cartItemId);
+    void deleteCartItem(UUID  cartItemId);
 
-    void updateCartItem(int id, CartItemRequestDTO cartItem);
+    void updateCartItem(UUID  id, CartItemRequestDTO cartItem);
 
-    void updateCartItemQuantity(int cartItemId, int quantity);
+    void updateCartItemQuantity(UUID  cartItemId, int quantity);
 
-    void deleteCartItemByCartId(int cartId);
+    void deleteCartItemByCartId(UUID  cartId);
 
 }
