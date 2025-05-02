@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="mobile@localhost" uuid="aa6e6ecd-3d9e-419e-a98e-216eda1c9269">
+    <data-source source="LOCAL" name="mobile@localhost" uuid="090efe39-fc38-42e8-b66d-6f8d6a243466">
       <driver-ref>mysql.8</driver-ref>
       <synchronize>true</synchronize>
-      <imported>true</imported>
-      <remarks>$PROJECT_DIR$/MobileAPI-develop/src/main/resources/application.properties</remarks>
       <jdbc-driver>com.mysql.cj.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://localhost:3306/mobile</jdbc-url>
       <jdbc-additional-properties>
