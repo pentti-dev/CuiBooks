@@ -55,11 +55,18 @@ public class CustomerController {
                 .build();
     }
 
+    @PreAuthorize("permitAll()")
     @Operation(summary = "Kiểm tra tên đăng nhập")
     @GetMapping("/checkUsername/{username}")
     public ApiResponse<Boolean> checkUsername(@PathVariable String username) {
-
         return ApiResponse.<Boolean>builder().data(customerService.checkUsername(username)).build();
+    }
+
+    @PreAuthorize("permitAll()")
+    @Operation(summary = "Kiểm tra Email")
+    @GetMapping("/checkEmail/{email}")
+    public ApiResponse<Boolean> checkEmail(@PathVariable String email) {
+        return ApiResponse.<Boolean>builder().data(customerService.checkEmail(email)).build();
     }
 
     @PreAuthorize("permitAll()")
