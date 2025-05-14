@@ -108,10 +108,10 @@ public class PaymentServiceImpl implements PaymentService {
     public boolean notifyOrder(String vnp_ResponseCode, String vnp_TxnRef, String vnp_TransactionNo, String vnp_TransactionDate, String vnp_Amount) {
         if (vnp_ResponseCode.equals("00")) {
             orderService.changeOrderStatus(UUID.fromString(vnp_TxnRef), OrderStatus.PAYMENT_SUCCESS);
-            transactionService.createTransaction(vnp_TransactionNo, UUID.fromString(vnp_TxnRef), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
+            transactionService.createTransaction(UUID.fromString(vnp_TransactionNo), UUID.fromString(vnp_TxnRef), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
             return true;
         } else {
-            transactionService.createTransaction(vnp_TransactionNo, UUID.fromString(vnp_TxnRef), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
+            transactionService.createTransaction(UUID.fromString(vnp_TransactionNo), UUID.fromString(vnp_TxnRef), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
             orderService.changeOrderStatus(UUID.fromString(vnp_TxnRef), OrderStatus.PAYMENT_FAILED);
             return false;
         }

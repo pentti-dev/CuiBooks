@@ -7,7 +7,7 @@ import com.example.mobileapi.exception.AppException;
 import java.util.UUID;
 
 public interface CartService {
-    UUID saveCart(CartRequestDTO cartRequestDTO);
+    UUID saveCart(CartRequestDTO cartRequestDTO) throws AppException;
 
     CartResponseDTO getCartById(UUID cartId) throws AppException;
 

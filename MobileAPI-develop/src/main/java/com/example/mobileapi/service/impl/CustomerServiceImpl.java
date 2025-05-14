@@ -3,11 +3,11 @@ package com.example.mobileapi.service.impl;
 import com.example.mobileapi.config.BCryptPasswordEncoder;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
+import com.example.mobileapi.entity.Customer;
 import com.example.mobileapi.event.CustomerCreatedEvent;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.CustomerMapper;
-import com.example.mobileapi.entity.Customer;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.EmailService;
@@ -46,10 +46,12 @@ public class CustomerServiceImpl implements CustomerService {
         } else if (checkEmail(request.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
+
         // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
         request.setPassword(passwordEncoder.encode(request.getPassword())); // Sử dụng passwordEncoder
 
         Customer customer = customerRepository.save(customerMapper.toCustomer(request));
+        log.info("Customer created with ID: {}", customer.getId());
         applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, customer.getId()));
         return customerMapper.toCustomerResponse(customer);
     }
@@ -186,12 +188,8 @@ public class CustomerServiceImpl implements CustomerService {
         return sb.toString();
     }
 
-    public Customer getCustomerById(UUID customerId) {
-        try {
-            return customerRepository.findById(customerId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        } catch (AppException e) {
-            throw new RuntimeException(e);
-        }
+    public Customer getCustomerById(UUID customerId) throws AppException {
+        return customerRepository.findById(customerId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
     public UUID getCustomerIdByUsername(String username) {

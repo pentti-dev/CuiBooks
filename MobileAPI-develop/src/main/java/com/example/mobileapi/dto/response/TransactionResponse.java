@@ -11,7 +11,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TransactionResponse {
-    String id;
+    UUID id;
     OrderResponseDTO orders;
     String responseCode;
     String transactionDate;

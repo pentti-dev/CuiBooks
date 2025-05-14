@@ -54,6 +54,7 @@ public class SecurityConfig {
             "/api/customer/initPasswordReset/**", "/api/customer/resetPassword/**",
             "/api/auth/**", "/api/customer/introspect", "/api/test/**"
             , "/graphiql", "/graphql", "/api/graphql/product"
+            , "/graphql-ui", "/webjars/**"
     };
 
     @Bean

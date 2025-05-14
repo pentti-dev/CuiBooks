@@ -12,7 +12,7 @@ public class TransactionServiceIml implements TransactionService {
     OrderService orderService;
 
     @Override
-    public TransactionResponse createTransaction(String id, UUID orderId, String responseCode, String transactionDate, String amount) {
+    public TransactionResponse createTransaction(UUID id, UUID orderId, String responseCode, String transactionDate, String amount) {
         return TransactionResponse.builder()
                 .id(id)
                 .orders(orderService.getOrder(orderId))

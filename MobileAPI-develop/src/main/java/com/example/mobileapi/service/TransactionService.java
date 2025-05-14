@@ -6,5 +6,5 @@ import java.util.UUID;
 
 public interface TransactionService {
 
-    TransactionResponse createTransaction(String id, UUID orderId, String responseCode, String transactionDate, String amount);
+    TransactionResponse createTransaction(UUID id, UUID orderId, String responseCode, String transactionDate, String amount);
 }

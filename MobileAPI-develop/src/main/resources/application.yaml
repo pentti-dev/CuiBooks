@@ -2,7 +2,7 @@ spring:
   application:
     name: MobileAPI
   datasource:
-    url: jdbc:mysql://localhost:3306/mobile
+    url: jdbc:mysql://localhost:3306/bookstore
     username: root
     password: 123
     driverClassName: com.mysql.cj.jdbc.Driver

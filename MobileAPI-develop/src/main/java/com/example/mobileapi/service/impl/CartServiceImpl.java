@@ -2,10 +2,10 @@ package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.dto.request.CartRequestDTO;
 import com.example.mobileapi.dto.response.CartResponseDTO;
-import com.example.mobileapi.exception.AppException;
-import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.entity.Cart;
 import com.example.mobileapi.entity.CartItem;
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.CartItemMapper;
 import com.example.mobileapi.repository.CartRepository;
 import com.example.mobileapi.service.CartService;
@@ -14,6 +14,7 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,10 +29,12 @@ public class CartServiceImpl implements CartService {
     CartItemMapper cartItemMapper;
 
     @Override
-    public UUID saveCart(CartRequestDTO cartRequestDTO) {
+    @Transactional
+    public UUID saveCart(CartRequestDTO cartRequestDTO) throws AppException {
         Cart cart = Cart.builder()
                 .customer(customerServiceImpl.getCustomerById(cartRequestDTO.getCustomerId()))
                 .build();
+        log.info("Save cart : {}", cart.getCustomer().getFullname());
         return cartRepository.save(cart).getId();
     }
 
