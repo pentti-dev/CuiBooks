@@ -4,22 +4,25 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
+import java.util.UUID;
+
 @Data
 @Builder
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ProductRequestDTO {
     String name;
     String img;
-    int price;
+    BigDecimal price;
     String detail;
     String supplier;
     String author;
     Integer publishYear;
     String publisher;
     String language;
-    Byte weight;
+    Integer weight;
     String size;
     Integer pageNumber;
     String form;
-    Integer categoryId;
+    UUID categoryId;
 }

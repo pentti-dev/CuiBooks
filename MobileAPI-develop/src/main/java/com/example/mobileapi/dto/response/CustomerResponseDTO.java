@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 
 @Getter
 @Builder
@@ -13,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CustomerResponseDTO {
-    Integer id;
+    UUID id;
 
     String fullname;
 
@@ -25,5 +27,5 @@ public class CustomerResponseDTO {
 
     Role role;
 
-    Integer cartId;
+    UUID cartId;
 }

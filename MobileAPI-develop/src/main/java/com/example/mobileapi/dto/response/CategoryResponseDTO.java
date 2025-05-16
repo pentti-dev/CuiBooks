@@ -4,11 +4,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 @Builder
 @Getter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class CategoryResponseDTO {
-    Integer id;
+    UUID id;
     String name;
     String img;
 }

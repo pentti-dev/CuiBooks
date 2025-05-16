@@ -3,6 +3,8 @@ package com.example.mobileapi.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -11,6 +13,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class CartRequestDTO {
-    Integer customerId;
+    UUID customerId;
 
 }

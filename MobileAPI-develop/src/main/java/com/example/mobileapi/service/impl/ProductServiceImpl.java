@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -37,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO updateProduct(Integer id, ProductRequestDTO productRequestDTO) {
+    public ProductResponseDTO updateProduct(UUID id, ProductRequestDTO productRequestDTO) {
         Product product = productMapper.toProduct(productRequestDTO);
         product.setId(id);
         productRepository.save(product);
@@ -45,7 +46,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void deleteProduct(int id) {
+    public void deleteProduct(UUID id) {
         productRepository.deleteById(id);
     }
 
@@ -55,13 +56,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO getProductById(Integer id) throws AppException {
+    public ProductResponseDTO getProductById(UUID id) throws AppException {
         return productMapper.toProductResponseDTO(productRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND)));
     }
 
     @Override
-    public List<ProductResponseDTO> findByCategoryId(Integer categoryId) {
+    public List<ProductResponseDTO> findByCategoryId(UUID categoryId) {
         List<Product> products = productRepository.findByCategoryId(categoryId);
         return productMapper.toProductResponseDTOList(products);
 
@@ -80,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDTO> filterProducts(String name, Integer categoryId, Language language, Integer minPrice, Integer maxPrice, BookForm form) {
+    public List<ProductResponseDTO> filterProducts(String name, UUID categoryId, Language language, Integer minPrice, Integer maxPrice, BookForm form) {
         Specification<Product> spec = Specification.where(null);
         if (StringUtils.hasText(name)) {
             spec = spec.and(ProductSpecifications
@@ -102,11 +103,11 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-    public Product getById(int id) {
+    public Product getById(UUID id) {
         return productRepository.findById(id).orElse(null);
     }
 
-    public boolean existById(int id) {
+    public boolean existById(UUID id) {
         return productRepository.existsById(id);
     }
 }

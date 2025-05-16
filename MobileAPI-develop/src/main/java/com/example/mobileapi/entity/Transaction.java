@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 @Entity
 @Table(name = "transactions")
 @Data
@@ -14,7 +16,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Transaction {
     @Id
-    Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    UUID id;
 
     @ManyToOne
     @JsonIgnore

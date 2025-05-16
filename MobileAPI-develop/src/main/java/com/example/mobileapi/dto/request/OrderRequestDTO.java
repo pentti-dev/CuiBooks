@@ -8,13 +8,14 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class OrderRequestDTO {
-    Integer id;
-    Integer customerId;//id khách hàng
+    UUID id;
+    UUID customerId;//id khách hàng
     Integer totalAmount;//tổng tiền
     String address;//địa chỉ
     String numberPhone;//số điện thoại

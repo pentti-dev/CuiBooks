@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
@@ -18,14 +19,14 @@ import java.time.Instant;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class Rating {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    UUID id;
     String comment;
     @Max(5)
     @Min(1)
     Integer score;
 
-    
+
     @Column(name = "created_at")
     Instant createdAt;
     @Column(name = "updated_at")

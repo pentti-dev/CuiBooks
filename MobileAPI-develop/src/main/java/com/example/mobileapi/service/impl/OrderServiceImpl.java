@@ -28,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,7 +45,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #orderRequestDTO.customerId")
-    public int saveOrder(OrderRequestDTO orderRequestDTO) throws AppException {
+    public UUID saveOrder(OrderRequestDTO orderRequestDTO) throws AppException {
 
         Order order = Order.builder()
                 .customer(customerRepository.findById(orderRequestDTO.getCustomerId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)))
@@ -80,7 +81,7 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public OrderResponseDTO getOrder(int orderId) {
+    public OrderResponseDTO getOrder(UUID orderId) {
         Order order = getOrderById(orderId);
         if (order == null) {
             return null;
@@ -90,12 +91,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void deleteOrder(int orderId) {
+    public void deleteOrder(UUID orderId) {
         orderRepository.deleteById(orderId);
     }
 
     @Override
-    public void updateOrder(int id, OrderRequestDTO orderRequestDTO) {
+    public void updateOrder(UUID id, OrderRequestDTO orderRequestDTO) {
         Order order = getOrderById(id);
         if (order != null) {
             order.setTotalAmount(orderRequestDTO.getTotalAmount());
@@ -112,7 +113,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #customerId")
-    public List<OrderResponseDTO> getOrderByCustomerId(int customerId) {
+    public List<OrderResponseDTO> getOrderByCustomerId(UUID customerId) {
         return getOrdersByCustomerId(customerId);
     }
 
@@ -130,7 +131,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void editOrder(int id, OrderEditRequestDTO orderEditRequestDTO) throws AppException {
+    public void editOrder(UUID id, OrderEditRequestDTO orderEditRequestDTO) throws AppException {
         Order order = orderRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         order.setAddress(orderEditRequestDTO.getAddress());
         order.setNumberPhone(orderEditRequestDTO.getPhone());
@@ -147,7 +148,7 @@ public class OrderServiceImpl implements OrderService {
         for (Object[] row : monthlyData) {
             int month = (int) row[0];
             BigDecimal value = (BigDecimal) row[1];
-            long revenue = value.longValueExact();
+            BigDecimal revenue = value != null ? value : BigDecimal.ZERO;
             responseList.add(MonthlyRevenueResponse.builder().month(month).revenue(revenue).build());
         }
 
@@ -165,7 +166,7 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public void changeOrderStatus(int orderId, OrderStatus status) throws AppException {
+    public void changeOrderStatus(UUID orderId, OrderStatus status) throws AppException {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         order.setStatus(status);
         orderRepository.save(order);
@@ -173,8 +174,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #customerId")
-    public List<OrderResponseDTO> getOrdersByStatusAndCustomerId(OrderStatus status, int customerId) {
-        List<Order> orderResponseDTO = orderRepository.findByStatusAndCustomerId(status, customerId);
+    public List<OrderResponseDTO> getOrdersByStatusAndCustomerId(OrderStatus status, UUID customerId) {
+        List<Order> orderResponseDTO = orderRepository.findByStatusAndCustomer_Id(status, customerId);
         if (orderResponseDTO.isEmpty()) {
             return Collections.emptyList();
         }
@@ -184,12 +185,12 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public boolean existById(Integer orderId) {
+    public boolean existById(UUID orderId) {
         return orderRepository.existsById(orderId);
     }
 
 
-    public List<OrderResponseDTO> getOrdersByCustomerId(int customerId) {
+    public List<OrderResponseDTO> getOrdersByCustomerId(UUID customerId) {
         List<Order> orders = orderRepository.findByCustomerId(customerId);
         if (orders.isEmpty()) {
             return Collections.emptyList(); // Return an empty list if no orders found
@@ -200,7 +201,7 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private Order getOrderById(int orderId) {
+    private Order getOrderById(UUID orderId) {
         return orderRepository.findById(orderId).orElse(null);
     }
 

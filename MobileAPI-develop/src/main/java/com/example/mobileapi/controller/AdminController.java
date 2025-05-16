@@ -21,6 +21,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -43,7 +44,7 @@ public class AdminController {
 
     @Operation(summary = "Lấy thông tin người dùng theo ID")
     @GetMapping("/customer/{customerId}")
-    public ApiResponse<CustomerResponseDTO> getCustomer(@PathVariable int customerId) {
+    public ApiResponse<CustomerResponseDTO> getCustomer(@PathVariable UUID customerId) {
         return ApiResponse.<CustomerResponseDTO>builder()
                 .data(adminService.getCustomerById(customerId))
                 .build();
@@ -61,7 +62,7 @@ public class AdminController {
 
     @Operation(summary = "Cập nhật thông tin người dùng")
     @PutMapping("/customer/{customerId}")
-    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable int customerId, @RequestBody CustomerRequestDTO customer) throws AppException {
+    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable UUID customerId, @RequestBody CustomerRequestDTO customer) throws AppException {
         return ApiResponse.<CustomerResponseDTO>builder()
                 .data(adminService.updateCustomer(customerId, customer))
                 .build();
@@ -69,7 +70,7 @@ public class AdminController {
 
     @Operation(summary = "Xóa người dùng")
     @DeleteMapping("/customer/{customerId}")
-    public ApiResponse<Void> deleteCustomer(@PathVariable int customerId) {
+    public ApiResponse<Void> deleteCustomer(@PathVariable UUID customerId) {
         adminService.deleteCustomer(customerId);
         return ApiResponse.success("Xóa người dùng thành công");
     }
@@ -87,7 +88,7 @@ public class AdminController {
 
     @DeleteMapping("/order/{orderId}")
     @Operation(summary = "Hủy đơn hàng")
-    public ApiResponse<Void> deleteOrder(@PathVariable("orderId") int orderId) {
+    public ApiResponse<Void> deleteOrder(@PathVariable("orderId") UUID orderId) {
         orderService.deleteOrder(orderId);
         return ApiResponse.success("Hủy đơn hàng thành công");
     }
@@ -104,7 +105,7 @@ public class AdminController {
 
     @Operation(summary = "Lấy đơn hàng theo ID")
     @PutMapping("/order/{orderId}")
-    public ApiResponse<Void> editOrder(@RequestBody OrderEditRequestDTO orderRequestDTO, @PathVariable("orderId") int orderId) throws AppException {
+    public ApiResponse<Void> editOrder(@RequestBody OrderEditRequestDTO orderRequestDTO, @PathVariable("orderId") UUID orderId) throws AppException {
         orderService.editOrder(orderId, orderRequestDTO);
         return ApiResponse.success("Cập nhật đơn hàng thành công");
     }
@@ -121,7 +122,7 @@ public class AdminController {
     @Operation(summary = "Cập nhật trạng thái đơn hàng")
     @PutMapping("/status/{status}/{orderId}")
     public ApiResponse<Void> changeOrderStatus(@PathVariable("status") OrderStatus status,
-                                               @PathVariable("orderId") int orderId) {
+                                               @PathVariable("orderId") UUID orderId) {
         try {
             orderService.changeOrderStatus(orderId, status);
             return ApiResponse.success("Cập nhật trạng thái đơn hàng thành công");

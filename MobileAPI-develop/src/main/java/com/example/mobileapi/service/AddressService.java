@@ -6,23 +6,24 @@ import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.entity.Address;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface AddressService {
 
     Address createAddress(CreateAddressDto dto) throws AppException;
 
-    Address updateAddress(Integer id, UpdateAddressDto dto) throws AppException;
+    Address updateAddress(UUID id, UpdateAddressDto dto) throws AppException;
 
-    void deleteAddress(Integer id);
+    void deleteAddress(UUID id);
 
-    Address getAddress(Integer id) throws AppException;
+    Address getAddress(UUID id) throws AppException;
 
-    List<Address> getAddressByCustomerId(Integer customerId);
+    List<Address> getAddressByCustomerId(UUID customerId);
 
     List<Address> getAllAddress();
 
-    boolean setDefaultAddress(Integer customerId, Integer addressId);
+    boolean setDefaultAddress(UUID customerId, UUID addressId);
 
-    Address getAddressByCustomerIdAndIsDefault(Integer customerId);
+    Address getAddressByCustomerIdAndIsDefault(UUID customerId);
 
 }

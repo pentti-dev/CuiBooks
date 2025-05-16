@@ -8,29 +8,30 @@ import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.exception.AppException;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface OrderService {
-    int saveOrder(OrderRequestDTO orderRequestDTO) throws AppException;
+    UUID saveOrder(OrderRequestDTO orderRequestDTO) throws AppException;
 
-    OrderResponseDTO getOrder(int orderId);
+    OrderResponseDTO getOrder(UUID orderId);
 
-    void deleteOrder(int orderId);
+    void deleteOrder(UUID  orderId);
 
-    void updateOrder(int id, OrderRequestDTO orderRequestDTO);
+    void updateOrder(UUID  id, OrderRequestDTO orderRequestDTO);
 
-    List<OrderResponseDTO> getOrderByCustomerId(int customerId);
+    List<OrderResponseDTO> getOrderByCustomerId(UUID  customerId);
 
     List<OrderResponseDTO> getAllOrders();
 
-    void editOrder(int id, OrderEditRequestDTO orderEditRequestDTO) throws AppException;
+    void editOrder(UUID  id, OrderEditRequestDTO orderEditRequestDTO) throws AppException;
 
     List<MonthlyRevenueResponse> getMonthlyRevenue();
 
     List<OrderResponseDTO> getOrdersByStatus(OrderStatus status);
 
-    void changeOrderStatus(int orderId, OrderStatus status) throws AppException;
+    void changeOrderStatus(UUID  orderId, OrderStatus status) throws AppException;
 
-    List<OrderResponseDTO> getOrdersByStatusAndCustomerId(OrderStatus status, int customerId);
+    List<OrderResponseDTO> getOrdersByStatusAndCustomerId(OrderStatus status, UUID  customerId);
 
-    boolean existById(Integer orderId);
+    boolean existById(UUID orderId);
 }

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -29,14 +30,14 @@ public class PaymentServiceImpl implements PaymentService {
     TransactionService transactionService;
 
     @Override
-    public PaymentResponse createVNPayPayment(Integer orderId, Long price) throws AppException {
+    public PaymentResponse createVNPayPayment(UUID orderId, BigDecimal price) throws AppException {
 
         if (!orderService.existById(orderId)) {
             throw new AppException(ErrorCode.ORDER_NOT_FOUND);
         }
 
         String orderType = "other";
-        Long amount = price;
+        BigDecimal amount = price;
         String bankCode = vnPayProperties.bankCode();
 
         String vnp_TxnRef = String.valueOf(orderId);
@@ -106,12 +107,12 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public boolean notifyOrder(String vnp_ResponseCode, String vnp_TxnRef, String vnp_TransactionNo, String vnp_TransactionDate, String vnp_Amount) {
         if (vnp_ResponseCode.equals("00")) {
-            orderService.changeOrderStatus(Integer.parseInt(vnp_TxnRef), OrderStatus.PAYMENT_SUCCESS);
-            transactionService.createTransaction(vnp_TransactionNo, vnp_TxnRef, vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
+            orderService.changeOrderStatus(UUID.fromString(vnp_TxnRef), OrderStatus.PAYMENT_SUCCESS);
+            transactionService.createTransaction(UUID.fromString(vnp_TransactionNo), UUID.fromString(vnp_TxnRef), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
             return true;
         } else {
-            transactionService.createTransaction(vnp_TransactionNo, vnp_TxnRef, vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
-            orderService.changeOrderStatus(Integer.parseInt(vnp_TxnRef), OrderStatus.PAYMENT_FAILED);
+            transactionService.createTransaction(UUID.fromString(vnp_TransactionNo), UUID.fromString(vnp_TxnRef), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
+            orderService.changeOrderStatus(UUID.fromString(vnp_TxnRef), OrderStatus.PAYMENT_FAILED);
             return false;
         }
     }

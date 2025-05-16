@@ -2,7 +2,6 @@ package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.dto.request.OrderDetailSaveRequest;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
-import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Order;
 import com.example.mobileapi.entity.OrderDetail;
 import com.example.mobileapi.entity.Product;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +57,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
     @Override
     @Transactional
-    public OrderDetailResponseDTO updateOrderDetail(int id, OrderDetailSaveRequest requestDTO) throws AppException {
+    public OrderDetailResponseDTO updateOrderDetail(UUID id, OrderDetailSaveRequest requestDTO) throws AppException {
         OrderDetail orderDetail = orderDetailRepository.findById(id)
                 .orElseThrow(
                         () -> new AppException(ErrorCode.ORDER_DETAIL_NOT_FOUND));
@@ -83,18 +83,18 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 
     @Override
-    public void deleteOrderDetail(int id) {
+    public void deleteOrderDetail(UUID id) {
         orderDetailRepository.deleteById(id);
     }
 
     @Override
-    public OrderDetailResponseDTO findOrderDetailById(int id) {
+    public OrderDetailResponseDTO findOrderDetailById(UUID id) {
         OrderDetail orderDetail = orderDetailRepository.findById(id).orElse(null);
         return orderDetailMapper.toOrderDetailResponseDTO(orderDetail);
     }
 
     @Override
-    public List<OrderDetailResponseDTO> findOrderDetailByOrderId(int orderId) {
+    public List<OrderDetailResponseDTO> findOrderDetailByOrderId(UUID orderId) {
 
         List<OrderDetail> orderDetails = orderDetailRepository.findOrderByOrderId(orderId);
 
@@ -103,7 +103,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
 
 
     @Override
-    public OrderDetailResponseDTO findOrderDetailByProductId(int productId) {
+    public OrderDetailResponseDTO findOrderDetailByProductId(UUID productId) {
         OrderDetail orderDetail = orderDetailRepository.findOrderByProductId(productId);
         return orderDetailMapper.toOrderDetailResponseDTO(orderDetail);
     }

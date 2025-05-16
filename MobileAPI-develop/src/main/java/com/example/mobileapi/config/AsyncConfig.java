@@ -1,5 +1,6 @@
 package com.example.mobileapi.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,14 +12,15 @@ import java.util.concurrent.Executor;
 
 @Configuration
 @EnableAsync
+@Slf4j
 public class AsyncConfig implements AsyncConfigurer {
 
     @Bean(name = "taskExecutor")
     public ThreadPoolTaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(20);
-        executor.setQueueCapacity(50);
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(2);
+        executor.setQueueCapacity(10);
         executor.setAllowCoreThreadTimeOut(true);
         executor.setThreadNamePrefix("Async-");
         executor.initialize();
@@ -33,6 +35,6 @@ public class AsyncConfig implements AsyncConfigurer {
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
         return (throwable, method, params) ->
-                System.err.println("Async error in " + method.getName() + ": " + throwable.getMessage());
+                log.error("Async error in " + method.getName() + ": " + throwable.getMessage());
     }
 }

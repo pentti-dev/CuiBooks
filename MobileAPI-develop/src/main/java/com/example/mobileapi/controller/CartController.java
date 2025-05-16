@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
@@ -23,14 +25,14 @@ public class CartController {
     }
 
     @GetMapping("/{customerId}")
-    public ApiResponse<CartResponseDTO> getCartByCustomerId(@PathVariable int customerId) throws AppException {
+    public ApiResponse<CartResponseDTO> getCartByCustomerId(@PathVariable UUID customerId) throws AppException {
         return ApiResponse.<CartResponseDTO>builder()
                 .data(cartService.getCartByCustomerId(customerId))
                 .build();
     }
 
     @GetMapping("/quantity/{cartId}")
-    public ApiResponse<Integer> getCart(@PathVariable int cartId) {
+    public ApiResponse<Integer> getCart(@PathVariable UUID cartId) {
 
         return ApiResponse.<Integer>builder()
                 .data(cartService.getQuantityCartItemInCart(cartId))

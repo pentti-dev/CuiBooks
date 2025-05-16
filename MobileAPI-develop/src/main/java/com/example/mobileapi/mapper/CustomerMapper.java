@@ -10,6 +10,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
+import java.util.UUID;
+
 @Mapper(componentModel = "spring")
 public interface CustomerMapper {
     Customer toCustomer(CustomerRequestDTO request);
@@ -20,12 +22,12 @@ public interface CustomerMapper {
     CustomerResponseDTO toCustomerResponse(Customer customer);
 
     @Named("booleanToRole")
-    static Role booleanToRole(boolean role) {
+    public static Role booleanToRole(boolean role) {
         return Role.role(role);
     }
 
     @Named("cartToCartId")
-    static Integer cartToCartId(Cart cart) {
+    public static UUID cartToCartId(Cart cart) {
         return (cart != null) ? cart.getId() : null;
     }
 

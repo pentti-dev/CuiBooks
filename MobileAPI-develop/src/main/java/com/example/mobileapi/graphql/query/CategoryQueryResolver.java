@@ -1,18 +1,18 @@
 package com.example.mobileapi.graphql.query;
 
-import com.example.mobileapi.dto.response.CategoryResponseDTO;
 import com.example.mobileapi.entity.Category;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.mapper.CategoryMapper;
 import com.example.mobileapi.service.CategoryService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.AccessLevel;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,7 +28,7 @@ public class CategoryQueryResolver {
     }
 
     @QueryMapping
-    public Category categoryById(@Argument Integer id) throws AppException {
+    public Category categoryById(@Argument UUID id) throws AppException {
         return categoryMapper.toCategory(categoryService.getCategoryById(id));
     }
 }

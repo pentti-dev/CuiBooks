@@ -55,6 +55,7 @@ public class SecurityConfig {
             "/api/auth/**", "/api/customer/introspect", "/api/test/**", "/api/customer/checkUsername/**", "/api/customer/checkEmail/**"
 
             , "/graphiql", "/graphql", "/api/graphql/product"
+            , "/graphql-ui", "/webjars/**"
     };
 
     @Bean

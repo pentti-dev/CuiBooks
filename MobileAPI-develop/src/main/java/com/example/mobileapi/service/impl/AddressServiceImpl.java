@@ -8,22 +8,22 @@ import com.example.mobileapi.entity.Address;
 import com.example.mobileapi.repository.AddressRepository;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.AddressService;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
+@FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class AddressServiceImpl implements AddressService {
 
-    private final AddressRepository addressRepository;
-    private final CustomerRepository customerRepository;
-
-    public AddressServiceImpl(AddressRepository addressRepository, CustomerRepository customerRepository) {
-        this.addressRepository = addressRepository;
-        this.customerRepository = customerRepository;
-    }
+    AddressRepository addressRepository;
+    CustomerRepository customerRepository;
 
 
     @Override
@@ -40,7 +40,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Address updateAddress(Integer id, UpdateAddressDto dto) throws AppException {
+    public Address updateAddress(UUID id, UpdateAddressDto dto) throws AppException {
         Address address = addressRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
         address.setAddress(dto.getAddress());
         address.setNumberPhone(dto.getNumberPhone());
@@ -51,17 +51,17 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public void deleteAddress(Integer id) {
+    public void deleteAddress(UUID id) {
         addressRepository.deleteById(id);
     }
 
     @Override
-    public Address getAddress(Integer id) throws AppException {
+    public Address getAddress(UUID id) throws AppException {
         return addressRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ADDRESS_NOT_FOUND));
     }
 
     @Override
-    public List<Address> getAddressByCustomerId(Integer customerId) {
+    public List<Address> getAddressByCustomerId(UUID customerId) {
         return addressRepository.findByCustomerId(customerId);
     }
 
@@ -73,7 +73,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public boolean setDefaultAddress(Integer customerId, Integer addressId) {
+    public boolean setDefaultAddress(UUID customerId, UUID addressId) {
         List<Address> addresses = addressRepository.findByCustomerId(customerId);
         Optional<Address> targetAddressOpt = addresses.stream()
                 .filter(address -> address.getId().equals(addressId))
@@ -89,7 +89,7 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public Address getAddressByCustomerIdAndIsDefault(Integer customerId) {
+    public Address getAddressByCustomerIdAndIsDefault(UUID customerId) {
         return addressRepository.findByCustomerIdAndIsDefault(customerId);
     }
 

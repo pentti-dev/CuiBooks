@@ -13,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/product")
@@ -30,7 +31,7 @@ public class ProductController {
     }
 
     @PutMapping("/{productId}")
-    public ApiResponse<ProductResponseDTO> updateProduct(@PathVariable int productId,
+    public ApiResponse<ProductResponseDTO> updateProduct(@PathVariable UUID productId,
                                                          @RequestBody @Valid ProductRequestDTO product) {
         return ApiResponse.<ProductResponseDTO>builder()
                 .data(productService.updateProduct(productId, product))
@@ -38,13 +39,13 @@ public class ProductController {
     }
 
     @DeleteMapping("/{productId}")
-    public ApiResponse<Void> deleteCustomer(@PathVariable int productId) {
+    public ApiResponse<Void> deleteCustomer(@PathVariable UUID productId) {
         productService.deleteProduct(productId);
         return ApiResponse.success("Xóa sản phẩm thành công");
     }
 
     @GetMapping("/{productId}")
-    public ApiResponse<ProductResponseDTO> getCustomer(@PathVariable int productId) throws AppException {
+    public ApiResponse<ProductResponseDTO> getCustomer(@PathVariable UUID productId) throws AppException {
         return ApiResponse.<ProductResponseDTO>builder()
                 .data(productService.getProductById(productId))
                 .build();
@@ -58,7 +59,7 @@ public class ProductController {
     }
 
     @GetMapping("/list/{categoryId}")
-    public ApiResponse<List<ProductResponseDTO>> getProductsByCategoryId(@PathVariable int categoryId) {
+    public ApiResponse<List<ProductResponseDTO>> getProductsByCategoryId(@PathVariable UUID categoryId) {
         return ApiResponse.<List<ProductResponseDTO>>builder()
                 .data(productService.findByCategoryId(categoryId))
                 .build();

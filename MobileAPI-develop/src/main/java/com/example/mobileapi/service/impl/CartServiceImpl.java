@@ -2,10 +2,10 @@ package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.dto.request.CartRequestDTO;
 import com.example.mobileapi.dto.response.CartResponseDTO;
-import com.example.mobileapi.exception.AppException;
-import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.entity.Cart;
 import com.example.mobileapi.entity.CartItem;
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.CartItemMapper;
 import com.example.mobileapi.repository.CartRepository;
 import com.example.mobileapi.service.CartService;
@@ -14,8 +14,10 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -27,15 +29,17 @@ public class CartServiceImpl implements CartService {
     CartItemMapper cartItemMapper;
 
     @Override
-    public Integer saveCart(CartRequestDTO cartRequestDTO) {
+    @Transactional
+    public UUID saveCart(CartRequestDTO cartRequestDTO) throws AppException {
         Cart cart = Cart.builder()
                 .customer(customerServiceImpl.getCustomerById(cartRequestDTO.getCustomerId()))
                 .build();
+        log.info("Save cart : {}", cart.getCustomer().getFullname());
         return cartRepository.save(cart).getId();
     }
 
     @Override
-    public CartResponseDTO getCartById(int cartId) throws AppException {
+    public CartResponseDTO getCartById(UUID cartId) throws AppException {
         Cart cart = getByCartId(cartId);
         if (cart == null) {
             throw new AppException(ErrorCode.INVALID_CART);
@@ -48,13 +52,13 @@ public class CartServiceImpl implements CartService {
                 .build();
     }
 
-    public Cart getByCartId(int cartId) {
+    public Cart getByCartId(UUID cartId) {
         return cartRepository.findById(cartId).orElse(null);
     }
 
 
     @Override
-    public CartResponseDTO getCartByCustomerId(int customerId) throws AppException {
+    public CartResponseDTO getCartByCustomerId(UUID customerId) throws AppException {
         Cart cart = getByCustomerId(customerId);
         if (cart == null) {
             throw new AppException(ErrorCode.INVALID_CART);
@@ -87,7 +91,7 @@ public class CartServiceImpl implements CartService {
                 .build();
     }
 
-    public Cart getByCustomerId(int customerId) {
+    public Cart getByCustomerId(UUID customerId) {
         return cartRepository.findByCustomerId(customerId).orElse(null);
     }
 
@@ -95,7 +99,7 @@ public class CartServiceImpl implements CartService {
         return cartRepository.findCartByCustomer_Username(username).orElse(null);
     }
 
-    public Integer getQuantityCartItemInCart(int cartId) {
+    public Integer getQuantityCartItemInCart(UUID cartId) {
         Cart cart = getByCartId(cartId);
         if (cart == null) {
             return 0;

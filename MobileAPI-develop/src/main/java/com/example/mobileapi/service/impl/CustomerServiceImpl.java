@@ -3,11 +3,11 @@ package com.example.mobileapi.service.impl;
 import com.example.mobileapi.config.BCryptPasswordEncoder;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
+import com.example.mobileapi.entity.Customer;
 import com.example.mobileapi.event.CustomerCreatedEvent;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.CustomerMapper;
-import com.example.mobileapi.entity.Customer;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.EmailService;
@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -45,10 +46,12 @@ public class CustomerServiceImpl implements CustomerService {
         } else if (checkEmail(request.getEmail())) {
             throw new AppException(ErrorCode.EMAIL_EXISTED);
         }
+
         // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
         request.setPassword(passwordEncoder.encode(request.getPassword())); // Sử dụng passwordEncoder
 
         Customer customer = customerRepository.save(customerMapper.toCustomer(request));
+        log.info("Customer created with ID: {}", customer.getId());
         applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, customer.getId()));
         return customerMapper.toCustomerResponse(customer);
     }
@@ -63,12 +66,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void deleteCustomer(int customerId) {
+    public void deleteCustomer(UUID customerId) {
         customerRepository.deleteById(customerId);
     }
 
     @Override
-    public CustomerResponseDTO getCustomer(int customerId) {
+    public CustomerResponseDTO getCustomer(UUID customerId) {
         Customer customer = getCustomerById(customerId);
 
         return customerMapper.toCustomerResponse(customer);
@@ -97,7 +100,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public CustomerResponseDTO updateCustomer(int customerId, CustomerRequestDTO request) throws AppException {
+    public CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO request) throws AppException {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
@@ -144,12 +147,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public int getQuantityByCustomerId(int customerId) {
+    public int getQuantityByCustomerId(UUID customerId) {
         return customerRepository.getQuantityByCustomerId(customerId);
     }
 
     @Override
-    public void changePassword(int customerId, String oldPassword, String newPassword) throws AppException {
+    public void changePassword(UUID customerId, String oldPassword, String newPassword) throws AppException {
         Customer customer = getCustomerById(customerId);
         if (passwordEncoder.matches(oldPassword, customer.getPassword())) { // Sử dụng passwordEncoder
             customer.setPassword(passwordEncoder.encode(newPassword)); // Sử dụng passwordEncoder
@@ -185,15 +188,11 @@ public class CustomerServiceImpl implements CustomerService {
         return sb.toString();
     }
 
-    public Customer getCustomerById(int customerId) {
-        try {
-            return customerRepository.findById(customerId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        } catch (AppException e) {
-            throw new RuntimeException(e);
-        }
+    public Customer getCustomerById(UUID customerId) throws AppException {
+        return customerRepository.findById(customerId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
     }
 
-    public Integer getCustomerIdByUsername(String username) {
+    public UUID getCustomerIdByUsername(String username) {
         return customerRepository.findIdByUsername(username);
     }
 }

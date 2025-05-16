@@ -1,9 +1,14 @@
 package com.example.mobileapi.dto.request;
 
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.experimental.FieldDefaults;
+
+import java.util.UUID;
 
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDetailRequestDTO {
-    private Integer productId;
-    private Integer quantity;
+    UUID productId;
+    Integer quantity;
 }
