@@ -142,18 +142,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<MonthlyRevenueResponse> getMonthlyRevenue() {
-        List<Object[]> monthlyData = orderRepository.getMonthlyRevenue();
-      
-        List<MonthlyRevenueResponse> responseList = new ArrayList<>();
-
-        for (Object[] row : monthlyData) {
-            Long month = (Long) row[0];
-            BigDecimal value = (BigDecimal) row[1];
-            BigDecimal revenue = value != null ? value : BigDecimal.ZERO;
-            responseList.add(MonthlyRevenueResponse.builder().month(month).revenue(revenue).build());
-        }
-
-        return responseList;
+        return orderRepository.getMonthlyRevenue().stream()
+                .map(p -> MonthlyRevenueResponse.builder()
+                        .month(p.getMonth())
+                        .revenue(p.getRevenue() != null ? p.getRevenue() : BigDecimal.ZERO)
+                        .build())
+                .toList();
     }
 
     @Override

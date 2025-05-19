@@ -5,14 +5,16 @@ import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
 
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 @Getter
 public class MonthlyRevenueResponse {
-    @Size(min = 1, max = 12)
-    Long month;
+    @Min(1)
+    @Max(12)
+    int month;
     BigDecimal revenue;
 
 }
