@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -81,7 +82,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDTO> filterProducts(String name, UUID categoryId, Language language, Integer minPrice, Integer maxPrice, BookForm form) {
+    public List<ProductResponseDTO> filterProducts(String name, UUID categoryId, Language language, Integer minPrice,
+            Integer maxPrice, BookForm form) {
         Specification<Product> spec = Specification.where(null);
         if (StringUtils.hasText(name)) {
             spec = spec.and(ProductSpecifications

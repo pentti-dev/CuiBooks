@@ -46,23 +46,25 @@ public class AdminController {
     @GetMapping("/customer/{customerId}")
     public ApiResponse<CustomerResponseDTO> getCustomer(@PathVariable UUID customerId) {
         return ApiResponse.<CustomerResponseDTO>builder()
-                .data(adminService.getCustomerById(customerId))
+                .data(adminService.getCustomer(customerId))
                 .build();
     }
 
     @Operation(summary = "Thêm người dùng")
     @PostMapping("/customer")
-    public ApiResponse<CustomerResponseDTO> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+    public ApiResponse<CustomerResponseDTO> addCustomer(@RequestBody @Valid CustomerRequestDTO customer)
+            throws AppException {
 
-        adminService.addCustomer(customer);
+        adminService.saveCustomer(customer);
         return ApiResponse.<CustomerResponseDTO>builder()
-                .data(adminService.addCustomer(customer))
+                .data(adminService.saveCustomer(customer))
                 .build();
     }
 
     @Operation(summary = "Cập nhật thông tin người dùng")
     @PutMapping("/customer/{customerId}")
-    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable UUID customerId, @RequestBody CustomerRequestDTO customer) throws AppException {
+    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable UUID customerId,
+                                                           @RequestBody CustomerRequestDTO customer) throws AppException {
         return ApiResponse.<CustomerResponseDTO>builder()
                 .data(adminService.updateCustomer(customerId, customer))
                 .build();
@@ -105,7 +107,8 @@ public class AdminController {
 
     @Operation(summary = "Lấy đơn hàng theo ID")
     @PutMapping("/order/{orderId}")
-    public ApiResponse<Void> editOrder(@RequestBody OrderEditRequestDTO orderRequestDTO, @PathVariable("orderId") UUID orderId) throws AppException {
+    public ApiResponse<Void> editOrder(@RequestBody OrderEditRequestDTO orderRequestDTO,
+                                       @PathVariable("orderId") UUID orderId) throws AppException {
         orderService.editOrder(orderId, orderRequestDTO);
         return ApiResponse.success("Cập nhật đơn hàng thành công");
     }

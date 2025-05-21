@@ -56,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryResponseDTO.builder()
                 .id(category.getId())
                 .name(category.getName())
-                .img(category.getImg())
+                .img(category.getDescription())
                 .build();
     }
 
@@ -67,7 +67,7 @@ public class CategoryServiceImpl implements CategoryService {
         for (Category category : categories) {
             categoriesResponseDTO.add(CategoryResponseDTO.builder()
                     .name(category.getName())
-                    .img(category.getImg())
+                    .img(category.getDescription())
                     .id(category.getId())
                     .build());
         }
