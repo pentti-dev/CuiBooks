@@ -38,33 +38,25 @@ public class Product {
     @Column(columnDefinition = "TEXT")
     String detail;
 
-    @Column(nullable = false)
     String supplier; // nhà cung cấp
 
     @Column(nullable = false)
     String author; // tác giả
 
-    @Column(nullable = false)
     Integer publishYear; // năm xuất bản
 
-    @Column(nullable = false)
     String publisher; // nhà xuất bản
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     Language language; // ngôn ngữ
 
-    @Column(nullable = false)
     Integer weight; // trọng lượng (gram)
 
-    @Column(nullable = false)
     String size; // kích thước
 
-    @Column(nullable = false)
     Integer pageNumber; // số trang
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     BookForm form; // hình thức
 
     @ManyToOne(fetch = FetchType.LAZY)

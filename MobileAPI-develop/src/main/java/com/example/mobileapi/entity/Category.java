@@ -28,9 +28,11 @@ public class Category {
     String name;
 
     @Column(nullable = false)
-    String img;
+    String description;
+
+    @Column(nullable = false, unique = true)
+    String code;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     List<Product> products = new ArrayList<>();
 }
-
