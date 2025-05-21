@@ -31,4 +31,7 @@ public interface ProductService {
             Language language, Integer minPrice, Integer maxPrice, BookForm form);
 
     public void saveAll(List<Product> products);
+
+    List<ProductResponseDTO> getProductSale();
+
 }

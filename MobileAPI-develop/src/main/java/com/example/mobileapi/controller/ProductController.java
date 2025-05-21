@@ -79,4 +79,11 @@ public class ProductController {
                 .data(productService.getProductByName(name))
                 .build();
     }
+
+    @GetMapping("/sale")
+    public ApiResponse<List<ProductResponseDTO>> getSaleProducts() {
+        return ApiResponse.<List<ProductResponseDTO>>builder()
+                .data(productService.getProductSale())
+                .build();
+    }
 }

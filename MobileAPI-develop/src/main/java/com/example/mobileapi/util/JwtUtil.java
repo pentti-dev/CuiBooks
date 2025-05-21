@@ -54,6 +54,7 @@ public final class JwtUtil {
                     .expirationTime(Date.from(now.plus(jwtProps.expirationMinutes(), ChronoUnit.MINUTES)))
                     .jwtID(UUID.randomUUID().toString())
                     .claim("scope", Role.role(user.isRole()))
+                    .claim("id", user.getId())
                     .build();
 
             JWSHeader header = new JWSHeader(JWSAlgorithm.RS512);

@@ -47,6 +47,9 @@ public class Product {
 
     String publisher; // nhà xuất bản
 
+    @Column(nullable = false)
+    double discount; // Tỷ lệ giảm giá
+
     @Enumerated(EnumType.STRING)
     Language language; // ngôn ngữ
 

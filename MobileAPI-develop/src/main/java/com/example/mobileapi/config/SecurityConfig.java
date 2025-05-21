@@ -52,9 +52,9 @@ public class SecurityConfig {
             "/swagger-ui/**", "/webjars/**", "/swagger-ui.html",
             "/api/customer/register", "/api/customer/verifyEmail",
             "/api/customer/initPasswordReset/**", "/api/customer/resetPassword/**",
-            "/api/auth/**", "/api/customer/introspect", "/api/test/**", "/api/customer/checkUsername/**", "/api/customer/checkEmail/**"
-
-            , "/graphiql", "/graphql", "/api/graphql/product"
+            "/api/auth/**", "/api/customer/introspect", "/api/test/**", "/api/customer/checkUsername/**", "/api/customer/checkEmail/**",
+            "/api/category/**", "/api/product/**",
+            "/graphiql", "/graphql", "/api/graphql/product"
             , "/graphql-ui", "/webjars/**"
     };
 

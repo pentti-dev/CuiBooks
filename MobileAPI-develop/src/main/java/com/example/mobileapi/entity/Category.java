@@ -33,6 +33,10 @@ public class Category {
     @Column(nullable = false, unique = true)
     String code;
 
+    @Column(nullable = false, unique = true)
+    String img;
+
+
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     List<Product> products = new ArrayList<>();
 }
