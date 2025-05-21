@@ -28,6 +28,14 @@ public class CartItemController {
         return ApiResponse.success();
     }
 
+    @PutMapping("/update/{cartItemId}")
+    public ApiResponse<Void> updateQuantityCartItem(
+            @PathVariable("cartItemId") UUID cartItemId,
+            @RequestBody CartItemRequestDTO cartItem) {
+        cartItemService.updateCartItem(cartItemId, cartItem);
+        return ApiResponse.success();
+    }
+
     @DeleteMapping("/{cartItemId}")
     public ApiResponse<Void> deleteCartItem(@PathVariable("cartItemId") UUID cartItemId) {
         cartItemService.deleteCartItem(cartItemId);

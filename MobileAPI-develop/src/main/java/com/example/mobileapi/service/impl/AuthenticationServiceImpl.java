@@ -13,11 +13,16 @@ import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.repository.InvalidateTokenRepository;
 import com.example.mobileapi.service.AuthenticationService;
 import com.example.mobileapi.util.JwtUtil;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.text.ParseException;
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -61,5 +66,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public IntrospectResponse introspect(IntrospectRequest request) {
         return null;
+    }
+
+    @Override
+    public void checkTokenExpiration(String token) throws AppException {
+        try {
+            // Giải mã token và kiểm tra thời gian hết hạn
+            SignedJWT jwt = SignedJWT.parse(token);
+            JWTClaimsSet claims = jwt.getJWTClaimsSet();
+            Date expirationTime = claims.getExpirationTime();
+
+            // Kiểm tra nếu token đã hết hạn
+            if (expirationTime.before(new Date())) {
+                throw new AppException(ErrorCode.TOKEN_EXPIRED);
+            }
+        } catch (ParseException e) {
+            log.error("Error parsing token", e);
+            throw new AppException(ErrorCode.INVALID_TOKEN);
+        }
     }
 }

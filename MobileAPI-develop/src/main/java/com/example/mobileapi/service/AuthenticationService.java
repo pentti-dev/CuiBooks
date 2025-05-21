@@ -17,5 +17,7 @@ public interface AuthenticationService {
 
     IntrospectResponse introspect(IntrospectRequest request) throws Exception;
 
+    void checkTokenExpiration(String token) throws AppException;
+
 
 }
