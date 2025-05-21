@@ -1,5 +1,6 @@
 package com.example.mobileapi.repository;
 
+import com.example.mobileapi.dto.projection.MonthlyRevenueProjection;
 import com.example.mobileapi.entity.Order;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,8 +28,7 @@ public interface OrderRepository extends JpaRepository<Order, UUID> {
             "    months.Month\n" +
             "ORDER BY\n" +
             "    months.Month;", nativeQuery = true)
-    List<Object[]> getMonthlyRevenue();
-
+    List<MonthlyRevenueProjection> getMonthlyRevenue();
 
     List<Order> findByStatusAndCustomer_Id(OrderStatus status, UUID customerId);
 

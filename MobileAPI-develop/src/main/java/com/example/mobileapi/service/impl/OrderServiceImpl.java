@@ -48,7 +48,8 @@ public class OrderServiceImpl implements OrderService {
     public UUID saveOrder(OrderRequestDTO orderRequestDTO) throws AppException {
 
         Order order = Order.builder()
-                .customer(customerRepository.findById(orderRequestDTO.getCustomerId()).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)))
+                .customer(customerRepository.findById(orderRequestDTO.getCustomerId())
+                        .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)))
                 .orderDate(LocalDateTime.now())
                 .totalAmount(orderRequestDTO.getTotalAmount())
                 .address(orderRequestDTO.getAddress())
@@ -71,14 +72,13 @@ public class OrderServiceImpl implements OrderService {
             case COD:
                 return OrderStatus.PENDING;
             case VN_PAY,
-                 MOMO,
-                 ZALO_PAY:
+                    MOMO,
+                    ZALO_PAY:
                 return OrderStatus.PENDING_PAYMENT;
             default:
                 return OrderStatus.PENDING;
         }
     }
-
 
     @Override
     public OrderResponseDTO getOrder(UUID orderId) {
@@ -142,17 +142,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<MonthlyRevenueResponse> getMonthlyRevenue() {
-        List<Object[]> monthlyData = orderRepository.getMonthlyRevenue();
-        List<MonthlyRevenueResponse> responseList = new ArrayList<>();
-
-        for (Object[] row : monthlyData) {
-            int month = (int) row[0];
-            BigDecimal value = (BigDecimal) row[1];
-            BigDecimal revenue = value != null ? value : BigDecimal.ZERO;
-            responseList.add(MonthlyRevenueResponse.builder().month(month).revenue(revenue).build());
-        }
-
-        return responseList;
+        return orderRepository.getMonthlyRevenue().stream()
+                .map(p -> MonthlyRevenueResponse.builder()
+                        .month(p.getMonth())
+                        .revenue(p.getRevenue() != null ? p.getRevenue() : BigDecimal.ZERO)
+                        .build())
+                .toList();
     }
 
     @Override
@@ -163,7 +158,6 @@ public class OrderServiceImpl implements OrderService {
         }
         return orderMapper.toOrderResponseDTOList(orders);
     }
-
 
     @Override
     public void changeOrderStatus(UUID orderId, OrderStatus status) throws AppException {
@@ -188,7 +182,6 @@ public class OrderServiceImpl implements OrderService {
     public boolean existById(UUID orderId) {
         return orderRepository.existsById(orderId);
     }
-
 
     public List<OrderResponseDTO> getOrdersByCustomerId(UUID customerId) {
         List<Order> orders = orderRepository.findByCustomerId(customerId);
@@ -222,7 +215,6 @@ public class OrderServiceImpl implements OrderService {
                 .orderDetails(orderDetailDTOs)
                 .build();
     }
-
 
     private OrderDetailResponseDTO convertToOrderDetailResponseDTO(OrderDetail orderDetail) {
         return OrderDetailResponseDTO.builder()

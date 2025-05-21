@@ -1,6 +1,9 @@
 package com.example.mobileapi.controller;
 
+import com.example.mobileapi.entity.Category;
+import com.example.mobileapi.entity.Product;
 import com.example.mobileapi.entity.enums.OrderStatus;
+import com.cloudinary.Api;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
@@ -8,18 +11,27 @@ import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.AdminService;
 import com.example.mobileapi.service.OrderService;
+import com.example.mobileapi.service.impl.ProductServiceImpl;
+import com.example.mobileapi.util.ExcelHelper;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.Multipart;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +43,7 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
+
     AdminService adminService;
 
     @Operation(summary = "Lấy số lượng người dùng")
@@ -46,23 +59,25 @@ public class AdminController {
     @GetMapping("/customer/{customerId}")
     public ApiResponse<CustomerResponseDTO> getCustomer(@PathVariable UUID customerId) {
         return ApiResponse.<CustomerResponseDTO>builder()
-                .data(adminService.getCustomerById(customerId))
+                .data(adminService.getCustomer(customerId))
                 .build();
     }
 
     @Operation(summary = "Thêm người dùng")
     @PostMapping("/customer")
-    public ApiResponse<CustomerResponseDTO> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+    public ApiResponse<CustomerResponseDTO> addCustomer(@RequestBody @Valid CustomerRequestDTO customer)
+            throws AppException {
 
-        adminService.addCustomer(customer);
+        adminService.saveCustomer(customer);
         return ApiResponse.<CustomerResponseDTO>builder()
-                .data(adminService.addCustomer(customer))
+                .data(adminService.saveCustomer(customer))
                 .build();
     }
 
     @Operation(summary = "Cập nhật thông tin người dùng")
     @PutMapping("/customer/{customerId}")
-    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable UUID customerId, @RequestBody CustomerRequestDTO customer) throws AppException {
+    public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable UUID customerId,
+                                                           @RequestBody CustomerRequestDTO customer) throws AppException {
         return ApiResponse.<CustomerResponseDTO>builder()
                 .data(adminService.updateCustomer(customerId, customer))
                 .build();
@@ -105,7 +120,8 @@ public class AdminController {
 
     @Operation(summary = "Lấy đơn hàng theo ID")
     @PutMapping("/order/{orderId}")
-    public ApiResponse<Void> editOrder(@RequestBody OrderEditRequestDTO orderRequestDTO, @PathVariable("orderId") UUID orderId) throws AppException {
+    public ApiResponse<Void> editOrder(@RequestBody OrderEditRequestDTO orderRequestDTO,
+                                       @PathVariable("orderId") UUID orderId) throws AppException {
         orderService.editOrder(orderId, orderRequestDTO);
         return ApiResponse.success("Cập nhật đơn hàng thành công");
     }
@@ -135,5 +151,30 @@ public class AdminController {
         }
     }
 
+    @PostMapping(value = "/product/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<Void> importProduct(@RequestParam("file") MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            List<Product> products = ExcelHelper.parseExcel(inputStream);
+            adminService.saveAll(products);
+
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.BAD_REQUEST);
+
+        }
+        return ApiResponse.success("Thêm thành công");
+    }
+
+    @PostMapping(value = "/category/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ApiResponse<Void> importCategory(@RequestParam("file") MultipartFile file) {
+        try (InputStream inputStream = file.getInputStream()) {
+            List<Category> categories = ExcelHelper.importCategory(inputStream);
+            adminService.saveAllCategoryEntries(categories);
+
+        } catch (IOException e) {
+            throw new AppException(ErrorCode.BAD_REQUEST);
+
+        }
+        return ApiResponse.success("Thêm thành công");
+    }
 
 }
