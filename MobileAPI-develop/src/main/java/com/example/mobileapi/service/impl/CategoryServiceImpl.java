@@ -11,7 +11,9 @@ import com.example.mobileapi.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,18 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponseDTO saveCategory(CategoryRequestDTO dto) {
         Category category = categoryMapper.toCategory(dto);
         return categoryMapper.toCategoryResponseDTO(category);
+    }
+
+    @Transactional
+    @Override
+    public void saveAllCategoryEntries(List<Category> category) {
+        categoryRepository.saveAll(category);
+    }
+
+    @Override
+    public void saveAllCategoryDTOs(List<CategoryRequestDTO> dtos) {
+        List<Category> categories = categoryMapper.toCategories(dtos);
+        categoryRepository.saveAll(categories);
     }
 
     @Override

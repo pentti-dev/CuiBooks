@@ -112,4 +112,10 @@ public class ProductServiceImpl implements ProductService {
     public boolean existById(UUID id) {
         return productRepository.existsById(id);
     }
+
+    @Override
+    @Transactional
+    public void saveAll(List<Product> products) {
+        productRepository.saveAll(products);
+    }
 }
