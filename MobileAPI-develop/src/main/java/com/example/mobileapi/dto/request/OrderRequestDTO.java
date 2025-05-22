@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ import java.util.UUID;
 public class OrderRequestDTO {
     UUID id;
     UUID customerId;//id khách hàng
-    Integer totalAmount;//tổng tiền
+    BigDecimal totalAmount;//tổng tiền
     String address;//địa chỉ
     String numberPhone;//số điện thoại
     @Hidden
@@ -25,5 +26,7 @@ public class OrderRequestDTO {
     OrderMethod paymentMethod;//phương thức thanh toán
     String receiver;// người nhận
     List<OrderDetailRequestDTO> orderDetails;// danh sách chi tiết đơn hàng
+    @Hidden
+    String discountCode;
 }
 

@@ -40,13 +40,12 @@ public class OrderServiceImpl implements OrderService {
     CustomerRepository customerRepository;
     CustomerServiceImpl customerServiceImpl;
     ProductServiceImpl productService;
-    private final ProductMapper productMapper;
-    private final OrderMapper orderMapper;
+    ProductMapper productMapper;
+    OrderMapper orderMapper;
 
     @Override
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #orderRequestDTO.customerId")
     public UUID saveOrder(OrderRequestDTO orderRequestDTO) throws AppException {
-
         Order order = Order.builder()
                 .customer(customerRepository.findById(orderRequestDTO.getCustomerId())
                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)))

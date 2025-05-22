@@ -10,10 +10,18 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface ProductMapper {
+    @Mapping(target = "cartItems", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "orderDetails", ignore = true)
     Product toProduct(ProductRequestDTO dto);
 
+    @Mapping(target = "cartItems", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "orderDetails", ignore = true)
     Product toProduct(ProductResponseDTO dto);
 
+    @Mapping(source = "category.id", target = "categoryId")
     ProductRequestDTO toProductRequestDTO(Product product);
 
     @Mapping(source = "category.id", target = "categoryId")

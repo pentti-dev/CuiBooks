@@ -6,6 +6,7 @@ import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.entity.enums.OrderMethod;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.service.DiscountService;
 import com.example.mobileapi.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,13 +28,19 @@ import java.util.UUID;
 @PreAuthorize("hasRole('USER')")
 public class OrderController {
     OrderService orderService;
+    DiscountService discountService;
 
     @Operation(summary = "Lưu đơn hàng")
     @PostMapping
     public ApiResponse<UUID> createOrder(@RequestParam OrderMethod method,
+                                         @RequestParam String discountCode,
                                          @RequestBody OrderRequestDTO orderRequestDTO) throws AppException {
         orderRequestDTO.setPaymentMethod(method);
-
+        Integer discountPercent = discountService.getPercentDiscount(discountCode);
+        orderRequestDTO.setTotalAmount(orderRequestDTO.getTotalAmount()
+                .multiply(BigDecimal.valueOf(discountPercent))
+                .divide(BigDecimal.valueOf(100))
+        );
         return ApiResponse.<UUID>builder()
                 .code(HttpStatus.OK.value())
                 .data(orderService.saveOrder(orderRequestDTO))

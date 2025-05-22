@@ -5,6 +5,7 @@ import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -14,14 +15,13 @@ import java.util.Map;
 public class GraphQLExceptionHandler extends DataFetcherExceptionResolverAdapter {
 
     @Override
-    protected GraphQLError resolveToSingleError(Throwable ex, DataFetchingEnvironment env) {
+    protected GraphQLError resolveToSingleError(@NonNull Throwable ex, @NonNull DataFetchingEnvironment env) {
         if (ex instanceof AppException appException) {
             return GraphqlErrorBuilder.newError(env)
                     .message(appException.getErrorCode().getMessage())
                     .extensions(Map.of(
                             "code", appException.getErrorCode().getCode(),
-                            "httpStatus", appException.getErrorCode().getHttpStatus().value()
-                    ))
+                            "httpStatus", appException.getErrorCode().getHttpStatus().value()))
                     .build();
         }
 

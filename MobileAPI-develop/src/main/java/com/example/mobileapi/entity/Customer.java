@@ -7,7 +7,6 @@ import lombok.experimental.FieldDefaults;
 
 import java.util.*;
 
-
 @Table(name = "customers")
 @Entity
 @Builder
@@ -43,14 +42,16 @@ public class Customer {
 
     @Column(name = "reset_code")
     String resetCode;
-
+    @Builder.Default
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<Order> orders = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         Customer customer = (Customer) o;
 
@@ -62,6 +63,4 @@ public class Customer {
         return id != null ? id.hashCode() : 0;
     }
 
-
 }
-

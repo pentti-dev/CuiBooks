@@ -56,15 +56,6 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toCustomerResponse(customer);
     }
 
-    private void checkIfUserExists(String username, String email) throws AppException {
-        if (checkUsername(username)) {
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
-        }
-        if (checkEmail(email)) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
-        }
-    }
-
     @Override
     public void deleteCustomer(UUID customerId) {
         customerRepository.deleteById(customerId);
@@ -97,7 +88,6 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.existsByEmail(email);
     }
 
-
     @Override
     @Transactional
     public CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO request) throws AppException {
@@ -109,7 +99,6 @@ public class CustomerServiceImpl implements CustomerService {
 
         return customerMapper.toCustomerResponse(customer);
     }
-
 
     @Override
     public void resetPassword(String username, String resetCode, String newPassword) throws AppException {
@@ -162,7 +151,6 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-
     @Override
     @PostAuthorize("returnObject.username ==authentication.name")
     public CustomerResponseDTO getCustomerProfile(String token) throws AppException {
@@ -170,7 +158,6 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toCustomerResponse(getCustomerByUserName(username));
 
     }
-
 
     Customer getCustomerByUserName(String username) throws AppException {
         return customerRepository.findByUsername(username)

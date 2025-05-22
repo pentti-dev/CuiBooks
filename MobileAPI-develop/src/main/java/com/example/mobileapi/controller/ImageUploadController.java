@@ -1,6 +1,5 @@
 package com.example.mobileapi.controller;
 
-import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.UrlResponse;
 import com.example.mobileapi.service.ImageUploadService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +28,5 @@ public class ImageUploadController {
     public CompletableFuture<UrlResponse> uploadImage(@RequestParam("file") MultipartFile file) {
         return imageUploadService.uploadImage(file);
     }
-
 
 }

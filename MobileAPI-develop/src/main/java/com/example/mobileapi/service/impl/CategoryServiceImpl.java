@@ -11,7 +11,6 @@ import com.example.mobileapi.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,17 +90,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponseDTO getCategoryById(UUID categoryId) throws AppException {
         Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() ->
-                        new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         return categoryMapper.toCategoryResponseDTO(category);
     }
 
     @Override
     public Category getCategoryByName(String name) throws AppException {
-        return
-                categoryRepository.findByName(name)
-                        .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+        return categoryRepository.findByName(name)
+                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
     }
-
 
 }

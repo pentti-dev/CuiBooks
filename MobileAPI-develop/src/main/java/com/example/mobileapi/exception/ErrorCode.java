@@ -42,6 +42,7 @@ public enum ErrorCode {
     INVALID_BIRTHDATE(HttpStatus.BAD_REQUEST, 4113, "Ngày sinh không hợp lệ."),
     EMAIL_EXISTED(HttpStatus.BAD_REQUEST, 4114, "Email đã tồn tại."),
     INVALID_RESET_CODE(HttpStatus.BAD_REQUEST, 4115, "Mã xác nhận không hợp lệ hoặc đã hết hạn."),
+    INVALD_DISCOUNT(HttpStatus.BAD_REQUEST, 4115, "Mã giảm giá không hợp lệ hoặc đã hết hạn."),
 
     MISSING_NEW_PASSWORD(HttpStatus.BAD_REQUEST, 4116, "Mật khẩu mới không được để trống."),
 
@@ -86,7 +87,7 @@ public enum ErrorCode {
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, 4506, "Sản phẩm không tồn tại."),
     ORDER_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND, 4507, "Chi tiết đơn hàng không tồn tại."),
     CATEGORY_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, 4508, "Không tìm thấy danh mục với ID đã cho."),
-
+    DISCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, 4509, "Không tìm thấy mã giảm giá."),
     /**
      * ========== LỖI HỆ THỐNG ==========
      */

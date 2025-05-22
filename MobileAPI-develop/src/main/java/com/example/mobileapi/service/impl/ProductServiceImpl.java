@@ -28,7 +28,6 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
-    CategoryServiceImpl categoryService;
 
     ProductMapper productMapper;
 

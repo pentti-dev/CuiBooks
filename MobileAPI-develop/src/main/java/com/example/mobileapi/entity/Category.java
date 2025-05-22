@@ -33,6 +33,7 @@ public class Category {
     @Column(nullable = false, unique = true)
     String code;
 
+    @Builder.Default
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     List<Product> products = new ArrayList<>();
 }

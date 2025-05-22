@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,9 +29,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -52,15 +50,14 @@ public class SecurityConfig {
             "/swagger-ui/**", "/webjars/**", "/swagger-ui.html",
             "/api/customer/register", "/api/customer/verifyEmail",
             "/api/customer/initPasswordReset/**", "/api/customer/resetPassword/**",
-            "/api/auth/**", "/api/customer/introspect", "/api/test/**", "/api/customer/checkUsername/**", "/api/customer/checkEmail/**"
+            "/api/auth/**", "/api/customer/introspect", "/api/test/**", "/api/customer/checkUsername/**",
+            "/api/customer/checkEmail/**"
 
-            , "/graphiql", "/graphql", "/api/graphql/product"
-            , "/graphql-ui", "/webjars/**"
+            , "/graphiql", "/graphql", "/api/graphql/product", "/graphql-ui", "/webjars/**"
     };
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-
 
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
@@ -68,35 +65,16 @@ public class SecurityConfig {
                 .addFilterBefore(jwtExceptionFilter(), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint(exceptionHandler)
-                        .accessDeniedHandler(exceptionHandler)
-                )
-                .authorizeHttpRequests(request ->
-                        request.requestMatchers(acceptedEndpoint)
-                                .permitAll()
-                                .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(oauth2 ->
-                        oauth2.jwt(jwtConfigurer ->
-                                jwtConfigurer.decoder(jwtDecoder())
-                                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
-                );
-
+                        .accessDeniedHandler(exceptionHandler))
+                .authorizeHttpRequests(request -> request.requestMatchers(acceptedEndpoint)
+                        .permitAll()
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder())
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter())));
 
         return httpSecurity.build();
     }
 
-
-    @Bean
-    CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedMethod("*");
-        config.addAllowedHeader("*");
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
 
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
@@ -120,30 +98,30 @@ public class SecurityConfig {
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public OncePerRequestFilter jwtExceptionFilter() {
 
-
         return new OncePerRequestFilter() {
             private static final String ATTR = "jwtError";
 
             @Override
-            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+            protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
+                                            @NonNull FilterChain filterChain) throws ServletException, IOException {
                 String token = JwtUtil.resolveToken(request);
                 if (token != null) {
                     try {
                         jwtDecoder().decode(token);
-                        if (JwtUtil.isLogout(token)) request.setAttribute(ATTR, "LOGOUT");
-
+                        if (JwtUtil.isLogout(token))
+                            request.setAttribute(ATTR, "LOGOUT");
 
                     } catch (JwtException e) {
                         String msg = e.getMessage().toLowerCase();
-                        if (msg.contains("expired")) request.setAttribute(ATTR, "EXPIRED");
-                        else if
-                        (msg.contains("signature")) request.setAttribute(ATTR, "INVALID_SIGNATURE");
-                        else if
-                        (msg.contains("unsupported")) request.setAttribute(ATTR, "UNSUPPORTED");
+                        if (msg.contains("expired"))
+                            request.setAttribute(ATTR, "EXPIRED");
+                        else if (msg.contains("signature"))
+                            request.setAttribute(ATTR, "INVALID_SIGNATURE");
+                        else if (msg.contains("unsupported"))
+                            request.setAttribute(ATTR, "UNSUPPORTED");
                         else
                             request.setAttribute(ATTR, "INVALID");
                         throw new BadCredentialsException("JWT invalid");
-
 
                     }
                 }
