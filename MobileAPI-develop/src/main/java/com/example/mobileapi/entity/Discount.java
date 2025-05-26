@@ -4,10 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.UUID;
 
-import org.springframework.lang.NonNull;
 
 @Entity
 @Data
@@ -22,8 +21,8 @@ public class Discount {
     @Column(nullable = false)
     Integer percent;
 
-    Date startDate;
-    Date endDate;
+    LocalDate startDate;
+    LocalDate endDate;
     @Column(nullable = false)
     Boolean active;
 }

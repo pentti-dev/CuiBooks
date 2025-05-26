@@ -52,8 +52,25 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ApiResponse<Void> register(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+
         customerService.saveCustomer(customer);
         return ApiResponse.success();
+    }
+
+    @PostMapping("/check-username")
+    public ApiResponse<Boolean> checkUsername(@RequestBody String username) {
+        return ApiResponse.<Boolean>builder()
+                .code(HttpStatus.OK.value())
+                .data(customerService.checkUsername(username))
+                .build();
+    }
+
+    @PostMapping("/check-email")
+    public ApiResponse<Boolean> checkEmail(@RequestBody String email) {
+        return ApiResponse.<Boolean>builder()
+                .code(HttpStatus.OK.value())
+                .data(customerService.checkEmail(email))
+                .build();
     }
 
 }

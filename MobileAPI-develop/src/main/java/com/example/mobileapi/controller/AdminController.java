@@ -76,7 +76,7 @@ public class AdminController {
     @Operation(summary = "Cập nhật thông tin người dùng")
     @PutMapping("/customer/{customerId}")
     public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable UUID customerId,
-            @RequestBody CustomerRequestDTO customer) throws AppException {
+                                                           @RequestBody CustomerRequestDTO customer) throws AppException {
         return ApiResponse.<CustomerResponseDTO>builder()
                 .data(adminService.updateCustomer(customerId, customer))
                 .build();
@@ -120,7 +120,7 @@ public class AdminController {
     @Operation(summary = "Lấy đơn hàng theo ID")
     @PutMapping("/order/{orderId}")
     public ApiResponse<Void> editOrder(@RequestBody OrderEditRequestDTO orderRequestDTO,
-            @PathVariable("orderId") UUID orderId) throws AppException {
+                                       @PathVariable("orderId") UUID orderId) throws AppException {
         orderService.editOrder(orderId, orderRequestDTO);
         return ApiResponse.success("Cập nhật đơn hàng thành công");
     }
@@ -137,7 +137,7 @@ public class AdminController {
     @Operation(summary = "Cập nhật trạng thái đơn hàng")
     @PutMapping("/status/{status}/{orderId}")
     public ApiResponse<Void> changeOrderStatus(@PathVariable("status") OrderStatus status,
-            @PathVariable("orderId") UUID orderId) {
+                                               @PathVariable("orderId") UUID orderId) {
         try {
             orderService.changeOrderStatus(orderId, status);
             return ApiResponse.success("Cập nhật trạng thái đơn hàng thành công");
@@ -180,26 +180,34 @@ public class AdminController {
 
     @Operation(summary = "Thêm mã giảm giá")
     @PostMapping(value = "/discount")
-    public ApiResponse<DiscountDTO> createDiscount(@RequestBody DiscountDTO dto) {
+    public ApiResponse<DiscountDTO> createDiscount(@Valid @RequestBody DiscountDTO dto) {
         return ApiResponse.<DiscountDTO>builder().data(adminService.create(dto)).build();
     }
 
     @Operation(summary = "Sửa mã giảm giá")
     @PutMapping(value = "/discount")
-    public ApiResponse<DiscountDTO> updateDiscount(@RequestBody DiscountDTO dto) {
+    public ApiResponse<DiscountDTO> updateDiscount(@Valid @RequestBody DiscountDTO dto) {
         return ApiResponse.<DiscountDTO>builder().data(adminService.update(dto)).build();
+    }
+
+    @Operation(summary = "Lấy tất cả mã giảm giá")
+    @GetMapping(value = "/discount/all")
+    public ApiResponse<List<DiscountDTO>> getDiscount() {
+        return ApiResponse.<List<DiscountDTO>>builder().data(adminService.getAllDiscount()).build();
+
     }
 
     @Operation(summary = "Lấy mã giảm giá theo code")
     @GetMapping(value = "/discount")
-    public ApiResponse<List<DiscountDTO>> getDiscount() {
-        return ApiResponse.<List<DiscountDTO>>builder().data(adminService.getAllDiscount()).build();
-    }
-
-    @Operation(summary = "Lấy tất cả mã giảm giá")
-    @GetMapping(value = "/discount/list")
     public ApiResponse<DiscountDTO> getAllDiscount(@RequestParam("code") String code) {
         return ApiResponse.<DiscountDTO>builder().data(adminService.getDiscount(code)).build();
+    }
+
+    @Operation(summary = "Xóa mã giảm giá")
+    @DeleteMapping(value = "/discount/{id}")
+    public ApiResponse<Void> deleteDiscount(@PathVariable UUID id) {
+        adminService.delete(id);
+        return ApiResponse.success();
     }
 
 }

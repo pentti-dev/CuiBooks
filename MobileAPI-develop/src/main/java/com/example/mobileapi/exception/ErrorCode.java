@@ -43,6 +43,7 @@ public enum ErrorCode {
     EMAIL_EXISTED(HttpStatus.BAD_REQUEST, 4114, "Email đã tồn tại."),
     INVALID_RESET_CODE(HttpStatus.BAD_REQUEST, 4115, "Mã xác nhận không hợp lệ hoặc đã hết hạn."),
     INVALD_DISCOUNT(HttpStatus.BAD_REQUEST, 4115, "Mã giảm giá không hợp lệ hoặc đã hết hạn."),
+    INVALID_ORDER_AMOUNT(HttpStatus.BAD_REQUEST, 4115, "Số lượng đơn hàng không hợp lệ."),
 
     MISSING_NEW_PASSWORD(HttpStatus.BAD_REQUEST, 4116, "Mật khẩu mới không được để trống."),
 
@@ -50,6 +51,12 @@ public enum ErrorCode {
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, 4118, "Mật khẩu không chính xác."),
 
     ERROR_DURING_SEND_EMAIL(HttpStatus.INTERNAL_SERVER_ERROR, 4119, "Lỗi trong quá trình gửi email."),
+    MISSING_EMAIL(HttpStatus.BAD_REQUEST, 4120, "Email không được để trống."),
+    MISSING_CODE_DISCOUNT(HttpStatus.BAD_REQUEST, 4121, "Mã giảm giá không được để trống."),
+    MISSING_PERCENT(HttpStatus.BAD_REQUEST, 4122, "Phần trăm giảm giá không được để trống."),
+    INVALID_PERCENT(HttpStatus.BAD_REQUEST, 4123, "Phần trăm giảm giá không hợp lệ(1-100)."),
+    INVALID_CODE_DISCOUNT(HttpStatus.BAD_REQUEST, 4124, "Mã giảm giá không hợp lệ. Tối đa 10 ký tự!"),
+
 
     /**
      * ========== LỖI XÁC THỰC ==========

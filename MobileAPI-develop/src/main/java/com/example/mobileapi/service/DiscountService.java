@@ -6,19 +6,19 @@ import java.util.List;
 import java.util.UUID;
 
 public interface DiscountService {
-    public boolean checkVailidDIscountCode(String code);
+    boolean checkVailidDIscountCode(String code);
 
-    public Integer getPercentDiscount(String code);
+    Integer getPercentDiscount(String code);
 
-    public boolean checkDiscountTime(String code);
+    boolean checkDiscountTime(String code);
 
-    public DiscountDTO getDiscount(String code);
+    DiscountDTO getDiscount(String code);
 
-    public List<DiscountDTO> getAllDiscount();
+    List<DiscountDTO> getAllDiscount();
 
-    public DiscountDTO create(DiscountDTO discount);
+    DiscountDTO create(DiscountDTO discount);
 
-    public DiscountDTO update(DiscountDTO discount);
+    DiscountDTO update(DiscountDTO discount);
 
-    public void delete(UUID id);
+    void delete(UUID id);
 }

@@ -19,6 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Service
 @Slf4j
 @Transactional
@@ -59,7 +64,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public IntrospectResponse introspect(IntrospectRequest request) {
-        return null;
+    public boolean isTokenBlacklisted(String jwtID) {
+        return invalidateTokenRepository.existsById(jwtID);
     }
 }

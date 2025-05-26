@@ -27,4 +27,6 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
 
     @Query("SELECT u.id FROM Customer u WHERE u.username = :username")
     UUID findIdByUsername(String username);
+
+    Optional<Customer> findByEmail(String email);
 }

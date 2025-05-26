@@ -1,5 +1,7 @@
 package com.example.mobileapi.dto.request;
 
+import com.example.mobileapi.entity.enums.Role;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -26,5 +28,7 @@ public class CustomerRequestDTO {
 
     @NotBlank(message = "MISSING_PHONE")
     String phone;
+    @Hidden
+    Role role;
 
 }

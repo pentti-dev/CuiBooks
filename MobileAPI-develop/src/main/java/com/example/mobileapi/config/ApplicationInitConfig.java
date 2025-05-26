@@ -2,6 +2,7 @@ package com.example.mobileapi.config;
 
 
 import com.example.mobileapi.entity.Customer;
+import com.example.mobileapi.entity.enums.Role;
 import com.example.mobileapi.repository.CustomerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -26,7 +27,7 @@ public class ApplicationInitConfig {
                 Customer customer = Customer.builder()
                         .fullname("Admin")
                         .username("admin")
-                        .role(true)
+                        .role(Role.ADMIN)
                         .password(bCryptPasswordEncoder.encode("admin"))
                         .email("admin@gmail.com")
                         .phone("0123456789")

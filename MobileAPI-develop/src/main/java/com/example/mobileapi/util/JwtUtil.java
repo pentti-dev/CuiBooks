@@ -3,6 +3,7 @@ package com.example.mobileapi.util;
 import com.example.mobileapi.config.props.JwtProperties;
 import com.example.mobileapi.entity.Customer;
 import com.example.mobileapi.entity.enums.Role;
+import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.repository.InvalidateTokenRepository;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
@@ -53,7 +54,7 @@ public final class JwtUtil {
                     .issueTime(Date.from(now))
                     .expirationTime(Date.from(now.plus(jwtProps.expirationMinutes(), ChronoUnit.MINUTES)))
                     .jwtID(UUID.randomUUID().toString())
-                    .claim("scope", Role.role(user.isRole()))
+                    .claim("scope", user.getRole())
                     .build();
 
             JWSHeader header = new JWSHeader(JWSAlgorithm.RS512);
@@ -62,8 +63,7 @@ public final class JwtUtil {
 
             return jwt.serialize();
         } catch (JOSEException e) {
-            log.error("Error while generating JWT token", e);
-            throw new RuntimeException("JWT creation failed", e);
+            throw new AppException("Error generating JWT token");
         }
     }
 

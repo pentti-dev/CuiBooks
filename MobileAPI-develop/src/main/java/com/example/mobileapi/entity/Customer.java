@@ -1,5 +1,6 @@
 package com.example.mobileapi.entity;
 
+import com.example.mobileapi.entity.enums.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,8 +35,10 @@ public class Customer {
     String password;
     @Column(nullable = false, name = "number_phone")
     String phone;
-    // 0-customer, 1-admin
-    boolean role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    Role role;
 
     @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     Cart cart;

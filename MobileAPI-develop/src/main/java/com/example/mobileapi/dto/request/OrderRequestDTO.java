@@ -26,7 +26,6 @@ public class OrderRequestDTO {
     OrderMethod paymentMethod;//phương thức thanh toán
     String receiver;// người nhận
     List<OrderDetailRequestDTO> orderDetails;// danh sách chi tiết đơn hàng
-    @Hidden
     String discountCode;
 }
 

@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.server.resource.BearerTokenErrorCodes;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
@@ -19,6 +21,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 public class SecurityExceptionHandler implements AuthenticationEntryPoint, AccessDeniedHandler {
+
 
     private void sendErrorResponse(HttpServletResponse response, ErrorCode errorCode) throws IOException {
         response.setStatus(errorCode.getHttpStatus().value());
@@ -36,25 +39,29 @@ public class SecurityExceptionHandler implements AuthenticationEntryPoint, Acces
         response.flushBuffer();
     }
 
-    /**
-     * Xử lý lỗi 401 - Unauthorized (Người dùng chưa xác thực)
-     */
+
     @Override
-    public void commence(HttpServletRequest req, HttpServletResponse resp,
+    public void commence(HttpServletRequest req,
+                         HttpServletResponse resp,
                          AuthenticationException ex) throws IOException {
-        String jwtError = (String) req.getAttribute("jwtError");
-        ErrorCode code;
-        if (jwtError == null) {
-            code = ErrorCode.UNAUTHORIZED;
-        } else {
-            code = switch (jwtError) {
-                case "EXPIRED", "LOGOUT" -> ErrorCode.TOKEN_EXPIRED;
-                case "INVALID_SIGNATURE", "UNSUPPORTED", "INVALID" -> ErrorCode.INVALID_TOKEN;
-                default -> ErrorCode.UNAUTHORIZED;
-            };
+
+        ErrorCode appCode = ErrorCode.UNAUTHORIZED;
+
+        if (ex instanceof OAuth2AuthenticationException oauth2Ex) {
+            String errorCode = oauth2Ex.getError().getErrorCode();
+            String description = oauth2Ex.getError().getDescription()
+                    .toLowerCase();
+
+            if ("expired_token".equals(errorCode) || description.contains("expired")) {
+                appCode = ErrorCode.TOKEN_EXPIRED;
+            } else if ("invalid_token".equals(errorCode)) {
+                appCode = ErrorCode.INVALID_TOKEN;
+            }
         }
-        sendErrorResponse(resp, code);
+
+        sendErrorResponse(resp, appCode);
     }
+
 
     @Override
     public void handle(HttpServletRequest req, HttpServletResponse resp,

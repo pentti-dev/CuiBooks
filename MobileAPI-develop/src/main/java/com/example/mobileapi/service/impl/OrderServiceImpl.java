@@ -16,20 +16,26 @@ import com.example.mobileapi.mapper.OrderMapper;
 import com.example.mobileapi.mapper.ProductMapper;
 import com.example.mobileapi.repository.OrderRepository;
 import com.example.mobileapi.repository.CustomerRepository;
+import com.example.mobileapi.service.DiscountService;
 import com.example.mobileapi.service.OrderService;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static org.apache.commons.math3.util.MathUtils.reduce;
 
 @Service
 @Slf4j
@@ -42,15 +48,24 @@ public class OrderServiceImpl implements OrderService {
     ProductServiceImpl productService;
     ProductMapper productMapper;
     OrderMapper orderMapper;
+    DiscountServiceImpl discountService;
 
     @Override
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #orderRequestDTO.customerId")
     public UUID saveOrder(OrderRequestDTO orderRequestDTO) throws AppException {
+        //Kiểm tra các tham số của đơn hàng
+        checkOrderParam(orderRequestDTO.getDiscountCode());
+
+
+        BigDecimal amount = calcTotalAmount(orderRequestDTO.getOrderDetails(), discountService.getPercentDiscount(orderRequestDTO.getDiscountCode()));
+
+
+
         Order order = Order.builder()
                 .customer(customerRepository.findById(orderRequestDTO.getCustomerId())
                         .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND)))
                 .orderDate(LocalDateTime.now())
-                .totalAmount(orderRequestDTO.getTotalAmount())
+                .totalAmount(amount)
                 .address(orderRequestDTO.getAddress())
                 .numberPhone(orderRequestDTO.getNumberPhone())
                 .receiver(orderRequestDTO.getReceiver())
@@ -66,13 +81,42 @@ public class OrderServiceImpl implements OrderService {
         return orderRepository.save(order).getId();
     }
 
+    // Tính toán tổng tiền đơn hàng từ chi tiết đơn hàng và mã giảm giá
+    private BigDecimal calcTotalAmount(List<OrderDetailRequestDTO> orderDetails, Integer discountPercent) {
+        // tính tiền tổng
+        BigDecimal totalAmount = orderDetails.stream()
+                .map(detail -> {
+                    BigDecimal price = productService.getPriceById(detail.getProductId());
+                    log.warn(String.valueOf(price));
+                    return price.multiply(BigDecimal.valueOf(detail.getQuantity()));
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // tính toán neeus có mã giảm giá
+        if (discountPercent != null && discountPercent > 0) {
+            BigDecimal discountAmount = totalAmount
+                    .multiply(BigDecimal.valueOf(discountPercent))
+                    .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            totalAmount = totalAmount.subtract(discountAmount);
+        }
+
+        return totalAmount;
+    }
+
+
+    private void checkOrderParam(String discountCode) {
+        if (!discountService.checkVailidDIscountCode(discountCode)) {
+            throw new AppException(ErrorCode.DISCOUNT_NOT_FOUND);
+        }
+    }
+
     public OrderStatus determineDefaultStatus(OrderMethod method) {
         switch (method) {
             case COD:
                 return OrderStatus.PENDING;
             case VN_PAY,
-                    MOMO,
-                    ZALO_PAY:
+                 MOMO,
+                 ZALO_PAY:
                 return OrderStatus.PENDING_PAYMENT;
             default:
                 return OrderStatus.PENDING;
