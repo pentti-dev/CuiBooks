@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Product {
+public class Product implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -47,9 +48,6 @@ public class Product {
 
     String publisher; // nhà xuất bản
 
-    @Enumerated(EnumType.STRING)
-    Language language; // ngôn ngữ
-
     Integer weight; // trọng lượng (gram)
 
     String size; // kích thước
@@ -62,14 +60,17 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     @JsonBackReference
-    Category category;
-
-    // Bắt buộc phải để kèm "= new ArrayList<>()" khi dùng @Builder.Default
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    @Builder.Default
-    List<CartItem> cartItems = new ArrayList<>();
+    private Category category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @Builder.Default
-    List<OrderDetail> orderDetails = new ArrayList<>();
+    private List<CartItem> cartItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<OrderDetail> orderDetails = new ArrayList<>();
+    
+    @Builder.Default
+    private List<Rating> ratings = new ArrayList<>();
+
 }

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ import java.util.UUID;
 @Data
 @Table(name = "ratings")
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class Rating {
+public class Rating implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
@@ -25,7 +26,6 @@ public class Rating {
     @Max(5)
     @Min(1)
     Integer score;
-
 
     @Column(name = "created_at")
     Instant createdAt;
@@ -37,6 +37,7 @@ public class Rating {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     Product product;
-
+    @Transient
+    Double avgScore;
 
 }

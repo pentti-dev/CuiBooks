@@ -2,7 +2,6 @@ package com.example.mobileapi.util;
 
 import com.example.mobileapi.config.props.JwtProperties;
 import com.example.mobileapi.entity.Customer;
-import com.example.mobileapi.entity.enums.Role;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.repository.InvalidateTokenRepository;
 import com.nimbusds.jose.*;

@@ -1,6 +1,5 @@
 package com.example.mobileapi.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Table(name = "cart_items")
@@ -18,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class CartItem {
+public class CartItem implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
@@ -26,7 +26,7 @@ public class CartItem {
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "cart_id", nullable = false)
-    Cart cart;
+    private Cart cart;
 
     @ManyToOne
     @JsonBackReference
@@ -35,6 +35,5 @@ public class CartItem {
 
     @Column(name = "quantity", nullable = false)
     int quantity;
-
 
 }
