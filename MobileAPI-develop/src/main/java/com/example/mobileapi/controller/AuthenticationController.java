@@ -16,10 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -71,6 +68,11 @@ public class AuthenticationController {
                 .code(HttpStatus.OK.value())
                 .data(customerService.checkEmail(email))
                 .build();
+    }   
+     @PostMapping("/checkTokenExpiration/{token}")
+    public ApiResponse<Void> checkTokenExpiration(@PathVariable("token") String token) throws AppException {
+        authenticationService.checkTokenExpiration(token);
+        return ApiResponse.success();
     }
 
 }

@@ -48,6 +48,9 @@ public class Product implements Serializable {
 
     String publisher; // nhà xuất bản
 
+    @Enumerated(EnumType.STRING)
+    Language language; // ngôn ngữ
+
     Integer weight; // trọng lượng (gram)
 
     String size; // kích thước

@@ -123,4 +123,11 @@ public class ProductServiceImpl implements ProductService {
     public void saveAll(List<Product> products) {
         productRepository.saveAll(products);
     }
+
+    @Override
+    public List<ProductResponseDTO> getProductSale() {
+        // Giả sử discount là một trường trong thực thể Product và có giá trị > 0 khi có giảm giá
+        List<Product> productsOnSale = productRepository.findByDiscountGreaterThan(0);
+        return productMapper.toProductResponseDTOList(productsOnSale);
+    }
 }

@@ -14,5 +14,7 @@ public interface AuthenticationService {
 
     boolean isTokenBlacklisted(String jwtID);
 
+    void checkTokenExpiration(String token) throws AppException;
+
 
 }

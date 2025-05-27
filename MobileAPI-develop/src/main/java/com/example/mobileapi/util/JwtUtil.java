@@ -53,6 +53,7 @@ public final class JwtUtil {
                     .issueTime(Date.from(now))
                     .expirationTime(Date.from(now.plus(jwtProps.expirationMinutes(), ChronoUnit.MINUTES)))
                     .jwtID(UUID.randomUUID().toString())
+                    .claim("id", user.getId())
                     .claim("scope", user.getRole())
                     .build();
 

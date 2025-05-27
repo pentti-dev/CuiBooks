@@ -34,6 +34,10 @@ public class Category implements Serializable {
     @Column(nullable = false, unique = true)
     String code;
 
+    @Column(nullable = false, unique = true)
+    String img;
+
+
     @Builder.Default
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
