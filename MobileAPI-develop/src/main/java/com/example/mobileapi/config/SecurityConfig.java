@@ -52,6 +52,7 @@ public class SecurityConfig {
             "/api/customer/initPasswordReset/**", "/api/customer/resetPassword/**",
             "/api/auth/**", "/api/customer/introspect", "/api/test/**", "/api/customer/checkUsername/**", "/api/customer/checkEmail/**",
             "/api/category/**", "/api/product/**",
+            "/api/payments/return",
             "/graphiql", "/graphql", "/api/graphql/product"
             , "/graphql-ui", "/webjars/**"
     };

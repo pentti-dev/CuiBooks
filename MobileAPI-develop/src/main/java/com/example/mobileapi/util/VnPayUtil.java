@@ -37,7 +37,7 @@ public class VnPayUtil {
         params.put("vnp_Version", props.version());
         params.put("vnp_Command", props.command());
         params.put("vnp_TmnCode", props.tmnCode());
-        params.put("vnp_Amount", amount.multiply(new BigDecimal(100)).toBigInteger().toString());
+        params.put("vnp_Amount", amount.toString());
         params.put("vnp_CurrCode", props.currencyCode());
         params.put("vnp_TxnRef", txnRef);
         params.put("vnp_OrderInfo", orderInfo);

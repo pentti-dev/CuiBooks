@@ -7,6 +7,7 @@ import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.exception.AppException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,8 @@ public interface OrderService {
     UUID saveOrder(OrderRequestDTO orderRequestDTO) throws AppException;
 
     OrderResponseDTO getOrder(UUID orderId);
+
+    BigDecimal getPriceByOrderId(UUID orderId);
 
     void deleteOrder(UUID orderId);
 

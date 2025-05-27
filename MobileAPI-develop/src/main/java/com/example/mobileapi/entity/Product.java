@@ -74,8 +74,8 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @Builder.Default
     private List<OrderDetail> orderDetails = new ArrayList<>();
-
-    // @Builder.Default
-    // private List<Rating> ratings = new ArrayList<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @Builder.Default
+    private List<Rating> ratings = new ArrayList<>();
 
 }

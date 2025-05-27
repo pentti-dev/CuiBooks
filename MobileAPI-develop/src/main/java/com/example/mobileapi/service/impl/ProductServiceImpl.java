@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +41,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public BigDecimal getPriceById(UUID id) {
-        return getProductById(id).getPrice();
+        Product product = getById(id);
+        double discountPercent = product.getDiscount();
+        BigDecimal originalPrice = product.getPrice();
+        // Tính toán giá nếu có giảm giá thì nhân với giảm giá nến khôngkhông thì không
+        // cần
+        // nhân
+        return discountPercent != 0.0 ? originalPrice.multiply(BigDecimal.valueOf(discountPercent)) : originalPrice;
     }
 
     @Override
@@ -88,7 +95,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponseDTO> filterProducts(String name, UUID categoryId, Language language, Integer minPrice,
-                                                   Integer maxPrice, BookForm form) {
+            Integer maxPrice, BookForm form) {
         Specification<Product> spec = Specification.where(null);
         if (StringUtils.hasText(name)) {
             spec = spec.and(ProductSpecifications
@@ -126,7 +133,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponseDTO> getProductSale() {
-        // Giả sử discount là một trường trong thực thể Product và có giá trị > 0 khi có giảm giá
+        // Giả sử discount là một trường trong thực thể Product và có giá trị > 0 khi có
+        // giảm giá
         List<Product> productsOnSale = productRepository.findByDiscountGreaterThan(0);
         return productMapper.toProductResponseDTOList(productsOnSale);
     }

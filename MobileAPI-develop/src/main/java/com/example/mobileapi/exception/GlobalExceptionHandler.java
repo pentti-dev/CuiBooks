@@ -84,7 +84,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = RuntimeException.class)
     ResponseEntity<ApiResponse<Void>> handlingRuntimeException(Exception e) {
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
-        log.error(e.getMessage());
+        e.printStackTrace();
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(

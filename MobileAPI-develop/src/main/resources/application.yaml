@@ -74,7 +74,7 @@ vnpay:
   tmn-code: C0LUS1XF
   hash-secret: MRSUPJYDQQV713GJPX8IVD1XAJIEVVJI
   pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-  return-url: /api/pay/vnpay/return
+  return-url: http://localhost:8080/api/payments/return
   version: 2.1.0
   command: pay
   currency-code: VND
