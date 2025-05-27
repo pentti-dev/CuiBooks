@@ -60,6 +60,8 @@ public class Product implements Serializable {
     @Enumerated(EnumType.STRING)
     BookForm form; // hình thức
 
+    @Column(nullable = false)
+    double discount;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     @JsonBackReference
@@ -72,8 +74,8 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @Builder.Default
     private List<OrderDetail> orderDetails = new ArrayList<>();
-    
-    @Builder.Default
-    private List<Rating> ratings = new ArrayList<>();
+
+    // @Builder.Default
+    // private List<Rating> ratings = new ArrayList<>();
 
 }
