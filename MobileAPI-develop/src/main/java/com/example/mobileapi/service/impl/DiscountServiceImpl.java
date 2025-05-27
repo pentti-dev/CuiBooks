@@ -27,7 +27,6 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public boolean checkVailidDIscountCode(String code) {
-        log.warn(code);
         return discountRepository.findByCodeAndActiveIsTrue(code).isPresent();
     }
 

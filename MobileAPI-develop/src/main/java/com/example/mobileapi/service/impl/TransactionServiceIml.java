@@ -3,11 +3,15 @@ package com.example.mobileapi.service.impl;
 import com.example.mobileapi.dto.response.TransactionResponse;
 import com.example.mobileapi.service.OrderService;
 import com.example.mobileapi.service.TransactionService;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
+@FieldDefaults(level = lombok.AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class TransactionServiceIml implements TransactionService {
     OrderService orderService;
 

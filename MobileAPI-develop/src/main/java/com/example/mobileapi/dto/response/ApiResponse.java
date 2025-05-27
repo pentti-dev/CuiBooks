@@ -44,10 +44,19 @@ public class ApiResponse<T> {
                 .build();
     }
 
+    public static <T> ApiResponse<T> success(T data) {
+        return ApiResponse.<T>builder()
+                .code(200)
+                .data(data)
+                .build();
+    }
+
     public static <T> ApiResponse<T> error(Integer code, String message) {
         return ApiResponse.<T>builder()
                 .code(code)
                 .message(message)
                 .build();
     }
+
+
 }

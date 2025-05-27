@@ -2,6 +2,7 @@ package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.config.props.VnPayProperties;
 import com.example.mobileapi.dto.response.PaymentResponse;
+import com.example.mobileapi.entity.Order;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
@@ -10,34 +11,40 @@ import com.example.mobileapi.service.PaymentService;
 import com.example.mobileapi.service.TransactionService;
 import com.example.mobileapi.util.VnPayUtil;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentServiceImpl implements PaymentService {
+    @Delegate
     OrderService orderService;
     VnPayProperties vnPayProperties;
     VnPayUtil vnPayUtil;
     TransactionService transactionService;
 
-    @Override
-    public PaymentResponse createVNPayPayment(UUID orderId, BigDecimal price) throws AppException {
 
+    @Override
+    public PaymentResponse createVNPayPayment(UUID orderId) throws AppException {
         if (!orderService.existById(orderId)) {
             throw new AppException(ErrorCode.ORDER_NOT_FOUND);
         }
-
+        BigDecimal price = orderService.getPriceByOrderId(orderId);
+        log.info("Đơn hàng: {}, giá: {}", orderId, price);
         String orderType = "other";
-        BigDecimal amount = price;
         String bankCode = vnPayProperties.bankCode();
 
         String vnp_TxnRef = String.valueOf(orderId);
@@ -47,7 +54,10 @@ public class PaymentServiceImpl implements PaymentService {
         vnp_Params.put("vnp_Version", vnPayProperties.version());
         vnp_Params.put("vnp_Command", vnPayProperties.command());
         vnp_Params.put("vnp_TmnCode", vnPayProperties.tmnCode());
-        vnp_Params.put("vnp_Amount", String.valueOf(amount));
+//Điều chỉnh lại giá cho phù hợp
+        BigDecimal amount = price.movePointRight(2);
+        vnp_Params.put("vnp_Amount", amount.setScale(0, RoundingMode.UNNECESSARY).toPlainString());
+
         vnp_Params.put("vnp_CurrCode", vnPayProperties.currencyCode());
 
         if (bankCode != null && !bankCode.isEmpty()) {
@@ -97,25 +107,23 @@ public class PaymentServiceImpl implements PaymentService {
         String vnp_SecureHash = vnPayUtil.hmacSHA512(vnPayProperties.hashSecret(), hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = vnPayProperties.payUrl() + "?" + queryUrl;
-        return PaymentResponse.builder()
-                .url(paymentUrl)
-                .build();
+        return PaymentResponse.builder().url(paymentUrl).build();
     }
 
     @Override
-    public boolean notifyOrder(String vnp_ResponseCode, String vnp_TxnRef, String vnp_TransactionNo,
-            String vnp_TransactionDate, String vnp_Amount) {
+    public boolean notifyOrder(String vnp_ResponseCode, String orderId, String vnpTransactionNo, String vnp_TransactionDate, String vnp_Amount) {
+        log.info("vnp_ResponseCode: {}, orderId: {}, vnp_TransactionNo: {}, vnp_TransactionDate: {}, vnp_Amount: {}",
+                vnp_ResponseCode, orderId, vnpTransactionNo, vnp_TransactionDate, vnp_Amount);
+        UUID transactionID = UUID.nameUUIDFromBytes(orderId.getBytes());
         if (vnp_ResponseCode.equals("00")) {
-            orderService.changeOrderStatus(UUID.fromString(vnp_TxnRef), OrderStatus.PAYMENT_SUCCESS);
-            transactionService.createTransaction(UUID.fromString(vnp_TransactionNo), UUID.fromString(vnp_TxnRef),
-                    vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
+            orderService.changeOrderStatus(UUID.fromString(orderId), OrderStatus.PAYMENT_SUCCESS);
+            transactionService.createTransaction(transactionID, UUID.fromString(orderId), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
             return true;
-        } else {
-            transactionService.createTransaction(UUID.fromString(vnp_TransactionNo), UUID.fromString(vnp_TxnRef),
-                    vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
-            orderService.changeOrderStatus(UUID.fromString(vnp_TxnRef), OrderStatus.PAYMENT_FAILED);
-            return false;
         }
+        transactionService.createTransaction(transactionID, UUID.fromString(orderId), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
+        orderService.changeOrderStatus(UUID.fromString(orderId), OrderStatus.PAYMENT_FAILED);
+        return false;
+
     }
 
 }
