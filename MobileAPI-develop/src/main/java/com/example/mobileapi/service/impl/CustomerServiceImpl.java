@@ -4,6 +4,7 @@ import com.example.mobileapi.config.BCryptPasswordEncoder;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.entity.Customer;
+import com.example.mobileapi.entity.enums.Role;
 import com.example.mobileapi.event.CustomerCreatedEvent;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
@@ -49,20 +50,11 @@ public class CustomerServiceImpl implements CustomerService {
 
         // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
         request.setPassword(passwordEncoder.encode(request.getPassword())); // Sử dụng passwordEncoder
-
+        request.setRole(Role.USER);
         Customer customer = customerRepository.save(customerMapper.toCustomer(request));
         log.info("Customer created with ID: {}", customer.getId());
         applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, customer.getId()));
         return customerMapper.toCustomerResponse(customer);
-    }
-
-    private void checkIfUserExists(String username, String email) throws AppException {
-        if (checkUsername(username)) {
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
-        }
-        if (checkEmail(email)) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
-        }
     }
 
     @Override
@@ -97,7 +89,6 @@ public class CustomerServiceImpl implements CustomerService {
         return customerRepository.existsByEmail(email);
     }
 
-
     @Override
     @Transactional
     public CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO request) throws AppException {
@@ -109,7 +100,6 @@ public class CustomerServiceImpl implements CustomerService {
 
         return customerMapper.toCustomerResponse(customer);
     }
-
 
     @Override
     public void resetPassword(String username, String resetCode, String newPassword) throws AppException {
@@ -162,7 +152,6 @@ public class CustomerServiceImpl implements CustomerService {
         }
     }
 
-
     @Override
     @PostAuthorize("returnObject.username ==authentication.name")
     public CustomerResponseDTO getCustomerProfile(String token) throws AppException {
@@ -170,7 +159,6 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toCustomerResponse(getCustomerByUserName(username));
 
     }
-
 
     Customer getCustomerByUserName(String username) throws AppException {
         return customerRepository.findByUsername(username)

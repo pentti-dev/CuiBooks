@@ -3,7 +3,6 @@ package com.example.mobileapi.config;
 import com.cloudinary.Cloudinary;
 import com.example.mobileapi.config.props.CloudinaryProperties;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,4 +25,3 @@ public class CloudinaryConfig {
         return new Cloudinary(config);
     }
 }
-

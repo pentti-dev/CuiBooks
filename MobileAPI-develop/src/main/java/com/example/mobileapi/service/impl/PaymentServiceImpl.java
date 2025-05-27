@@ -43,7 +43,6 @@ public class PaymentServiceImpl implements PaymentService {
         String vnp_TxnRef = String.valueOf(orderId);
         String vnp_IpAddr = vnPayUtil.getClientIpAddress();
 
-
         Map<String, String> vnp_Params = new HashMap<>();
         vnp_Params.put("vnp_Version", vnPayProperties.version());
         vnp_Params.put("vnp_Command", vnPayProperties.command());
@@ -80,11 +79,11 @@ public class PaymentServiceImpl implements PaymentService {
             String fieldName = (String) itr.next();
             String fieldValue = (String) vnp_Params.get(fieldName);
             if ((fieldValue != null) && (!fieldValue.isEmpty())) {
-                //Build hash data
+                // Build hash data
                 hashData.append(fieldName);
                 hashData.append('=');
                 hashData.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
-                //Build query
+                // Build query
                 query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII));
                 query.append('=');
                 query.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
@@ -103,19 +102,20 @@ public class PaymentServiceImpl implements PaymentService {
                 .build();
     }
 
-
     @Override
-    public boolean notifyOrder(String vnp_ResponseCode, String vnp_TxnRef, String vnp_TransactionNo, String vnp_TransactionDate, String vnp_Amount) {
+    public boolean notifyOrder(String vnp_ResponseCode, String vnp_TxnRef, String vnp_TransactionNo,
+            String vnp_TransactionDate, String vnp_Amount) {
         if (vnp_ResponseCode.equals("00")) {
             orderService.changeOrderStatus(UUID.fromString(vnp_TxnRef), OrderStatus.PAYMENT_SUCCESS);
-            transactionService.createTransaction(UUID.fromString(vnp_TransactionNo), UUID.fromString(vnp_TxnRef), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
+            transactionService.createTransaction(UUID.fromString(vnp_TransactionNo), UUID.fromString(vnp_TxnRef),
+                    vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
             return true;
         } else {
-            transactionService.createTransaction(UUID.fromString(vnp_TransactionNo), UUID.fromString(vnp_TxnRef), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
+            transactionService.createTransaction(UUID.fromString(vnp_TransactionNo), UUID.fromString(vnp_TxnRef),
+                    vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
             orderService.changeOrderStatus(UUID.fromString(vnp_TxnRef), OrderStatus.PAYMENT_FAILED);
             return false;
         }
     }
-
 
 }

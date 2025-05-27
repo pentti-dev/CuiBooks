@@ -6,6 +6,7 @@ import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.CustomerResponseDTO;
 import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -58,19 +59,6 @@ public class CustomerController {
                 .build();
     }
 
-    @PreAuthorize("permitAll()")
-    @Operation(summary = "Kiểm tra tên đăng nhập")
-    @GetMapping("/checkUsername/{username}")
-    public ApiResponse<Boolean> checkUsername(@PathVariable String username) {
-        return ApiResponse.<Boolean>builder().data(customerService.checkUsername(username)).build();
-    }
-
-    @PreAuthorize("permitAll()")
-    @Operation(summary = "Kiểm tra Email")
-    @GetMapping("/checkEmail/{email}")
-    public ApiResponse<Boolean> checkEmail(@PathVariable String email) {
-        return ApiResponse.<Boolean>builder().data(customerService.checkEmail(email)).build();
-    }
 
     @PreAuthorize("permitAll()")
     @Operation(summary = "Thay đổi mật khẩu")
@@ -82,7 +70,7 @@ public class CustomerController {
         try {
             customerService.resetPassword(username, resetCode, newPassword);
         } catch (AppException e) {
-            throw new RuntimeException(e);
+            throw new AppException(ErrorCode.SERVICE_UNAVAILABLE);
         }
 
         return ApiResponse.success("Đặt lại mật khẩu thành công");
@@ -96,7 +84,7 @@ public class CustomerController {
         try {
             customerService.initPasswordReset(username);
         } catch (AppException e) {
-            throw new RuntimeException(e);
+            throw new AppException(ErrorCode.SERVICE_UNAVAILABLE);
         }
 
         return ApiResponse.success("Gửi mã xác nhận thành công");

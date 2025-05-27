@@ -15,23 +15,24 @@ public interface OrderService {
 
     OrderResponseDTO getOrder(UUID orderId);
 
-    void deleteOrder(UUID  orderId);
+    void deleteOrder(UUID orderId);
 
-    void updateOrder(UUID  id, OrderRequestDTO orderRequestDTO);
+    void updateOrder(UUID id, OrderRequestDTO orderRequestDTO);
 
-    List<OrderResponseDTO> getOrderByCustomerId(UUID  customerId);
+    List<OrderResponseDTO> getOrderByCustomerId(UUID customerId);
 
     List<OrderResponseDTO> getAllOrders();
 
-    void editOrder(UUID  id, OrderEditRequestDTO orderEditRequestDTO) throws AppException;
+    void editOrder(UUID id, OrderEditRequestDTO orderEditRequestDTO) throws AppException;
 
     List<MonthlyRevenueResponse> getMonthlyRevenue();
 
     List<OrderResponseDTO> getOrdersByStatus(OrderStatus status);
 
-    void changeOrderStatus(UUID  orderId, OrderStatus status) throws AppException;
+    void changeOrderStatus(UUID orderId, OrderStatus status) throws AppException;
 
-    List<OrderResponseDTO> getOrdersByStatusAndCustomerId(OrderStatus status, UUID  customerId);
+    List<OrderResponseDTO> getOrdersByStatusAndCustomerId(OrderStatus status, UUID customerId);
 
     boolean existById(UUID orderId);
+
 }

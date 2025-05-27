@@ -6,18 +6,25 @@ import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.entity.enums.OrderMethod;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
+import com.example.mobileapi.service.DiscountService;
+import com.example.mobileapi.service.OrderDetailService;
 import com.example.mobileapi.service.OrderService;
+import com.example.mobileapi.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/order")
 @RequiredArgsConstructor
@@ -26,6 +33,7 @@ import java.util.UUID;
 @PreAuthorize("hasRole('USER')")
 public class OrderController {
     OrderService orderService;
+    DiscountService discountService;
 
     @Operation(summary = "Lưu đơn hàng")
     @PostMapping
@@ -38,6 +46,16 @@ public class OrderController {
                 .data(orderService.saveOrder(orderRequestDTO))
                 .build();
     }
+
+    @Operation(summary = "Kiểm tra mã giảm giá")
+    @PostMapping("/check-discount")
+    public ApiResponse<Boolean> checkDiscountCode(@RequestParam String discountCode) {
+        return ApiResponse.<Boolean>builder()
+                .code(HttpStatus.OK.value())
+                .data(discountService.checkVailidDIscountCode(discountCode))
+                .build();
+    }
+
 
     @Operation(summary = "Lấy danh sách đơn hàng theo ID khách hàng")
     @GetMapping("/customer/{customerId}")

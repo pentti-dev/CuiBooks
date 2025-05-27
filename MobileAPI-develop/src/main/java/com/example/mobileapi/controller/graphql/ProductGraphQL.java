@@ -1,17 +1,12 @@
 package com.example.mobileapi.controller.graphql;
 
 import com.example.mobileapi.dto.request.GraphQLRequest;
-import com.example.mobileapi.dto.response.ApiResponse;
 import graphql.ExecutionInput;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.graphql.ExecutionGraphQlRequest;
-import org.springframework.graphql.ExecutionGraphQlService;
-import org.springframework.graphql.GraphQlRequest;
-import org.springframework.graphql.GraphQlResponse;
 import org.springframework.graphql.execution.GraphQlSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

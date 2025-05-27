@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +30,6 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 public class ProductServiceImpl implements ProductService {
     ProductRepository productRepository;
-    CategoryServiceImpl categoryService;
 
     ProductMapper productMapper;
 
@@ -36,6 +37,10 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDTO saveProduct(ProductRequestDTO dto) {
         return productMapper.toProductResponseDTO(productRepository.save(productMapper.toProduct(dto)));
 
+    }
+
+    public BigDecimal getPriceById(UUID id) {
+        return getProductById(id).getPrice();
     }
 
     @Override
@@ -83,7 +88,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductResponseDTO> filterProducts(String name, UUID categoryId, Language language, Integer minPrice,
-            Integer maxPrice, BookForm form) {
+                                                   Integer maxPrice, BookForm form) {
         Specification<Product> spec = Specification.where(null);
         if (StringUtils.hasText(name)) {
             spec = spec.and(ProductSpecifications

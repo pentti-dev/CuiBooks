@@ -3,7 +3,7 @@ package com.example.mobileapi.controller;
 import com.example.mobileapi.entity.Category;
 import com.example.mobileapi.entity.Product;
 import com.example.mobileapi.entity.enums.OrderStatus;
-import com.cloudinary.Api;
+import com.example.mobileapi.dto.DiscountDTO;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
@@ -14,12 +14,10 @@ import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.AdminService;
 import com.example.mobileapi.service.OrderService;
-import com.example.mobileapi.service.impl.ProductServiceImpl;
-import com.example.mobileapi.util.ExcelHelper;
+import com.example.mobileapi.util.data.ExportDataHelper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.mail.Multipart;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -45,6 +43,7 @@ import java.util.UUID;
 public class AdminController {
 
     AdminService adminService;
+    ExportDataHelper exportDataHelper;
 
     @Operation(summary = "Lấy số lượng người dùng")
     @GetMapping("/customers")
@@ -151,10 +150,11 @@ public class AdminController {
         }
     }
 
+    @Operation(summary = "Nhập sản phẩm với excel")
     @PostMapping(value = "/product/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Void> importProduct(@RequestParam("file") MultipartFile file) {
         try (InputStream inputStream = file.getInputStream()) {
-            List<Product> products = ExcelHelper.parseExcel(inputStream);
+            List<Product> products = exportDataHelper.importProducts(inputStream);
             adminService.saveAll(products);
 
         } catch (IOException e) {
@@ -164,10 +164,11 @@ public class AdminController {
         return ApiResponse.success("Thêm thành công");
     }
 
+    @Operation(summary = "Nhập danh mục với excel")
     @PostMapping(value = "/category/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<Void> importCategory(@RequestParam("file") MultipartFile file) {
         try (InputStream inputStream = file.getInputStream()) {
-            List<Category> categories = ExcelHelper.importCategory(inputStream);
+            List<Category> categories = exportDataHelper.importCategories(inputStream);
             adminService.saveAllCategoryEntries(categories);
 
         } catch (IOException e) {
@@ -175,6 +176,38 @@ public class AdminController {
 
         }
         return ApiResponse.success("Thêm thành công");
+    }
+
+    @Operation(summary = "Thêm mã giảm giá")
+    @PostMapping(value = "/discount")
+    public ApiResponse<DiscountDTO> createDiscount(@Valid @RequestBody DiscountDTO dto) {
+        return ApiResponse.<DiscountDTO>builder().data(adminService.create(dto)).build();
+    }
+
+    @Operation(summary = "Sửa mã giảm giá")
+    @PutMapping(value = "/discount")
+    public ApiResponse<DiscountDTO> updateDiscount(@Valid @RequestBody DiscountDTO dto) {
+        return ApiResponse.<DiscountDTO>builder().data(adminService.update(dto)).build();
+    }
+
+    @Operation(summary = "Lấy tất cả mã giảm giá")
+    @GetMapping(value = "/discount/all")
+    public ApiResponse<List<DiscountDTO>> getDiscount() {
+        return ApiResponse.<List<DiscountDTO>>builder().data(adminService.getAllDiscount()).build();
+
+    }
+
+    @Operation(summary = "Lấy mã giảm giá theo code")
+    @GetMapping(value = "/discount")
+    public ApiResponse<DiscountDTO> getAllDiscount(@RequestParam("code") String code) {
+        return ApiResponse.<DiscountDTO>builder().data(adminService.getDiscount(code)).build();
+    }
+
+    @Operation(summary = "Xóa mã giảm giá")
+    @DeleteMapping(value = "/discount/{id}")
+    public ApiResponse<Void> deleteDiscount(@PathVariable UUID id) {
+        adminService.delete(id);
+        return ApiResponse.success();
     }
 
 }

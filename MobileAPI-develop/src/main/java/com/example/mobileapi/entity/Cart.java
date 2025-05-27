@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,18 +15,17 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Cart {
+public class Cart implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
     UUID id;
 
-
     @OneToOne
     @JoinColumn(name = "customer_id", nullable = false, unique = true)
-    Customer customer;
+    private Customer customer;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<CartItem> cartItems;
+    private List<CartItem> cartItems;
 
 }

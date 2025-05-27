@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Table(name = "order-details")
@@ -17,7 +18,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Data
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class OrderDetail {
+public class OrderDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
@@ -31,14 +32,16 @@ public class OrderDetail {
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "product_id", nullable = false)
-    Product product;
+    private Product product;
 
     Integer quantity;
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         OrderDetail that = (OrderDetail) o;
 
@@ -50,4 +53,3 @@ public class OrderDetail {
         return id != null ? id.hashCode() : 0;
     }
 }
-

@@ -17,14 +17,9 @@ public interface CustomerMapper {
     Customer toCustomer(CustomerRequestDTO request);
 
     //
-    @Mapping(target = "role", source = "role", qualifiedByName = "booleanToRole")
     @Mapping(target = "cartId", source = "cart", qualifiedByName = "cartToCartId")
     CustomerResponseDTO toCustomerResponse(Customer customer);
 
-    @Named("booleanToRole")
-    public static Role booleanToRole(boolean role) {
-        return Role.role(role);
-    }
 
     @Named("cartToCartId")
     public static UUID cartToCartId(Cart cart) {

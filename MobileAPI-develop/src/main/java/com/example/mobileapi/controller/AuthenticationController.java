@@ -2,14 +2,12 @@ package com.example.mobileapi.controller;
 
 import com.example.mobileapi.annotation.GetToken;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
-import com.example.mobileapi.dto.request.IntrospectRequest;
 import com.example.mobileapi.dto.request.LoginRequest;
 import com.example.mobileapi.dto.response.ApiResponse;
-import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.AuthenticationService;
-import com.example.mobileapi.service.CartService;
 import com.example.mobileapi.service.CustomerService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +28,6 @@ public class AuthenticationController {
 
     AuthenticationService authenticationService;
     CustomerService customerService;
-    CartService cartService;
 
     @PostMapping("/login")
     public ApiResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest) throws AppException {
@@ -40,31 +37,39 @@ public class AuthenticationController {
                 .build();
     }
 
-    @PostMapping("/introspect")
-    public IntrospectResponse authenticate(@RequestBody IntrospectRequest request) throws Exception {
-        return authenticationService.introspect(request);
-
-
-    }
 
     @PostMapping("/logout")
     public ApiResponse<Void> logout(@Parameter(hidden = true) @GetToken String token) {
-        try {
-            log.info("Token length: {}", token.length());
-            authenticationService.logout(token);
-            return ApiResponse.success("Đăng xuất thành công");
-        } catch (AppException e) {
-            throw new RuntimeException(e);
+        if (token == null || token.isEmpty()) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
         }
+        authenticationService.logout(token);
+        return ApiResponse.success();
     }
 
     @PostMapping("/register")
-    public ApiResponse<Void> addCustomer(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+    public ApiResponse<Void> register(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+
         customerService.saveCustomer(customer);
-        return ApiResponse.success("Đăng ký tài khoản thành công");
+        return ApiResponse.success();
     }
 
-    @PostMapping("/checkTokenExpiration/{token}")
+    @PostMapping("/check-username")
+    public ApiResponse<Boolean> checkUsername(@RequestBody String username) {
+        return ApiResponse.<Boolean>builder()
+                .code(HttpStatus.OK.value())
+                .data(customerService.checkUsername(username))
+                .build();
+    }
+
+    @PostMapping("/check-email")
+    public ApiResponse<Boolean> checkEmail(@RequestBody String email) {
+        return ApiResponse.<Boolean>builder()
+                .code(HttpStatus.OK.value())
+                .data(customerService.checkEmail(email))
+                .build();
+    }   
+     @PostMapping("/checkTokenExpiration/{token}")
     public ApiResponse<Void> checkTokenExpiration(@PathVariable("token") String token) throws AppException {
         authenticationService.checkTokenExpiration(token);
         return ApiResponse.success();

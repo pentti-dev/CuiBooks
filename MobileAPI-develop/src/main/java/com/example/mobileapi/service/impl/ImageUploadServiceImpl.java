@@ -5,7 +5,6 @@ import com.example.mobileapi.dto.response.UrlResponse;
 import com.example.mobileapi.service.ImageUploadService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,8 +31,7 @@ public class ImageUploadServiceImpl implements ImageUploadService {
             return CompletableFuture.completedFuture(
                     UrlResponse.builder()
                             .url(cdnUrl)
-                            .build()
-            );
+                            .build());
         } catch (IOException e) {
             e.printStackTrace();
             // Trả về null nếu có lỗi

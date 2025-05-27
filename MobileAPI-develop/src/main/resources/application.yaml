@@ -4,8 +4,24 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/bookstore
     username: root
-    password:
+    password: 123
     driverClassName: com.mysql.cj.jdbc.Driver
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 564809681010-j9tb6t9o5p64hrf9f9s7gvrfq51vnplo.apps.googleusercontent.com
+            client-secret: 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
+            redirect-uri: http://localhost:8080/login/oauth2/code/google
+            scope: profile, email, openid
+
+        provider:
+          google:
+            issuer-uri: https://accounts.google.com
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
   jpa:
     properties:
       hibernate:
@@ -54,7 +70,6 @@ cloudinary:
   api-key: 652981452525434
   api-secret: pgIYakDqMVAYHy9bo-vdyFl3k1o
 
-
 vnpay:
   tmn-code: C0LUS1XF
   hash-secret: MRSUPJYDQQV713GJPX8IVD1XAJIEVVJI
@@ -72,5 +87,3 @@ jwt:
   keys:
     private-key: classpath:keys/private_key.pem
     public-key: classpath:keys/public_key.pem
-
-

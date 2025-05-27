@@ -64,11 +64,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public IntrospectResponse introspect(IntrospectRequest request) {
-        return null;
-    }
-
-    @Override
     public void checkTokenExpiration(String token) throws AppException {
         try {
             // Giải mã token và kiểm tra thời gian hết hạn
@@ -85,4 +80,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new AppException(ErrorCode.INVALID_TOKEN);
         }
     }
+
+    @Override
+    public boolean isTokenBlacklisted(String jwtID) {
+        return invalidateTokenRepository.existsById(jwtID);
+    }
+
 }

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.example.mobileapi.exception.AppException;
+import com.example.mobileapi.exception.ErrorCode;
+
 import java.lang.reflect.Parameter;
 
 @Aspect
@@ -19,11 +22,14 @@ public class TokenAspect {
     @Around("within(@org.springframework.web.bind.annotation.RestController *) && execution(* *(.., @com.example.mobileapi.annotation.GetToken (*), ..))")
     public Object injectToken(ProceedingJoinPoint joinPoint) throws Throwable {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) {
+            throw new AppException(ErrorCode.SERVICE_UNAVAILABLE);
+        }
         HttpServletRequest request = attributes.getRequest();
 
         // Lấy token từ Header Authorization
         String authHeader = request.getHeader("Authorization");
-        String token = (authHeader != null && authHeader.startsWith("Bearer ")) ? authHeader.substring(7) : null;
+        String token = (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) ? authHeader.substring(BEARER_PREFIX.length()) : null;
 
         Object[] args = joinPoint.getArgs();
         Parameter[] parameters = ((MethodSignature) joinPoint.getSignature()).getMethod().getParameters();

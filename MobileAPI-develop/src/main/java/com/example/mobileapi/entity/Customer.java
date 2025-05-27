@@ -1,12 +1,13 @@
 package com.example.mobileapi.entity;
 
+import com.example.mobileapi.entity.enums.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.io.Serializable;
 import java.util.*;
-
 
 @Table(name = "customers")
 @Entity
@@ -16,7 +17,7 @@ import java.util.*;
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Customer {
+public class Customer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(nullable = false)
@@ -35,22 +36,26 @@ public class Customer {
     String password;
     @Column(nullable = false, name = "number_phone")
     String phone;
-    // 0-customer, 1-admin
-    boolean role;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    Cart cart;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    Role role;
+
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Cart cart;
 
     @Column(name = "reset_code")
     String resetCode;
-
+    @Builder.Default
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<Order> orders = new ArrayList<>();
+    private List<Order> orders = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         Customer customer = (Customer) o;
 
@@ -62,6 +67,4 @@ public class Customer {
         return id != null ? id.hashCode() : 0;
     }
 
-
 }
-
