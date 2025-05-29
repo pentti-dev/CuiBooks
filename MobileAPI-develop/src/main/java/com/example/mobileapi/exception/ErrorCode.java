@@ -49,13 +49,33 @@ public enum ErrorCode {
 
     WRONG_OLD_PASSWORD(HttpStatus.BAD_REQUEST, 4117, "Mật khẩu cũ không chính xác."),
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, 4118, "Mật khẩu không chính xác."),
-
+    MISSING_CATEGORY_NAME(HttpStatus.BAD_REQUEST, 4119, "Tên danh mục không được để trống."),
+    MISSING_CATEGORY_CODE(HttpStatus.BAD_REQUEST, 4120, "Mã danh mục không được để trống."),
+    MISSING_PRODUCT_NAME(HttpStatus.BAD_REQUEST, 4121, "Tên sản phẩm không được để trống."),
+    MISSING_PRODUCT_PRICE(HttpStatus.BAD_REQUEST, 4122, "Giá sản phẩm không được để trống."),
+    MISSING_PRODUCT_IMG(HttpStatus.BAD_REQUEST, 4123, "Ảnh sản phẩm không được để trống."),
+    MISSING_PRODUCT_DETAIL(HttpStatus.BAD_REQUEST, 4124, "Chi tiết sản phẩm không được để trống."),
+    MISSING_PRODUCT_AUTHOR(HttpStatus.BAD_REQUEST, 4125, "Tác giả sản phẩm không được để trống."),
+    MISSING_PRODUCT_PUBLISH_YEAR(HttpStatus.BAD_REQUEST, 4126, "Năm xuất bản sản phẩm không được để trống."),
+    MISSING_PRODUCT_PUBLISHER(HttpStatus.BAD_REQUEST, 4127, "Nhà xuất bản sản phẩm không được để trống."),
+    MISSING_PRODUCT_LANGUAGE(HttpStatus.BAD_REQUEST, 4128, "Ngôn ngữ sản phẩm không được để trống."),
+    MISSING_PRODUCT_WEIGHT(HttpStatus.BAD_REQUEST, 4129, "Trọng lượng sản phẩm không được để trống."),
+    MISSING_PRODUCT_SIZE(HttpStatus.BAD_REQUEST, 4130, "Kích thước sản phẩm không được để trống."),
+    MISSING_PRODUCT_PAGE_NUMBER(HttpStatus.BAD_REQUEST, 4131, "Số trang sản phẩm không được để trống."),
+    MISSING_PRODUCT_FORM(HttpStatus.BAD_REQUEST, 4132, "Hình thức sản phẩm không được để trống."),
+    MISSING_PRODUCT_SUPPLIER(HttpStatus.BAD_REQUEST, 4127, "Nhà cung cấp sản phẩm không được để trống."),
+    MISSING_PRODUCT_DISCOUNT(HttpStatus.BAD_REQUEST, 4133, "Giảm giá sản phẩm không được để trống."),
+    MISSING_PRODUCT_CATEGORY(HttpStatus.BAD_REQUEST, 4134, "Danh mục sản phẩm không được để trống."),
+    MISSING_PRODUCT_ID(HttpStatus.BAD_REQUEST, 4135, "ID sản phẩm không được để trống."),
     ERROR_DURING_SEND_EMAIL(HttpStatus.INTERNAL_SERVER_ERROR, 4119, "Lỗi trong quá trình gửi email."),
     MISSING_EMAIL(HttpStatus.BAD_REQUEST, 4120, "Email không được để trống."),
     MISSING_CODE_DISCOUNT(HttpStatus.BAD_REQUEST, 4121, "Mã giảm giá không được để trống."),
     MISSING_PERCENT(HttpStatus.BAD_REQUEST, 4122, "Phần trăm giảm giá không được để trống."),
     INVALID_PERCENT(HttpStatus.BAD_REQUEST, 4123, "Phần trăm giảm giá không hợp lệ(1-100)."),
     INVALID_CODE_DISCOUNT(HttpStatus.BAD_REQUEST, 4124, "Mã giảm giá không hợp lệ. Tối đa 10 ký tự!"),
+    INVALID_DATA(HttpStatus.BAD_REQUEST, 4125, "Dữ liệu không hợp lệ."),
+    INVALID_PRODUCT_PUBLIC_YEAR(HttpStatus.BAD_REQUEST, 4126, "Năm xuất bản sản phẩm không hợp lệ. "),
+    INVALID_PRODUCT_PRICE(HttpStatus.BAD_REQUEST, 4127, "Giá sản phẩm không hợp lệ. Phải lớn hơn 50000"),
 
 
     /**
@@ -95,6 +115,7 @@ public enum ErrorCode {
     ORDER_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND, 4507, "Chi tiết đơn hàng không tồn tại."),
     CATEGORY_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, 4508, "Không tìm thấy danh mục với ID đã cho."),
     DISCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, 4509, "Không tìm thấy mã giảm giá."),
+    CATEGORY_EXISTED(HttpStatus.BAD_REQUEST, 4510, "Danh mục đã tồn tại."),
     /**
      * ========== LỖI HỆ THỐNG ==========
      */

@@ -12,5 +12,6 @@ import java.util.UUID;
 public class CategoryResponseDTO {
     UUID id;
     String name;
-    String img;
+    String code;
+    String description;
 }

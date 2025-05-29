@@ -1,9 +1,16 @@
 package com.example.mobileapi.exception;
 
 import com.example.mobileapi.dto.response.ApiResponse;
+import graphql.GraphQLError;
+import graphql.GraphqlErrorBuilder;
+import graphql.schema.DataFetchingEnvironment;
 import jakarta.mail.MessagingException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.mail.MailParseException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,11 +18,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter {
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse<Void>> handlingAppException(AppException e) {
         ErrorCode errorCode = e.getErrorCode();
@@ -89,7 +97,7 @@ public class GlobalExceptionHandler {
                 .status(errorCode.getHttpStatus())
                 .body(
                         ApiResponse.<Void>builder()
-                                .message(errorCode.getMessage())
+                                .message(e.getMessage())
                                 .code(errorCode.getCode())
                                 .build());
 
@@ -105,9 +113,48 @@ public class GlobalExceptionHandler {
                 .status(errorCode.getHttpStatus())
                 .body(
                         ApiResponse.<Void>builder()
-                                .message(errorCode.getMessage())
+                                .message(e.getMessage())
                                 .code(errorCode.getCode())
                                 .build());
 
+    }
+
+    //--------------------------------------------------------------GRAPHQL----------------------------------------------------------------------------
+    @Override
+    protected GraphQLError resolveToSingleError(@NonNull Throwable ex, @NonNull DataFetchingEnvironment env) {
+        if (ex instanceof AppException appException) {
+            ErrorCode errorCode = appException.getErrorCode();
+            return GraphqlErrorBuilder.newError(env)
+                    .message(errorCode.getMessage())
+                    .extensions(Map.of(
+                            "code", errorCode.getCode()
+                            ,
+                            "httpStatus", errorCode.getHttpStatus().value()))
+                    .build();
+        }
+        if (ex instanceof ConstraintViolationException ce) {
+            var violation = ce.getConstraintViolations();
+            ErrorCode errorCode = violation.stream()
+                    .map(ConstraintViolation::getMessage)
+                    .map(ErrorCode::valueOf)
+                    .findFirst().orElse(ErrorCode.INVALID_DATA);
+            return GraphqlErrorBuilder.newError(env)
+                    .message(errorCode.getMessage())
+                    .extensions(
+
+                            Map.of(
+                                    "code", errorCode.getCode(),
+                                    "httpStatus", errorCode.getHttpStatus()
+
+                            )
+                    ).build();
+
+
+        }
+
+        log.error("", ex);
+        return GraphqlErrorBuilder.newError(env)
+                .message(ex.getMessage())
+                .build();
     }
 }

@@ -24,7 +24,7 @@ public class CategoryMutationResolver {
     CategoryService categoryService;
 
     @MutationMapping
-    public CategoryResponseDTO addCategory(@Argument("input") CategoryRequestDTO category) {
+    public CategoryResponseDTO addCategory(@Valid @Argument("input") CategoryRequestDTO category) {
         return categoryService.saveCategory(category);
     }
 
