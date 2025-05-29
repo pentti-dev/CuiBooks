@@ -1,22 +1,7 @@
 # ———————————————————————————
-# ENUM DEFINITIONS
+scalar UUID
+scalar BigDecimal
 # ———————————————————————————
-enum Language {
-    ENGLISH
-    VIETNAMESE
-    FRENCH
-    SPANISH
-    GERMAN
-    CHINESE
-    JAPANESE
-    KOREAN
-    RUSSIAN
-    ARABIC
-    PORTUGUESE
-    ITALIAN
-    HINDI
-}
-
 enum BookForm {
     HARDCOVER
     PAPERBACK
@@ -34,57 +19,70 @@ enum BookForm {
 # ———————————————————————————
 type Category {
     id: ID!
-    name: String!
-    img: String!
-    # Mối quan hệ một-nhiều với Product
+    name: String
+    code: String
+    description: String
     products: [Product!]!
 }
 
 type Product {
-    id: ID!
-    name: String!
-    img: String!
-    price: Int!
+    id: ID
+    name: String
+    img: String
+    price: Int
     detail: String
-    supplier: String!
-    author: String!
-    publishYear: Int!
-    publisher: String!
-    language: Language!
-    weight: Int!        # đổi từ Byte -> Int
-    size: String!
-    pageNumber: Int!
-    form: BookForm!
-    # Quan hệ nhiều-một với Category
-    category: Category!
+    supplier: String
+    author: String
+    publishYear: Int
+    publisher: String
+    weight: Int
+    size: String
+    pageNumber: Int
+    form: BookForm
+    category: Category
 }
 
 # ———————————————————————————
 # INPUT DEFINITIONS
 # ———————————————————————————
 input CategoryInput {
-    id: ID!
-    name: String!
-    img: String!
+    id: ID
+    name: String
+    code: String
+    description: String
 }
 
 input ProductInput {
-    name: String!
-    img: String!
-    price: Int!
+    name: String
+    img: String
+    price:BigDecimal
     detail: String
-    supplier: String!
-    author: String!
-    publishYear: Int!
-    publisher: String!
-    language: Language!
-    weight: Int!
-    size: String!
-    pageNumber: Int!
-    form: BookForm!
-    categoryId: ID!
+    supplier: String
+    author: String
+    publishYear: Int
+    publisher: String
+    weight: Int
+    size: String
+    pageNumber: Int
+    form: BookForm
+    categoryId: ID
 }
-
+input ProductFilterInput {
+    name: String
+    categoryId: UUID
+    minPrice: BigDecimal
+    maxPrice: BigDecimal
+    form: BookForm
+    minDiscount: Float
+    maxDiscount: Float
+    minYear: Int
+    maxYear: Int
+    minWeight: Int
+    maxWeight: Int
+    size: String
+    minPages: Int
+    maxPages: Int
+}
 # ———————————————————————————
 # QUERY ROOT
 # ———————————————————————————
@@ -98,14 +96,7 @@ type Query {
     productById(id: ID!): Product
     productsByCategoryId(categoryId: ID!): [Product!]!
     productsByName(name: String!): [Product!]!
-    filteredProducts(
-        name: String,
-        categoryId: Int,
-        language: Language,
-        minPrice: Int,
-        maxPrice: Int,
-        form: BookForm
-    ): [Product!]!
+    filteredProducts(filter: ProductFilterInput ={}): [Product!]!
 }
 
 # ———————————————————————————
@@ -114,7 +105,7 @@ type Query {
 type Mutation {
     # Category mutations
     addCategory(input: CategoryInput!): Category!
-    updateCategory(id:ID!,input: CategoryInput!): Category!
+    updateCategory(id: ID!, input: CategoryInput!): Category!
     deleteCategory(id: ID!): Boolean!
 
     # Product mutations

@@ -1,10 +1,10 @@
 package com.example.mobileapi.service.impl;
 
+import com.example.mobileapi.dto.ProductFilterInput;
 import com.example.mobileapi.dto.request.ProductRequestDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Product;
 import com.example.mobileapi.entity.enums.BookForm;
-import com.example.mobileapi.entity.enums.Language;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.ProductMapper;
@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,8 +68,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponseDTO getProductById(UUID id) throws AppException {
-        return productMapper.toProductResponseDTO(productRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND)));
+        return productMapper.toProductResponseDTO(productRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.PRODUCT_NOT_FOUND)));
     }
 
     @Override
@@ -94,25 +91,33 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDTO> filterProducts(String name, UUID categoryId, Language language, Integer minPrice,
-            Integer maxPrice, BookForm form) {
+    public List<ProductResponseDTO> filterProducts(ProductFilterInput filter) {
         Specification<Product> spec = Specification.where(null);
-        if (StringUtils.hasText(name)) {
-            spec = spec.and(ProductSpecifications
-                    .nameContains(name));
+        if (StringUtils.hasText(filter.getName())) {
+            spec = spec.and(ProductSpecifications.nameContains(filter.getName()));
         }
-        if (categoryId != null) {
-            spec = spec.and(ProductSpecifications.hasCategoryId(categoryId));
+        if (filter.getCategoryId() != null) {
+            spec = spec.and(ProductSpecifications.hasCategoryId(filter.getCategoryId()));
         }
-        if (language != null) {
-            spec = spec.and(ProductSpecifications.hasLanguage(language));
+        if (filter.getForm() != null) {
+            spec = spec.and(ProductSpecifications.hasForm(filter.getForm()));
         }
-        if (form != null) {
-            spec = spec.and(ProductSpecifications.hasForm(form));
+            spec = spec.and(ProductSpecifications.priceBetween(filter.getMinPrice(), filter.getMaxPrice()));
+            spec = spec.and(ProductSpecifications.discountBetween(filter.getMinDiscount(), filter.getMaxDiscount()));
+
+            spec = spec.and(ProductSpecifications.publishYearBetween(
+                    filter.getMinYear(), filter.getMaxYear()));
+
+        spec = spec.and(ProductSpecifications.weightBetween(
+                filter.getMinWeight(), filter.getMaxWeight()));
+        if (StringUtils.hasText(filter.getSize())) {
+            spec = spec.and(ProductSpecifications.sizeContains(filter.getSize()));
         }
-        if (minPrice != null && maxPrice != null) {
-            spec = spec.and(ProductSpecifications.priceBetween(minPrice, maxPrice));
-        }
+
+        spec = spec.and(ProductSpecifications.pageNumberBetween(
+                filter.getMinPages(), filter.getMaxPages()));
+
+
         return productMapper.toProductResponseDTOList(productRepository.findAll(spec));
 
     }

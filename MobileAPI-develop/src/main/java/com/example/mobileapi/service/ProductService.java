@@ -1,12 +1,13 @@
 package com.example.mobileapi.service;
 
+import com.example.mobileapi.dto.ProductFilterInput;
 import com.example.mobileapi.dto.request.ProductRequestDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Product;
 import com.example.mobileapi.entity.enums.BookForm;
-import com.example.mobileapi.entity.enums.Language;
 import com.example.mobileapi.exception.AppException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,10 +28,9 @@ public interface ProductService {
 
     List<ProductResponseDTO> findByNameContainingIgnoreCase(String name);
 
-    List<ProductResponseDTO> filterProducts(String name, UUID categoryId,
-            Language language, Integer minPrice, Integer maxPrice, BookForm form);
+    List<ProductResponseDTO> filterProducts(ProductFilterInput filterInput);
 
-    public void saveAll(List<Product> products);
+    void saveAll(List<Product> products);
 
     List<ProductResponseDTO> getProductSale();
 
