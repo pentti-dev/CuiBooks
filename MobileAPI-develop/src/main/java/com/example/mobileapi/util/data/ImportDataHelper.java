@@ -19,11 +19,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class ExportDataHelper {
+public class ImportDataHelper {
 
     private final CategoryRepository categoryRepository;
 
-    public ExportDataHelper(CategoryRepository categoryRepository) {
+    public ImportDataHelper(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 
@@ -45,7 +45,7 @@ public class ExportDataHelper {
                     .weight(getInt(row, headers.get("weight")))
                     .size(getString(row, headers.get("size")))
                     .pageNumber(getInt(row, headers.get("pagenumber")))
-                    // .form(randomBookForm())
+//                     .form(randomBookForm())
                     // .language(Language.VIETNAMESE)
                     .build();
         });
