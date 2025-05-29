@@ -35,7 +35,6 @@ public class SwaggerConfig {
                         .description("API documents")
                         .version(version)
                         .license(new License().name("Apache 2.0").url("https://springdoc.org")))
-                // ✅ Thêm JWT Bearer Token vào Swagger UI
                 .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
                 .components(new io.swagger.v3.oas.models.Components()
                         .addSecuritySchemes("BearerAuth", new SecurityScheme()

@@ -14,7 +14,7 @@ import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.AdminService;
 import com.example.mobileapi.service.OrderService;
-import com.example.mobileapi.util.data.ExportDataHelper;
+import com.example.mobileapi.util.data.ImportDataHelper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -43,7 +43,7 @@ import java.util.UUID;
 public class AdminController {
 
     AdminService adminService;
-    ExportDataHelper exportDataHelper;
+    ImportDataHelper exportDataHelper;
 
     @Operation(summary = "Lấy số lượng người dùng")
     @GetMapping("/customers")
