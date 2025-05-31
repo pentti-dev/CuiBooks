@@ -4,7 +4,6 @@ import com.example.mobileapi.dto.ProductFilterInput;
 import com.example.mobileapi.dto.request.ProductRequestDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Product;
-import com.example.mobileapi.entity.enums.BookForm;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.ProductMapper;
@@ -39,7 +38,11 @@ public class ProductServiceImpl implements ProductService {
     }
 
     public BigDecimal getPriceById(UUID id) {
+
         Product product = getById(id);
+        if (product == null) {
+            throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
         double discountPercent = product.getDiscount();
         BigDecimal originalPrice = product.getPrice();
         // Tính toán giá nếu có giảm giá thì nhân với giảm giá nến khôngkhông thì không
@@ -143,4 +146,6 @@ public class ProductServiceImpl implements ProductService {
         List<Product> productsOnSale = productRepository.findByDiscountGreaterThan(0);
         return productMapper.toProductResponseDTOList(productsOnSale);
     }
+
+
 }

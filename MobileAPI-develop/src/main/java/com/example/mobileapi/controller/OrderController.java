@@ -10,6 +10,7 @@ import com.example.mobileapi.service.DiscountService;
 import com.example.mobileapi.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +35,7 @@ public class OrderController {
     @Operation(summary = "Lưu đơn hàng")
     @PostMapping
     public ApiResponse<UUID> createOrder(@RequestParam OrderMethod method,
-                                         @RequestBody OrderRequestDTO orderRequestDTO) throws AppException {
+                                   @Valid @RequestBody OrderRequestDTO orderRequestDTO) throws AppException {
         orderRequestDTO.setPaymentMethod(method);
 
         return ApiResponse.<UUID>builder()

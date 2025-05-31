@@ -51,10 +51,14 @@ public class DiscountServiceImpl implements DiscountService {
 
     @Override
     public Integer getPercentDiscount(String code) {
-        Discount discount = getDiscountEntity(code);
-        checkValidDiscount(discount);
+        Discount discount = discountRepository.findByCode(code).orElse(null);
+        if (discount != null) {
+            checkValidDiscount(discount);
 
-        return discount.getPercent();
+        }
+
+
+        return discount != null ? discount.getPercent() : 0;
     }
 
     @Override
@@ -71,9 +75,7 @@ public class DiscountServiceImpl implements DiscountService {
     @Transactional
     public DiscountDTO create(DiscountDTO discount) {
         Discount entity = discountMapper.toDiscount(discount);
-        return discountMapper.toDTO(
-                discountRepository.save(entity)
-        );
+        return discountMapper.toDTO(discountRepository.save(entity));
     }
 
     @Override
@@ -96,7 +98,6 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     private Discount getDiscountEntity(String code) {
-        return discountRepository.findByCode(code)
-                .orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
+        return discountRepository.findByCode(code).orElseThrow(() -> new AppException(ErrorCode.DISCOUNT_NOT_FOUND));
     }
 }

@@ -21,6 +21,8 @@ import com.example.mobileapi.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,36 +51,32 @@ public class OrderServiceImpl implements OrderService {
     OrderDetailRepository orderDetailRepository;
 
     @Override
-    @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #orderRequestDTO.customerId")
+    @PostAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #dto.customerId")
+    @PreAuthorize("hasRole('USER')")
     @Transactional
-    public UUID saveOrder(OrderRequestDTO orderRequestDTO) throws AppException {
-        String discountCode = orderRequestDTO.getDiscountCode();
-        BigDecimal amount;
-        if (discountCode != null && !discountCode.isEmpty()) {
-
-        }
-        amount = calcTotalAmount(
-                orderRequestDTO.getOrderDetails(),
-                discountService.getPercentDiscount(orderRequestDTO.getDiscountCode())
+    public UUID saveOrder(OrderRequestDTO dto) throws AppException {
+        BigDecimal amount = calcTotalAmount(
+                dto.getOrderDetails(),
+                discountService.getPercentDiscount(dto.getDiscountCode())
         );
 
         Order order = Order.builder()
                 .customer(
-                        customerRepository.findById(orderRequestDTO.getCustomerId())
+                        customerRepository.findById(dto.getCustomerId())
                                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND))
                 )
                 .orderDate(LocalDateTime.now())
                 .totalAmount(amount)
-                .address(orderRequestDTO.getAddress())
-                .numberPhone(orderRequestDTO.getNumberPhone())
-                .receiver(orderRequestDTO.getReceiver())
-                .paymentMethod(orderRequestDTO.getPaymentMethod())
-                .status(determineDefaultStatus(orderRequestDTO.getPaymentMethod()))
+                .address(dto.getAddress())
+                .numberPhone(dto.getNumberPhone())
+                .receiver(dto.getReceiver())
+                .paymentMethod(dto.getPaymentMethod())
+                .status(determineDefaultStatus(dto.getPaymentMethod()))
                 .build();
         //Luu đon hàng
         Order savedOrder = orderRepository.save(order);
 //Thêm detail khi đã có orderId
-        List<OrderDetail> details = orderRequestDTO.getOrderDetails().stream()
+        List<OrderDetail> details = dto.getOrderDetails().stream()
                 .map(req -> {
                     OrderDetail od = convertToOrderDetailEntity(req);
                     od.setOrder(savedOrder);
