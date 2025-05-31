@@ -76,7 +76,14 @@ public enum ErrorCode {
     INVALID_DATA(HttpStatus.BAD_REQUEST, 4125, "Dữ liệu không hợp lệ."),
     INVALID_PRODUCT_PUBLIC_YEAR(HttpStatus.BAD_REQUEST, 4126, "Năm xuất bản sản phẩm không hợp lệ. "),
     INVALID_PRODUCT_PRICE(HttpStatus.BAD_REQUEST, 4127, "Giá sản phẩm không hợp lệ. Phải lớn hơn 50000"),
-
+    EXPIRED_DISCOUNT(HttpStatus.BAD_REQUEST, 4128, "Mã giảm giá đã hết hạn."),
+    MISSING_START_DATE(HttpStatus.BAD_REQUEST, 4129, "Ngày bắt đầu không được để trống."),
+    MISSING_END_DATE(HttpStatus.BAD_REQUEST, 4130, "Ngày kết thúc không được để trống."),
+    INVALID_START_DATE(HttpStatus.BAD_REQUEST, 4131, "Ngày bắt đầu không hợp lệ. Phải là ngày hiện tại hoặc tương lai."),
+    INVALID_END_DATE(HttpStatus.BAD_REQUEST, 4132, "Ngày kết thúc không hợp lệ. Phải là ngày sau ngày bắt đầu."),
+    DISCOUNT_NOT_STARTED(HttpStatus.BAD_REQUEST, 4133, "Mã giảm giá chưa bắt đầu."),
+    DISCOUNT_INACTIVE(HttpStatus.BAD_REQUEST, 4134, "Mã giảm giá không hoạt động."),
+    INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, 4135, "Định dạng ngày không hợp lệ."),
 
     /**
      * ========== LỖI XÁC THỰC ==========
@@ -127,7 +134,8 @@ public enum ErrorCode {
 
     SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, 5030, "Dịch vụ hiện không khả dụng."),
 
-    TIMEOUT_ERROR(HttpStatus.GATEWAY_TIMEOUT, 5040, "Hệ thống phản hồi chậm.");
+    TIMEOUT_ERROR(HttpStatus.GATEWAY_TIMEOUT, 5040, "Hệ thống phản hồi chậm."),
+    ;
 
     HttpStatus httpStatus;
 
