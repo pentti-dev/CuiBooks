@@ -21,6 +21,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.format.DateTimeParseException;
 import java.util.Map;
@@ -92,6 +93,20 @@ public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter 
                                 .message(errorCode.getMessage())
                                 .code(errorCode.getCode())
                                 .build());
+    }
+
+    @ExceptionHandler(value = IOException.class)
+    ResponseEntity<ApiResponse<Void>> handlingIOException(IOException e) {
+        ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
+        log.error(e.getMessage(), e);
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(
+                        ApiResponse.<Void>builder()
+                                .message(e.getMessage())
+                                .code(errorCode.getCode())
+                                .build());
+
     }
 
     @ExceptionHandler(value = RuntimeException.class)

@@ -14,7 +14,7 @@ import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.AdminService;
 import com.example.mobileapi.service.OrderService;
-import com.example.mobileapi.util.data.ImportDataHelper;
+import com.example.mobileapi.helper.data.ImportDataHelper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -152,27 +152,20 @@ public class AdminController {
 
     @Operation(summary = "Nhập sản phẩm với excel")
     @PostMapping(value = "/product/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<Void> importProduct(@RequestParam("file") MultipartFile file) {
+    public ApiResponse<Void> importProduct(@RequestParam("file") MultipartFile file) throws IOException {
         try (InputStream inputStream = file.getInputStream()) {
             List<Product> products = exportDataHelper.importProducts(inputStream);
             adminService.saveAll(products);
-
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.BAD_REQUEST);
-
         }
         return ApiResponse.success("Thêm thành công");
     }
 
     @Operation(summary = "Nhập danh mục với excel")
     @PostMapping(value = "/category/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<Void> importCategory(@RequestParam("file") MultipartFile file) {
+    public ApiResponse<Void> importCategory(@RequestParam("file") MultipartFile file) throws IOException {
         try (InputStream inputStream = file.getInputStream()) {
             List<Category> categories = exportDataHelper.importCategories(inputStream);
             adminService.saveAllCategoryEntries(categories);
-
-        } catch (IOException e) {
-            throw new AppException(ErrorCode.BAD_REQUEST);
 
         }
         return ApiResponse.success("Thêm thành công");
