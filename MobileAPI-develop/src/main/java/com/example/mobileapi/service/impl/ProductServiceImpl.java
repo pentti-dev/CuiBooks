@@ -102,11 +102,11 @@ public class ProductServiceImpl implements ProductService {
         if (filter.getForm() != null) {
             spec = spec.and(ProductSpecifications.hasForm(filter.getForm()));
         }
-            spec = spec.and(ProductSpecifications.priceBetween(filter.getMinPrice(), filter.getMaxPrice()));
-            spec = spec.and(ProductSpecifications.discountBetween(filter.getMinDiscount(), filter.getMaxDiscount()));
+        spec = spec.and(ProductSpecifications.priceBetween(filter.getMinPrice(), filter.getMaxPrice()));
+        spec = spec.and(ProductSpecifications.discountBetween(filter.getMinDiscount(), filter.getMaxDiscount()));
 
-            spec = spec.and(ProductSpecifications.publishYearBetween(
-                    filter.getMinYear(), filter.getMaxYear()));
+        spec = spec.and(ProductSpecifications.publishYearBetween(
+                filter.getMinYear(), filter.getMaxYear()));
 
         spec = spec.and(ProductSpecifications.weightBetween(
                 filter.getMinWeight(), filter.getMaxWeight()));
