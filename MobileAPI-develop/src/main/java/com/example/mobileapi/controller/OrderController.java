@@ -1,5 +1,6 @@
 package com.example.mobileapi.controller;
 
+import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,7 +37,7 @@ public class OrderController {
     @Operation(summary = "Lưu đơn hàng")
     @PostMapping
     public ApiResponse<UUID> createOrder(@RequestParam OrderMethod method,
-                                   @Valid @RequestBody OrderRequestDTO orderRequestDTO) throws AppException {
+                                         @Valid @RequestBody OrderRequestDTO orderRequestDTO) throws AppException {
         orderRequestDTO.setPaymentMethod(method);
 
         return ApiResponse.<UUID>builder()
@@ -49,6 +51,15 @@ public class OrderController {
     public ApiResponse<Void> checkDiscountCode(@RequestParam String discountCode) {
         discountService.checkValidDiscount(discountCode);
         return ApiResponse.success();
+    }
+
+    @GetMapping("/total-amount")
+    @Operation(summary = "Lấy tổng số tiền của đơn hàng")
+    public ApiResponse<BigDecimal> getTotalAmount(@RequestParam String discountCode, @RequestBody List<OrderDetailRequestDTO> orderDetails) {
+        Integer discountPercent = discountService.getDiscountPercent(discountCode);
+        return ApiResponse.<BigDecimal>builder()
+                .data(orderService.calcTotalAmount(orderDetails, discountPercent))
+                .build();
     }
 
 

@@ -50,7 +50,7 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public Integer getPercentDiscount(String code) {
+    public Integer getDiscountPercent(String code) {
         Discount discount = discountRepository.findByCode(code).orElse(null);
         if (discount != null) {
             checkValidDiscount(discount);

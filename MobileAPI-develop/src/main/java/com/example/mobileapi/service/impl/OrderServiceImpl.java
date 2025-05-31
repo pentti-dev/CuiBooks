@@ -21,7 +21,6 @@ import com.example.mobileapi.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Primary;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -57,7 +56,7 @@ public class OrderServiceImpl implements OrderService {
     public UUID saveOrder(OrderRequestDTO dto) throws AppException {
         BigDecimal amount = calcTotalAmount(
                 dto.getOrderDetails(),
-                discountService.getPercentDiscount(dto.getDiscountCode())
+                discountService.getDiscountPercent(dto.getDiscountCode())
         );
 
         Order order = Order.builder()
@@ -90,7 +89,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // Tính toán tổng tiền đơn hàng từ chi tiết đơn hàng và mã giảm giá
-    private BigDecimal calcTotalAmount(List<OrderDetailRequestDTO> orderDetails, Integer discountPercent) {
+    @Override
+    public BigDecimal calcTotalAmount(List<OrderDetailRequestDTO> orderDetails, Integer discountPercent) {
         // tính tiền tổng
         BigDecimal totalAmount = orderDetails.stream()
                 .map(detail -> {

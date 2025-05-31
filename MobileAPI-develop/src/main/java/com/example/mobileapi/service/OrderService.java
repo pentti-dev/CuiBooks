@@ -1,5 +1,6 @@
 package com.example.mobileapi.service;
 
+import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
@@ -13,6 +14,9 @@ import java.util.UUID;
 
 public interface OrderService {
     UUID saveOrder(OrderRequestDTO orderRequestDTO) throws AppException;
+
+    // Tính toán tổng tiền đơn hàng từ chi tiết đơn hàng và mã giảm giá
+    BigDecimal calcTotalAmount(List<OrderDetailRequestDTO> orderDetails, Integer discountPercent);
 
     OrderResponseDTO getOrder(UUID orderId);
 

@@ -10,7 +10,7 @@ public interface DiscountService {
 
     void checkValidDiscount(Discount discount);
 
-    Integer getPercentDiscount(String code);
+    Integer getDiscountPercent(String code);
 
 
     DiscountDTO getDiscount(String code);
