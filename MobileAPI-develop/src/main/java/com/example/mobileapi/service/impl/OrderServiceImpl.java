@@ -21,6 +21,7 @@ import com.example.mobileapi.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,34 +50,32 @@ public class OrderServiceImpl implements OrderService {
     OrderDetailRepository orderDetailRepository;
 
     @Override
-    @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #orderRequestDTO.customerId")
+    @PostAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #dto.customerId")
+    @PreAuthorize("hasRole('USER')")
     @Transactional
-    public UUID saveOrder(OrderRequestDTO orderRequestDTO) throws AppException {
-
-
-        checkOrderParam(orderRequestDTO.getDiscountCode());
+    public UUID saveOrder(OrderRequestDTO dto) throws AppException {
         BigDecimal amount = calcTotalAmount(
-                orderRequestDTO.getOrderDetails(),
-                discountService.getPercentDiscount(orderRequestDTO.getDiscountCode())
+                dto.getOrderDetails(),
+                discountService.getDiscountPercent(dto.getDiscountCode())
         );
 
         Order order = Order.builder()
                 .customer(
-                        customerRepository.findById(orderRequestDTO.getCustomerId())
+                        customerRepository.findById(dto.getCustomerId())
                                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND))
                 )
                 .orderDate(LocalDateTime.now())
                 .totalAmount(amount)
-                .address(orderRequestDTO.getAddress())
-                .numberPhone(orderRequestDTO.getNumberPhone())
-                .receiver(orderRequestDTO.getReceiver())
-                .paymentMethod(orderRequestDTO.getPaymentMethod())
-                .status(determineDefaultStatus(orderRequestDTO.getPaymentMethod()))
+                .address(dto.getAddress())
+                .numberPhone(dto.getNumberPhone())
+                .receiver(dto.getReceiver())
+                .paymentMethod(dto.getPaymentMethod())
+                .status(determineDefaultStatus(dto.getPaymentMethod()))
                 .build();
         //Luu đon hàng
         Order savedOrder = orderRepository.save(order);
 //Thêm detail khi đã có orderId
-        List<OrderDetail> details = orderRequestDTO.getOrderDetails().stream()
+        List<OrderDetail> details = dto.getOrderDetails().stream()
                 .map(req -> {
                     OrderDetail od = convertToOrderDetailEntity(req);
                     od.setOrder(savedOrder);
@@ -90,7 +89,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     // Tính toán tổng tiền đơn hàng từ chi tiết đơn hàng và mã giảm giá
-    private BigDecimal calcTotalAmount(List<OrderDetailRequestDTO> orderDetails, Integer discountPercent) {
+    @Override
+    public BigDecimal calcTotalAmount(List<OrderDetailRequestDTO> orderDetails, Integer discountPercent) {
         // tính tiền tổng
         BigDecimal totalAmount = orderDetails.stream()
                 .map(detail -> {
@@ -108,23 +108,13 @@ public class OrderServiceImpl implements OrderService {
         return totalAmount;
     }
 
-    private void checkOrderParam(String discountCode) {
-        if (!discountService.checkVailidDIscountCode(discountCode)) {
-            throw new AppException(ErrorCode.DISCOUNT_NOT_FOUND);
-        }
-    }
 
     public OrderStatus determineDefaultStatus(OrderMethod method) {
-        switch (method) {
-            case COD:
-                return OrderStatus.PENDING;
-            case VN_PAY,
-                 MOMO,
-                 ZALO_PAY:
-                return OrderStatus.PENDING_PAYMENT;
-            default:
-                return OrderStatus.PENDING;
-        }
+        return switch (method) {
+            case COD -> OrderStatus.PENDING;
+            case VN_PAY, MOMO, ZALO_PAY -> OrderStatus.PENDING_PAYMENT;
+            default -> OrderStatus.PENDING;
+        };
     }
 
     @Override
@@ -139,8 +129,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public BigDecimal getPriceByOrderId(UUID orderId) {
-        BigDecimal re= orderRepository.findTotalAmountByOrderId(orderId);
-        return re;
+        return orderRepository.findTotalAmountByOrderId(orderId);
     }
 
     @Override

@@ -28,14 +28,11 @@ public class Category implements Serializable {
     @Column(nullable = false)
     String name;
 
-    @Column(nullable = false)
     String description;
 
     @Column(nullable = false, unique = true)
     String code;
 
-    @Column(nullable = false, unique = true)
-    String img;
 
     @Builder.Default
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

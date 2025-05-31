@@ -1,4 +1,4 @@
-package com.example.mobileapi.util.data;
+package com.example.mobileapi.helper.data;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +8,7 @@ import java.util.function.BiFunction;
 
 import com.example.mobileapi.entity.Category;
 import com.example.mobileapi.entity.Product;
+import com.example.mobileapi.entity.enums.BookForm;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.repository.CategoryRepository;
@@ -19,11 +20,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class ExportDataHelper {
+public class ImportDataHelper {
 
     private final CategoryRepository categoryRepository;
 
-    public ExportDataHelper(CategoryRepository categoryRepository) {
+    public ImportDataHelper(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
     }
 
@@ -41,12 +42,11 @@ public class ExportDataHelper {
                     .supplier(getString(row, headers.get("supplier")))
                     .publisher(getString(row, headers.get("publisher")))
                     .author(getString(row, headers.get("author")))
-                    .publishYear(getInt(row, headers.get("publishyear")))
+                    .publishYear(getInt(row, headers.get("publish_year")))
                     .weight(getInt(row, headers.get("weight")))
                     .size(getString(row, headers.get("size")))
-                    .pageNumber(getInt(row, headers.get("pagenumber")))
-                    // .form(randomBookForm())
-                    // .language(Language.VIETNAMESE)
+                    .pageNumber(getInt(row, headers.get("page_number")))
+                    .form(BookForm.valueOf(getString(row, headers.get("form"))))
                     .build();
         });
     }
@@ -60,7 +60,7 @@ public class ExportDataHelper {
     }
 
     private <T> List<T> parseSheet(InputStream is,
-            BiFunction<Row, Map<String, Integer>, T> mapper)
+                                   BiFunction<Row, Map<String, Integer>, T> mapper)
             throws IOException {
         List<T> results = new ArrayList<>();
         try (Workbook wb = new XSSFWorkbook(is)) {

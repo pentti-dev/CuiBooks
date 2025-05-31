@@ -56,6 +56,6 @@ public class TokenAspect {
         if (authHeader != null && authHeader.startsWith(BEARER_PREFIX)) {
             return authHeader.substring(BEARER_PREFIX.length());
         }
-        return null; // hoặc throw Exception nếu muốn xử lý lỗi
+        return null;
     }
 }

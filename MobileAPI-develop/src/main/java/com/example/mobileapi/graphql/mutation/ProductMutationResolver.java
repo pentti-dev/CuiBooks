@@ -3,6 +3,7 @@ package com.example.mobileapi.graphql.mutation;
 import com.example.mobileapi.dto.request.ProductRequestDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.service.ProductService;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,13 +24,13 @@ public class ProductMutationResolver {
 
     // Thêm sản phẩm
     @MutationMapping
-    public ProductResponseDTO addProduct(@Argument("input") ProductRequestDTO product) {
+    public ProductResponseDTO addProduct(@Valid @Argument("input") ProductRequestDTO product) {
         return productService.saveProduct(product);
     }
 
     // Cập nhật sản phẩm
     @MutationMapping
-    public ProductResponseDTO updateProduct(@Argument("id") UUID id, @Argument("input") ProductRequestDTO product) {
+    public ProductResponseDTO updateProduct(@Argument("id") UUID id, @Valid @Argument("input") ProductRequestDTO product) {
         return productService.updateProduct(id, product);
     }
 

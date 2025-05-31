@@ -28,8 +28,12 @@ public class CategoryServiceImpl implements CategoryService {
     CategoryMapper categoryMapper;
 
     @Override
+    @Transactional
     public CategoryResponseDTO saveCategory(CategoryRequestDTO dto) {
-        Category category = categoryMapper.toCategory(dto);
+        if (categoryRepository.existsCategoryByCodeOrName(dto.getCode(), dto.getName())) {
+            throw new AppException(ErrorCode.CATEGORY_EXISTED);
+        }
+        Category category = categoryRepository.save(categoryMapper.toCategory(dto));
         return categoryMapper.toCategoryResponseDTO(category);
     }
 
@@ -53,8 +57,7 @@ public class CategoryServiceImpl implements CategoryService {
         }
         Category entity = categoryMapper.toCategory(dto);
         entity.setId(id);
-        return categoryMapper.toCategoryResponseDTO(
-                categoryRepository.save(entity));
+        return categoryMapper.toCategoryResponseDTO(categoryRepository.save(entity));
     }
 
     @Override
@@ -64,40 +67,25 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDTO getCategory(UUID id) throws AppException {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
-        return CategoryResponseDTO.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .img(category.getImg())
-                .build();
+        Category category = categoryRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+        return CategoryResponseDTO.builder().id(category.getId()).name(category.getName()).build();
     }
 
     @Override
     public List<CategoryResponseDTO> getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
-        List<CategoryResponseDTO> categoriesResponseDTO = new ArrayList<>();
-        for (Category category : categories) {
-            categoriesResponseDTO.add(CategoryResponseDTO.builder()
-                    .name(category.getName())
-                    .img(category.getImg())
-                    .id(category.getId())
-                    .build());
-        }
-        return categoriesResponseDTO;
+        return categoryMapper.toCategoryResponseDTOsFromEntities(categories);
     }
 
     @Override
     public CategoryResponseDTO getCategoryById(UUID categoryId) throws AppException {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
         return categoryMapper.toCategoryResponseDTO(category);
     }
 
     @Override
     public Category getCategoryByName(String name) throws AppException {
-        return categoryRepository.findByName(name)
-                .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+        return categoryRepository.findByName(name).orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
 }

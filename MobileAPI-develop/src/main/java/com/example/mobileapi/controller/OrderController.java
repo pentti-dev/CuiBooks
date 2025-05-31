@@ -1,18 +1,17 @@
 package com.example.mobileapi.controller;
 
+import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.entity.enums.OrderMethod;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.exception.AppException;
-import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.DiscountService;
-import com.example.mobileapi.service.OrderDetailService;
 import com.example.mobileapi.service.OrderService;
-import com.example.mobileapi.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +37,7 @@ public class OrderController {
     @Operation(summary = "Lưu đơn hàng")
     @PostMapping
     public ApiResponse<UUID> createOrder(@RequestParam OrderMethod method,
-                                         @RequestBody OrderRequestDTO orderRequestDTO) throws AppException {
+                                         @Valid @RequestBody OrderRequestDTO orderRequestDTO) throws AppException {
         orderRequestDTO.setPaymentMethod(method);
 
         return ApiResponse.<UUID>builder()
@@ -49,10 +48,17 @@ public class OrderController {
 
     @Operation(summary = "Kiểm tra mã giảm giá")
     @PostMapping("/check-discount")
-    public ApiResponse<Boolean> checkDiscountCode(@RequestParam String discountCode) {
-        return ApiResponse.<Boolean>builder()
-                .code(HttpStatus.OK.value())
-                .data(discountService.checkVailidDIscountCode(discountCode))
+    public ApiResponse<Void> checkDiscountCode(@RequestParam String discountCode) {
+        discountService.checkValidDiscount(discountCode);
+        return ApiResponse.success();
+    }
+
+    @GetMapping("/total-amount")
+    @Operation(summary = "Lấy tổng số tiền của đơn hàng")
+    public ApiResponse<BigDecimal> getTotalAmount(@RequestParam String discountCode, @RequestBody List<OrderDetailRequestDTO> orderDetails) {
+        Integer discountPercent = discountService.getDiscountPercent(discountCode);
+        return ApiResponse.<BigDecimal>builder()
+                .data(orderService.calcTotalAmount(orderDetails, discountPercent))
                 .build();
     }
 

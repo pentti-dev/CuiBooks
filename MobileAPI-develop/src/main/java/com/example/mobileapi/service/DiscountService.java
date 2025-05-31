@@ -1,16 +1,17 @@
 package com.example.mobileapi.service;
 
 import com.example.mobileapi.dto.DiscountDTO;
+import com.example.mobileapi.entity.Discount;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface DiscountService {
-    boolean checkVailidDIscountCode(String code);
+    void checkValidDiscount(String code);
 
-    Integer getPercentDiscount(String code);
+    void checkValidDiscount(Discount discount);
 
-    boolean checkDiscountTime(String code);
+    Integer getDiscountPercent(String code);
+
 
     DiscountDTO getDiscount(String code);
 
@@ -20,5 +21,5 @@ public interface DiscountService {
 
     DiscountDTO update(DiscountDTO discount);
 
-    void delete(UUID id);
+    void delete(String code);
 }
