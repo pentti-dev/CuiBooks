@@ -112,25 +112,49 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public boolean notifyOrder(String vnp_ResponseCode, String orderId, String vnpTransactionNo, String vnp_TransactionDate, String vnp_Amount) {
-        OrderResponseDTO order = orderService.getOrder(UUID.fromString(orderId));
-        log.info("Notify order: {}", order.getCustomerDTO().getId());
-        UUID cartId = cartService.getCartByCustomerId(order.getCustomerDTO().getId()).getId();
-        log.info( "CartId: {}", cartId);
-        cartItemService.deleteCartItemByCartId(cartId);
+    public boolean notifyOrder(
+            String vnpResponseCode,
+            String orderId,
+            String vnpTransactionNo,
+            String vnpTransactionDate,
+            String vnpAmount) {
+        try {
+            UUID orderUUID = UUID.fromString(orderId);
 
-        log.info("vnp_ResponseCode: {}, orderId: {}, vnp_TransactionNo: {}, vnp_TransactionDate: {}, vnp_Amount: {}",
-                vnp_ResponseCode, orderId, vnpTransactionNo, vnp_TransactionDate, vnp_Amount);
-        UUID transactionID = UUID.nameUUIDFromBytes(orderId.getBytes());
-        if (vnp_ResponseCode.equals("00")) {
-            orderService.changeOrderStatus(UUID.fromString(orderId), OrderStatus.PAYMENT_SUCCESS);
-            transactionService.createTransaction(transactionID, UUID.fromString(orderId), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
-            return true;
+            UUID transactionId = UUID.nameUUIDFromBytes(
+                    orderId.getBytes(StandardCharsets.UTF_8)
+            );
+
+            boolean isSuccess = "00".equals(vnpResponseCode);
+            OrderStatus newStatus = isSuccess
+                    ? OrderStatus.PAYMENT_SUCCESS
+                    : OrderStatus.PAYMENT_FAILED;
+
+            orderService.changeOrderStatus(orderUUID, newStatus);
+
+            transactionService.createTransaction(
+                    transactionId, orderUUID,
+                    vnpResponseCode,
+                    vnpTransactionDate,
+                    vnpAmount
+            );
+
+            log.info(
+                    "VNPay call: orderId={}, status={}, txnNo={}, amount={}",
+                    orderId, newStatus, vnpTransactionNo, vnpAmount
+            );
+
+            return isSuccess;
+        } catch (IllegalArgumentException e) {
+            // orderId không phải UUID hợp lệ
+            log.error("notifyOrder failed: invalid orderId '{}'", orderId, e);
+            return false;
+        } catch (Exception e) {
+            // Bắt mọi exception khác (CSDL, service, v.v.)
+            log.error("notifyOrder encountered unexpected error for orderId '{}'", orderId, e);
+            return false;
         }
-        transactionService.createTransaction(transactionID, UUID.fromString(orderId), vnp_ResponseCode, vnp_TransactionDate, vnp_Amount);
-        orderService.changeOrderStatus(UUID.fromString(orderId), OrderStatus.PAYMENT_FAILED);
-        return false;
-
     }
+
 
 }
