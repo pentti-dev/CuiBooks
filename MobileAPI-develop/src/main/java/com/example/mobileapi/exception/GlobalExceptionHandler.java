@@ -1,6 +1,7 @@
 package com.example.mobileapi.exception;
 
 import com.example.mobileapi.dto.response.ApiResponse;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import graphql.GraphQLError;
 import graphql.GraphqlErrorBuilder;
 import graphql.schema.DataFetchingEnvironment;
@@ -9,7 +10,10 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.execution.DataFetcherExceptionResolverAdapter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.lang.NonNull;
 import org.springframework.mail.MailParseException;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,6 +22,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.io.UnsupportedEncodingException;
+import java.time.format.DateTimeParseException;
 import java.util.Map;
 import java.util.Objects;
 
@@ -116,6 +121,29 @@ public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter 
                                 .message(e.getMessage())
                                 .code(errorCode.getCode())
                                 .build());
+
+    }
+
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiResponse<Void>> handlingHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        Throwable cause = e.getCause();
+        if (cause instanceof InvalidFormatException || cause instanceof DateTimeParseException) {
+            ErrorCode errorCode = ErrorCode.INVALID_DATE_FORMAT;
+            return ResponseEntity
+                    .status(errorCode.getHttpStatus())
+                    .body(
+                            ApiResponse.<Void>builder()
+                                    .message(errorCode.getMessage())
+                                    .code(errorCode.getCode())
+                                    .build());
+        }
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ApiResponse.<Void>builder()
+                                .message(e.getMessage())
+                                .build());
+
 
     }
 
