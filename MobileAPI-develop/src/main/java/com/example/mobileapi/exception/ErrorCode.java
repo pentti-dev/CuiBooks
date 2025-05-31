@@ -91,6 +91,11 @@ public enum ErrorCode {
     MISSING_ORDER_DETAILS(HttpStatus.BAD_REQUEST, 4139, "Chi tiết đơn hàng không được để trống."),
     PHONE_EXISTED(HttpStatus.BAD_REQUEST, 4140, "Số điện thoại đã tồn tại."),
     QUANTITY_MUST_BE_POSITIVE(HttpStatus.BAD_REQUEST, 4141, "Số lượng sản phẩm phải là số dương."),
+    MISSING_PRODUCT(HttpStatus.BAD_REQUEST, 4142, "Sản phẩm không được để trống."),
+    MISSING_CUSTOMER(HttpStatus.BAD_REQUEST, 4143, "Khách hàng không được để trống."),
+    MISSING_COMMENT(HttpStatus.BAD_REQUEST, 4144, "Bình luận không được để trống."),
+    INVALID_COMMENT_LENGTH(HttpStatus.BAD_REQUEST, 4145, "Độ dài bình luận không hợp lệ. Phải từ 10 đến 500 ký tự."),
+    INVALID_SCORE(HttpStatus.BAD_REQUEST, 4146, "Điểm đánh giá không hợp lệ. Phải từ 1 đến 5."),
 
     /**
      * ========== LỖI XÁC THỰC ==========

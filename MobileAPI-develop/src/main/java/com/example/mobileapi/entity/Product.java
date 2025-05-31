@@ -60,7 +60,7 @@ public class Product implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     @JsonBackReference
-    private Category category;
+    Category category;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @Builder.Default
@@ -69,7 +69,8 @@ public class Product implements Serializable {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     @Builder.Default
     private List<OrderDetail> orderDetails = new ArrayList<>();
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<Rating> ratings = new ArrayList<>();
 
