@@ -20,10 +20,12 @@ public class DiscountDTO {
             "INVALID_PERCENT")
     @NotNull(message = "MISSING_PERCENT")
     Integer percent;
-
+    @NotNull(message = "MISSING_START_DATE")
+    @FutureOrPresent(message = "INVALID_START_DATE")
     LocalDate startDate;
 
-
+    @NotNull(message = "MISSING_END_DATE")
+    @Future(message = "INVALID_END_DATE")
     LocalDate endDate;
     Boolean active;
 

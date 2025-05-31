@@ -52,10 +52,12 @@ public class OrderServiceImpl implements OrderService {
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #orderRequestDTO.customerId")
     @Transactional
     public UUID saveOrder(OrderRequestDTO orderRequestDTO) throws AppException {
+        String discountCode = orderRequestDTO.getDiscountCode();
+        BigDecimal amount;
+        if (discountCode != null && !discountCode.isEmpty()) {
 
-
-        checkOrderParam(orderRequestDTO.getDiscountCode());
-        BigDecimal amount = calcTotalAmount(
+        }
+        amount = calcTotalAmount(
                 orderRequestDTO.getOrderDetails(),
                 discountService.getPercentDiscount(orderRequestDTO.getDiscountCode())
         );
@@ -108,23 +110,13 @@ public class OrderServiceImpl implements OrderService {
         return totalAmount;
     }
 
-    private void checkOrderParam(String discountCode) {
-        if (!discountService.checkVailidDIscountCode(discountCode)) {
-            throw new AppException(ErrorCode.DISCOUNT_NOT_FOUND);
-        }
-    }
 
     public OrderStatus determineDefaultStatus(OrderMethod method) {
-        switch (method) {
-            case COD:
-                return OrderStatus.PENDING;
-            case VN_PAY,
-                 MOMO,
-                 ZALO_PAY:
-                return OrderStatus.PENDING_PAYMENT;
-            default:
-                return OrderStatus.PENDING;
-        }
+        return switch (method) {
+            case COD -> OrderStatus.PENDING;
+            case VN_PAY, MOMO, ZALO_PAY -> OrderStatus.PENDING_PAYMENT;
+            default -> OrderStatus.PENDING;
+        };
     }
 
     @Override
@@ -139,8 +131,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public BigDecimal getPriceByOrderId(UUID orderId) {
-        BigDecimal re= orderRepository.findTotalAmountByOrderId(orderId);
-        return re;
+        return orderRepository.findTotalAmountByOrderId(orderId);
     }
 
     @Override

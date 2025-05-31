@@ -6,11 +6,8 @@ import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.entity.enums.OrderMethod;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.exception.AppException;
-import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.DiscountService;
-import com.example.mobileapi.service.OrderDetailService;
 import com.example.mobileapi.service.OrderService;
-import com.example.mobileapi.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,11 +45,9 @@ public class OrderController {
 
     @Operation(summary = "Kiểm tra mã giảm giá")
     @PostMapping("/check-discount")
-    public ApiResponse<Boolean> checkDiscountCode(@RequestParam String discountCode) {
-        return ApiResponse.<Boolean>builder()
-                .code(HttpStatus.OK.value())
-                .data(discountService.checkVailidDIscountCode(discountCode))
-                .build();
+    public ApiResponse<Void> checkDiscountCode(@RequestParam String discountCode) {
+        discountService.checkValidDiscount(discountCode);
+        return ApiResponse.success();
     }
 
 

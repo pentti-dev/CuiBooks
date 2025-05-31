@@ -204,9 +204,9 @@ public class AdminController {
     }
 
     @Operation(summary = "Xóa mã giảm giá")
-    @DeleteMapping(value = "/discount/{id}")
-    public ApiResponse<Void> deleteDiscount(@PathVariable UUID id) {
-        adminService.delete(id);
+    @DeleteMapping(value = "/discount/{code}")
+    public ApiResponse<Void> deleteDiscount(@PathVariable String code) {
+        adminService.delete(code);
         return ApiResponse.success();
     }
 
