@@ -53,7 +53,7 @@ public class OrderController {
         return ApiResponse.success();
     }
 
-    @GetMapping("/total-amount")
+    @PostMapping("/total-amount")
     @Operation(summary = "Lấy tổng số tiền của đơn hàng")
     public ApiResponse<BigDecimal> getTotalAmount(@RequestParam String discountCode, @RequestBody List<OrderDetailRequestDTO> orderDetails) {
         Integer discountPercent = discountService.getDiscountPercent(discountCode);
