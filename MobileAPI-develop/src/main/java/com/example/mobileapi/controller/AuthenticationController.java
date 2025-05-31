@@ -30,7 +30,7 @@ public class AuthenticationController {
     CustomerService customerService;
 
     @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@RequestBody LoginRequest loginRequest) throws AppException {
+    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) throws AppException {
         return ApiResponse.<LoginResponse>builder()
                 .code(HttpStatus.OK.value())
                 .data(authenticationService.login(loginRequest))
@@ -68,8 +68,9 @@ public class AuthenticationController {
                 .code(HttpStatus.OK.value())
                 .data(customerService.checkEmail(email))
                 .build();
-    }   
-     @PostMapping("/checkTokenExpiration/{token}")
+    }
+
+    @PostMapping("/checkTokenExpiration/{token}")
     public ApiResponse<Void> checkTokenExpiration(@PathVariable("token") String token) throws AppException {
         authenticationService.checkTokenExpiration(token);
         return ApiResponse.success();

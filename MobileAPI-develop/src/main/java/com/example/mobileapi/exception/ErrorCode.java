@@ -87,6 +87,10 @@ public enum ErrorCode {
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, 4135, "Định dạng ngày không hợp lệ."),
     MISSING_ADDRESS(HttpStatus.BAD_REQUEST, 4136, "Địa chỉ không được để trống."),
     MISSING_NUMBER_PHONE(HttpStatus.BAD_REQUEST, 4137, "Số điện thoại không được để trống."),
+    MISSING_RECEIVER(HttpStatus.BAD_REQUEST, 4138, "Người nhận không được để trống."),
+    MISSING_ORDER_DETAILS(HttpStatus.BAD_REQUEST, 4139, "Chi tiết đơn hàng không được để trống."),
+    PHONE_EXISTED(HttpStatus.BAD_REQUEST, 4140, "Số điện thoại đã tồn tại."),
+    QUANTITY_MUST_BE_POSITIVE(HttpStatus.BAD_REQUEST, 4141, "Số lượng sản phẩm phải là số dương."),
 
     /**
      * ========== LỖI XÁC THỰC ==========
