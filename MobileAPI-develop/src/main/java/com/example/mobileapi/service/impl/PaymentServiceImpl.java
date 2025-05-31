@@ -1,14 +1,14 @@
 package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.config.props.VnPayProperties;
+import com.example.mobileapi.dto.response.CartResponseDTO;
+import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.dto.response.PaymentResponse;
 import com.example.mobileapi.entity.Order;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
-import com.example.mobileapi.service.OrderService;
-import com.example.mobileapi.service.PaymentService;
-import com.example.mobileapi.service.TransactionService;
+import com.example.mobileapi.service.*;
 import com.example.mobileapi.util.VnPayUtil;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,7 +35,8 @@ public class PaymentServiceImpl implements PaymentService {
     VnPayProperties vnPayProperties;
     VnPayUtil vnPayUtil;
     TransactionService transactionService;
-
+    CartItemService cartItemService;
+    private final CartService cartService;
 
     @Override
     public PaymentResponse createVNPayPayment(UUID orderId) throws AppException {
@@ -112,6 +113,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public boolean notifyOrder(String vnp_ResponseCode, String orderId, String vnpTransactionNo, String vnp_TransactionDate, String vnp_Amount) {
+        OrderResponseDTO order = orderService.getOrder(UUID.fromString(orderId));
+        log.info("Notify order: {}", order.getCustomerDTO().getId());
+        UUID cartId = cartService.getCartByCustomerId(order.getCustomerDTO().getId()).getId();
+        log.info( "CartId: {}", cartId);
+        cartItemService.deleteCartItemByCartId(cartId);
+
         log.info("vnp_ResponseCode: {}, orderId: {}, vnp_TransactionNo: {}, vnp_TransactionDate: {}, vnp_Amount: {}",
                 vnp_ResponseCode, orderId, vnpTransactionNo, vnp_TransactionDate, vnp_Amount);
         UUID transactionID = UUID.nameUUIDFromBytes(orderId.getBytes());

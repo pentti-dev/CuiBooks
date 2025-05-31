@@ -1,43 +1,49 @@
 package com.example.mobileapi.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name = "ratings",
+        indexes = @Index(name = "idx_ratings_product", columnList = "product_id"))
 @Data
-@Table(name = "ratings")
-@FieldDefaults(level = lombok.AccessLevel.PRIVATE)
-public class Rating implements Serializable {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Rating {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID id;
-    String comment;
-    @Max(5)
-    @Min(1)
-    Integer score;
+    private UUID id;
 
-    @Column(name = "created_at")
-    Instant createdAt;
-    @Column(name = "updated_at")
-    Instant updatedAt;
-    @ManyToOne
-    @JoinColumn(name = "customer_id", nullable = false)
-    Customer customer;
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    Product product;
-    @Transient
-    Double avgScore;
+    private Integer score;
+    private String comment;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "product_id",
+            nullable = false,
+            unique = true,
+            foreignKey = @ForeignKey(name = "FK_RATING_PRODUCT")
+    )
+    private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(
+            name = "customer_id",
+            nullable = false,
+            foreignKey = @ForeignKey(name = "FK_RATING_CUSTOMER")
+    )
+    private Customer customer;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Instant createdAt;
 }
