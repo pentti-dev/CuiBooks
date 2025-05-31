@@ -1,7 +1,6 @@
 package com.example.mobileapi.entity;
 
 import com.example.mobileapi.entity.enums.BookForm;
-import com.example.mobileapi.entity.enums.Language;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,15 +40,11 @@ public class Product implements Serializable {
 
     String supplier; // nhà cung cấp
 
-    @Column(nullable = false)
     String author; // tác giả
 
     Integer publishYear; // năm xuất bản
 
     String publisher; // nhà xuất bản
-
-    @Enumerated(EnumType.STRING)
-    Language language; // ngôn ngữ
 
     Integer weight; // trọng lượng (gram)
 

@@ -1,7 +1,6 @@
 package com.example.mobileapi.dto.response;
 
 import com.example.mobileapi.entity.enums.BookForm;
-import com.example.mobileapi.entity.enums.Language;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
@@ -24,7 +23,6 @@ public class ProductResponseDTO {
     String author;
     Integer publishYear;
     String publisher;
-    Language language;
     Integer weight;
     String size;
     Integer pageNumber;

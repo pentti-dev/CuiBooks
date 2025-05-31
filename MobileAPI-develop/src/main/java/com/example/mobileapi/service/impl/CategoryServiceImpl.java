@@ -28,8 +28,9 @@ public class CategoryServiceImpl implements CategoryService {
     CategoryMapper categoryMapper;
 
     @Override
+    @Transactional
     public CategoryResponseDTO saveCategory(CategoryRequestDTO dto) {
-        if (categoryRepository.findByCode(dto.getCode()).isPresent() || categoryRepository.findByName(dto.getName()).isPresent()) {
+        if (categoryRepository.existsCategoryByCodeOrName(dto.getCode(), dto.getName())) {
             throw new AppException(ErrorCode.CATEGORY_EXISTED);
         }
         Category category = categoryRepository.save(categoryMapper.toCategory(dto));
@@ -73,11 +74,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryResponseDTO> getAllCategories() {
         List<Category> categories = categoryRepository.findAll();
-        List<CategoryResponseDTO> categoriesResponseDTO = new ArrayList<>();
-        for (Category category : categories) {
-            categoriesResponseDTO.add(CategoryResponseDTO.builder().name(category.getName()).id(category.getId()).build());
-        }
-        return categoriesResponseDTO;
+        return categoryMapper.toCategoryResponseDTOsFromEntities(categories);
     }
 
     @Override
