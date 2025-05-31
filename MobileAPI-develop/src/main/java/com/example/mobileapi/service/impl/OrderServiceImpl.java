@@ -8,6 +8,8 @@ import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
 import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
+import com.example.mobileapi.event.CustomerCreatedEvent;
+import com.example.mobileapi.event.RemoveCartEvent;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.entity.Order;
@@ -21,6 +23,7 @@ import com.example.mobileapi.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -48,6 +51,7 @@ public class OrderServiceImpl implements OrderService {
     OrderMapper orderMapper;
     DiscountServiceImpl discountService;
     OrderDetailRepository orderDetailRepository;
+    ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     @PostAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #dto.customerId")
@@ -84,7 +88,7 @@ public class OrderServiceImpl implements OrderService {
                 .toList();
 
         orderDetailRepository.saveAll(details);
-
+        applicationEventPublisher.publishEvent(new RemoveCartEvent(this, order.getCustomer().getId()));
         return savedOrder.getId();
     }
 
