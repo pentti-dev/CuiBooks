@@ -23,10 +23,8 @@ public class CustomerCreatedListener {
     public void hanldeCustomerCreate(CustomerCreatedEvent customerCreatedEvent) throws AppException {
 
         UUID customerId = customerCreatedEvent.getCustomerId();
-        log.info("⏳ Đang tạo giỏ hàng cho customer {}", customerId);
-        log.info(customerId.toString());
         cartService.saveCart(CartRequestDTO.builder().customerId(customerId).build());
-        log.info("✅ Giỏ hàng đã được tạo cho customer {}", customerId);
+        log.info("Created cart for  {}", customerId);
     }
 
 

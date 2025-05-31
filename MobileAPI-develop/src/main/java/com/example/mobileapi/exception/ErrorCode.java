@@ -49,6 +49,7 @@ public enum ErrorCode {
 
     WRONG_OLD_PASSWORD(HttpStatus.BAD_REQUEST, 4117, "Mật khẩu cũ không chính xác."),
     WRONG_PASSWORD(HttpStatus.BAD_REQUEST, 4118, "Mật khẩu không chính xác."),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, 4118, "Mật khẩu không hợp lệ. Phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt."),
     MISSING_CATEGORY_NAME(HttpStatus.BAD_REQUEST, 4119, "Tên danh mục không được để trống."),
     MISSING_CATEGORY_CODE(HttpStatus.BAD_REQUEST, 4120, "Mã danh mục không được để trống."),
     MISSING_PRODUCT_NAME(HttpStatus.BAD_REQUEST, 4121, "Tên sản phẩm không được để trống."),
@@ -84,6 +85,8 @@ public enum ErrorCode {
     DISCOUNT_NOT_STARTED(HttpStatus.BAD_REQUEST, 4133, "Mã giảm giá chưa bắt đầu."),
     DISCOUNT_INACTIVE(HttpStatus.BAD_REQUEST, 4134, "Mã giảm giá không hoạt động."),
     INVALID_DATE_FORMAT(HttpStatus.BAD_REQUEST, 4135, "Định dạng ngày không hợp lệ."),
+    MISSING_ADDRESS(HttpStatus.BAD_REQUEST, 4136, "Địa chỉ không được để trống."),
+    MISSING_NUMBER_PHONE(HttpStatus.BAD_REQUEST, 4137, "Số điện thoại không được để trống."),
 
     /**
      * ========== LỖI XÁC THỰC ==========
