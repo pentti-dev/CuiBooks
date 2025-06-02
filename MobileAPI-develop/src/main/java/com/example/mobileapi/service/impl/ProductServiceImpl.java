@@ -45,10 +45,8 @@ public class ProductServiceImpl implements ProductService {
         }
         double discountPercent = product.getDiscount();
         BigDecimal originalPrice = product.getPrice();
-        // Tính toán giá nếu có giảm giá thì nhân với giảm giá nến khôngkhông thì không
-        // cần
-        // nhân
-        return discountPercent != 0.0 ? originalPrice.multiply(BigDecimal.valueOf(discountPercent)) : originalPrice;
+
+        return originalPrice.subtract(originalPrice.multiply(BigDecimal.valueOf(discountPercent)));
     }
 
     @Override
@@ -108,17 +106,14 @@ public class ProductServiceImpl implements ProductService {
         spec = spec.and(ProductSpecifications.priceBetween(filter.getMinPrice(), filter.getMaxPrice()));
         spec = spec.and(ProductSpecifications.discountBetween(filter.getMinDiscount(), filter.getMaxDiscount()));
 
-        spec = spec.and(ProductSpecifications.publishYearBetween(
-                filter.getMinYear(), filter.getMaxYear()));
+        spec = spec.and(ProductSpecifications.publishYearBetween(filter.getMinYear(), filter.getMaxYear()));
 
-        spec = spec.and(ProductSpecifications.weightBetween(
-                filter.getMinWeight(), filter.getMaxWeight()));
+        spec = spec.and(ProductSpecifications.weightBetween(filter.getMinWeight(), filter.getMaxWeight()));
         if (StringUtils.hasText(filter.getSize())) {
             spec = spec.and(ProductSpecifications.sizeContains(filter.getSize()));
         }
 
-        spec = spec.and(ProductSpecifications.pageNumberBetween(
-                filter.getMinPages(), filter.getMaxPages()));
+        spec = spec.and(ProductSpecifications.pageNumberBetween(filter.getMinPages(), filter.getMaxPages()));
 
 
         return productMapper.toProductResponseDTOList(productRepository.findAll(spec));
