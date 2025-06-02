@@ -13,7 +13,7 @@ import java.time.Instant;
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonInclude(JsonInclude.Include.NON_NULL)
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     Integer code;
     String message;
