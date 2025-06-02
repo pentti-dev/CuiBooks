@@ -83,7 +83,7 @@ vnpay:
 jwt:
   issuer: ngoctaiphan
   audience: ngoctaiphan
-  expiration-minutes: 30
+  expiration-minutes: 10080
   keys:
     private-key: classpath:keys/private_key.pem
     public-key: classpath:keys/public_key.pem
