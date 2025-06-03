@@ -1,6 +1,5 @@
 package com.example.mobileapi.controller;
 
-import com.cloudinary.Api;
 import com.example.mobileapi.dto.request.RatingRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.RatingResponseDTO;
@@ -22,7 +21,6 @@ import java.util.UUID;
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class RatingController {
     RatingService ratingService;
-
 
     ApiResponse<Void> create(RatingRequestDTO dto) {
         return ApiResponse

@@ -1,17 +1,13 @@
 package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.config.props.VnPayProperties;
-import com.example.mobileapi.dto.response.CartResponseDTO;
-import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.dto.response.PaymentResponse;
-import com.example.mobileapi.entity.Order;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.*;
 import com.example.mobileapi.util.VnPayUtil;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
@@ -35,8 +31,6 @@ public class PaymentServiceImpl implements PaymentService {
     VnPayProperties vnPayProperties;
     VnPayUtil vnPayUtil;
     TransactionService transactionService;
-    CartItemService cartItemService;
-    private final CartService cartService;
 
     @Override
     public PaymentResponse createVNPayPayment(UUID orderId) throws AppException {
@@ -55,7 +49,7 @@ public class PaymentServiceImpl implements PaymentService {
         vnp_Params.put("vnp_Version", vnPayProperties.version());
         vnp_Params.put("vnp_Command", vnPayProperties.command());
         vnp_Params.put("vnp_TmnCode", vnPayProperties.tmnCode());
-//Điều chỉnh lại giá cho phù hợp
+        // Điều chỉnh lại giá cho phù hợp
         BigDecimal amount = price.movePointRight(2);
         vnp_Params.put("vnp_Amount", amount.setScale(0, RoundingMode.UNNECESSARY).toPlainString());
 
@@ -122,8 +116,7 @@ public class PaymentServiceImpl implements PaymentService {
             UUID orderUUID = UUID.fromString(orderId);
 
             UUID transactionId = UUID.nameUUIDFromBytes(
-                    orderId.getBytes(StandardCharsets.UTF_8)
-            );
+                    orderId.getBytes(StandardCharsets.UTF_8));
 
             boolean isSuccess = "00".equals(vnpResponseCode);
             OrderStatus newStatus = isSuccess
@@ -136,13 +129,11 @@ public class PaymentServiceImpl implements PaymentService {
                     transactionId, orderUUID,
                     vnpResponseCode,
                     vnpTransactionDate,
-                    vnpAmount
-            );
+                    vnpAmount);
 
             log.info(
                     "VNPay call: orderId={}, status={}, txnNo={}, amount={}",
-                    orderId, newStatus, vnpTransactionNo, vnpAmount
-            );
+                    orderId, newStatus, vnpTransactionNo, vnpAmount);
 
             return isSuccess;
         } catch (IllegalArgumentException e) {
@@ -155,6 +146,5 @@ public class PaymentServiceImpl implements PaymentService {
             return false;
         }
     }
-
 
 }
