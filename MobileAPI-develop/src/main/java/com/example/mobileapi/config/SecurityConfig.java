@@ -134,7 +134,6 @@ public class SecurityConfig {
             Customer customer = customerRepository.findByEmail(email)
                     .orElseGet(() -> {
                         Customer newCustomer = Customer.builder()
-                                .id(UUID.randomUUID())
                                 .email(email)
                                 .id(UUID.fromString(googleId))
                                 .fullname(name)

@@ -1,17 +1,13 @@
 package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.config.props.VnPayProperties;
-import com.example.mobileapi.dto.response.CartResponseDTO;
-import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.dto.response.PaymentResponse;
-import com.example.mobileapi.entity.Order;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.service.*;
 import com.example.mobileapi.util.VnPayUtil;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
@@ -35,8 +31,6 @@ public class PaymentServiceImpl implements PaymentService {
     VnPayProperties vnPayProperties;
     VnPayUtil vnPayUtil;
     TransactionService transactionService;
-    CartItemService cartItemService;
-    private final CartService cartService;
 
     @Override
     public PaymentResponse createVNPayPayment(UUID orderId, String returnUrl) throws AppException {
