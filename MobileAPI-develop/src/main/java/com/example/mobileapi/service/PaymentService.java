@@ -7,9 +7,16 @@ import java.util.UUID;
 
 public interface PaymentService {
 
-    PaymentResponse createVNPayPayment(UUID orderId) throws AppException;
+    PaymentResponse createVNPayPayment(UUID orderId, String returnUrl) throws AppException;
 
-    boolean notifyOrder(String vnp_ResponseCode, String vnp_TxnRef, String vnp_TransactionNo,
-                        String vnp_TransactionDate, String vnp_Amount);
+    boolean notifyOrder(
+            String vnpResponseCode,
+            String vnpTransactionStatus,
+            String orderId,
+            String vnpTransactionNo,
+            String vnpTransactionDate,
+            String vnpAmount
+    );
+
 
 }

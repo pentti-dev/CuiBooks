@@ -29,4 +29,5 @@ public class ProductResponseDTO {
     BookForm form;
     String categoryId;
     String categoryName;
+    String discount;
 }
