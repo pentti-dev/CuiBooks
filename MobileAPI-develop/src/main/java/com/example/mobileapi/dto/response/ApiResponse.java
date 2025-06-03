@@ -13,7 +13,7 @@ import java.time.Instant;
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-//@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ApiResponse<T> {
     Integer code;
     String message;
@@ -38,7 +38,7 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> success(String message, T data) {
         return ApiResponse.<T>builder()
-                .code(200)
+                .code(HttpStatus.SC_OK)
                 .message(message)
                 .data(data)
                 .build();
@@ -46,7 +46,7 @@ public class ApiResponse<T> {
 
     public static <T> ApiResponse<T> success(T data) {
         return ApiResponse.<T>builder()
-                .code(200)
+                .code(HttpStatus.SC_OK)
                 .data(data)
                 .build();
     }

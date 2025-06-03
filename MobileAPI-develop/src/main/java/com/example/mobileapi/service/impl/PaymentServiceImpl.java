@@ -64,7 +64,6 @@ public class PaymentServiceImpl implements PaymentService {
         vnp_Params.put("vnp_OrderType", orderType);
         vnp_Params.put("vnp_Locale", vnPayProperties.locale());
 
-        // ✅ Dùng returnUrl truyền vào thay vì lấy từ properties
         vnp_Params.put("vnp_ReturnUrl", "http://localhost:3000/payment-return");
 
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
