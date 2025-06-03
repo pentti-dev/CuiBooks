@@ -106,7 +106,7 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO request) throws AppException {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-
+        request.setRole(request.getRole() != null ? request.getRole() : customer.getRole());
         // Cập nhật thông tin từ DTO
         customerMapper.updateCustomerFromDto(request, customer);
 

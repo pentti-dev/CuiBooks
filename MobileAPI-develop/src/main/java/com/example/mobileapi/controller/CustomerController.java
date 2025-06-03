@@ -43,10 +43,7 @@ public class CustomerController {
     @PutMapping("/{customerId}")
     public ApiResponse<CustomerResponseDTO> updateCustomer(@PathVariable UUID customerId, @Valid @RequestBody CustomerRequestDTO customer) throws AppException {
 
-        return ApiResponse.<CustomerResponseDTO>builder()
-                .data(customerService.updateCustomer(customerId, customer))
-                .build();
-
+        return ApiResponse.success(customerService.updateCustomer(customerId, customer));
     }
 
     @Operation(summary = "Lấy thông tin người dùng bằng token")
