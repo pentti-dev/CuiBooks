@@ -1,5 +1,6 @@
 package com.example.mobileapi.controller;
 
+import com.example.mobileapi.dto.request.CreatePaymentRequest;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.PaymentResponse;
 import com.example.mobileapi.service.OrderService;
@@ -13,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -33,18 +35,36 @@ public class PaymentController {
 
 
     @PostMapping("/create/{orderId}")
-    @ResponseStatus(HttpStatus.CREATED)
-    public ApiResponse<PaymentResponse> createPayment(@PathVariable("orderId") UUID orderId) {
-        var resp = paymentService.createVNPayPayment(orderId);
-        return ApiResponse.success(resp);
+    public ResponseEntity<PaymentResponse> createPayment(
+            @PathVariable UUID orderId,
+            @RequestBody CreatePaymentRequest request
+    ) {
+        String returnUrl = request.getReturnUrl();
+        PaymentResponse response = paymentService.createVNPayPayment(orderId, returnUrl);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/return")
-    public ApiResponse<?> notifyOrder(HttpServletResponse response, @RequestParam String vnp_Amount, @RequestParam String vnp_BankCode, @RequestParam(required = false) String vnp_BankTranNo, @RequestParam String vnp_CardType, @RequestParam String vnp_OrderInfo, @RequestParam String vnp_PayDate, @RequestParam String vnp_ResponseCode, @RequestParam String vnp_TmnCode, @RequestParam String vnp_TransactionNo, @RequestParam String vnp_TransactionStatus, @RequestParam String vnp_TxnRef, @RequestParam String vnp_SecureHash) {
+    @GetMapping("/vnpay-return")
+    public ResponseEntity<String> vnpayReturnHandler(
+            @RequestParam("vnp_ResponseCode") String responseCode,
+            @RequestParam("vnp_TransactionStatus") String transactionStatus,
+            @RequestParam("vnp_TxnRef") String orderId,
+            @RequestParam("vnp_TransactionNo") String transactionNo,
+            @RequestParam("vnp_PayDate") String transactionDate,
+            @RequestParam("vnp_Amount") String amount
+    ) {
+        boolean result = paymentService.notifyOrder(
+                responseCode,
+                transactionStatus,
+                orderId,
+                transactionNo,
+                transactionDate,
+                amount
+        );
 
-        // Gọi service với các tham số cần thiết
-        boolean isSuccess = paymentService.notifyOrder(vnp_ResponseCode, vnp_TxnRef, vnp_TransactionNo, vnp_PayDate, vnp_Amount);
-
-        return ApiResponse.<String>builder().message(isSuccess ? "Thanh toán thành công" : "Thanh toán thất bại").build();
+        return result
+                ? ResponseEntity.ok("Payment success")
+                : ResponseEntity.badRequest().body("Payment failed");
     }
+
 }
