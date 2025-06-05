@@ -8,7 +8,6 @@ import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
 import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
-import com.example.mobileapi.event.CustomerCreatedEvent;
 import com.example.mobileapi.event.RemoveCartEvent;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
@@ -117,7 +116,6 @@ public class OrderServiceImpl implements OrderService {
         return switch (method) {
             case COD -> OrderStatus.PENDING;
             case VN_PAY, MOMO, ZALO_PAY -> OrderStatus.PENDING_PAYMENT;
-            default -> OrderStatus.PENDING;
         };
     }
 

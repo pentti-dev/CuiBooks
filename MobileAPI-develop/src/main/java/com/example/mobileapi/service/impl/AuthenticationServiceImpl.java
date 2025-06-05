@@ -1,9 +1,7 @@
 package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.config.BCryptPasswordEncoder;
-import com.example.mobileapi.dto.request.IntrospectRequest;
 import com.example.mobileapi.dto.request.LoginRequest;
-import com.example.mobileapi.dto.response.IntrospectResponse;
 import com.example.mobileapi.dto.response.LoginResponse;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
@@ -36,7 +34,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) throws AppException {
-        log.warn("Username: " + loginRequest.getUsername() + " Password: " + loginRequest.getPassword());
+        log.warn("Username: {} Password: {}", loginRequest.getUsername(), loginRequest.getPassword());
         Customer customer = customerRepository.findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         if (passwordEncoder.matches(loginRequest.getPassword(), customer.getPassword())) { // Sử dụng passwordEncoder
