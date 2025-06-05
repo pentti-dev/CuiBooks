@@ -21,7 +21,7 @@ public class RatingServiceImpl implements RatingService {
 
     @Override
     public void create(RatingRequestDTO dto) {
-
+        //create rating
     }
 
     @Override
@@ -35,12 +35,13 @@ public class RatingServiceImpl implements RatingService {
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(UUID id) {
+        //delete rating
 
     }
 
     @Override
     public void getAllByProduct(UUID productId) {
-
+// Get all ratings for a product
     }
 }

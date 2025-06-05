@@ -3,6 +3,7 @@ package com.example.mobileapi.util;
 import lombok.SneakyThrows;
 import org.springframework.core.io.Resource;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPrivateKey;
@@ -34,7 +35,7 @@ public class KeyUtil {
         return (RSAPublicKey) factory.generatePublic(spec);
     }
 
-    private static String readPem(InputStream inputStream, String type) throws Exception {
+    private static String readPem(InputStream inputStream, String type) throws IOException {
         String pem = new String(inputStream.readAllBytes());
         pem = pem.replace("-----BEGIN " + type + "-----", "")
                 .replace("-----END " + type + "-----", "")

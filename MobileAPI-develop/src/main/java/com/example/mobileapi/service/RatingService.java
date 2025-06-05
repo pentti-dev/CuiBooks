@@ -13,7 +13,7 @@ public interface RatingService {
 
     RatingResponseDTO getById(Long id);
 
-    void delete(Long id);
+    void delete(UUID id);
 
     void getAllByProduct(UUID productId);
 }

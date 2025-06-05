@@ -20,6 +20,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,7 +65,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     private boolean checkPhone(@NotBlank(message = "MISSING_PHONE") @Pattern(
-            regexp = "^(0|\\+84)[0-9]{9,10}$"
+            regexp = "^(0|\\+84)\\d{9,10}$"
             , message = "INVALID_PHONE") String phone) {
         return customerRepository.existsByPhone(phone);
     }
@@ -106,9 +108,22 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO request) throws AppException {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        request.setRole(request.getRole() != null ? request.getRole() : customer.getRole());
+        log.error("Role: {}", request.getRole());
+        if (request.getRole() != null) {
+            if (!isCurrentUserAdmin() && request.getRole() != Role.USER) {
+                throw new AppException(ErrorCode.FORBIDDEN);
+            }
+            customer.setRole(request.getRole());
+
+        } else if (request.getPassword() != null) {
+
+            request.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
+        request.setRole(Role.USER);
         // Cập nhật thông tin từ DTO
         customerMapper.updateCustomerFromDto(request, customer);
+        log.error("Role : {}  ", customer.getRole());
+        customerRepository.save(customer);
 
         return customerMapper.toCustomerResponse(customer);
     }
@@ -171,6 +186,14 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toCustomerResponse(getCustomerByUserName(username));
 
     }
+
+    private boolean isCurrentUserAdmin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication != null &&
+                authentication.getAuthorities().stream()
+                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
 
     Customer getCustomerByUserName(String username) throws AppException {
         return customerRepository.findByUsername(username)

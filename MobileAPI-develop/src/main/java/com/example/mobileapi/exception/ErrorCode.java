@@ -138,7 +138,7 @@ public enum ErrorCode {
     /**
      * ========== LỖI HỆ THỐNG ==========
      */
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 5000, "Lỗi hệ thống."),
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 500, "Lỗi hệ thống."),
 
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 5001, "Lỗi kết nối cơ sở dữ liệu."),
 

@@ -142,8 +142,18 @@ public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter 
     @ExceptionHandler(value = HttpMessageNotReadableException.class)
     public ResponseEntity<ApiResponse<Void>> handlingHttpMessageNotReadableException(HttpMessageNotReadableException e) {
         Throwable cause = e.getCause();
-        if (cause instanceof InvalidFormatException || cause instanceof DateTimeParseException) {
+        if (cause instanceof DateTimeParseException) {
             ErrorCode errorCode = ErrorCode.INVALID_DATE_FORMAT;
+            return ResponseEntity
+                    .status(errorCode.getHttpStatus())
+                    .body(
+                            ApiResponse.<Void>builder()
+                                    .message(errorCode.getMessage())
+                                    .code(errorCode.getCode())
+                                    .build());
+        }
+        if (cause instanceof InvalidFormatException) {
+            ErrorCode errorCode = ErrorCode.INVALID_DATA;
             return ResponseEntity
                     .status(errorCode.getHttpStatus())
                     .body(

@@ -43,38 +43,38 @@ public class PaymentServiceImpl implements PaymentService {
 
         String orderType = "other";
         String bankCode = vnPayProperties.bankCode();
-        String vnp_TxnRef = String.valueOf(orderId);
-        String vnp_IpAddr = vnPayUtil.getClientIpAddress();
+        String vnpTxnRef = String.valueOf(orderId);
+        String vnpIpAddr = vnPayUtil.getClientIpAddress();
 
-        Map<String, String> vnp_Params = new HashMap<>();
-        vnp_Params.put("vnp_Version", vnPayProperties.version());
-        vnp_Params.put("vnp_Command", vnPayProperties.command());
-        vnp_Params.put("vnp_TmnCode", vnPayProperties.tmnCode());
+        Map<String, String> vnpParams = new HashMap<>();
+        vnpParams.put("vnp_Version", vnPayProperties.version());
+        vnpParams.put("vnp_Command", vnPayProperties.command());
+        vnpParams.put("vnp_TmnCode", vnPayProperties.tmnCode());
 
         BigDecimal amount = price.movePointRight(2);
-        vnp_Params.put("vnp_Amount", amount.setScale(0, RoundingMode.UNNECESSARY).toPlainString());
-        vnp_Params.put("vnp_CurrCode", vnPayProperties.currencyCode());
+        vnpParams.put("vnp_Amount", amount.setScale(0, RoundingMode.UNNECESSARY).toPlainString());
+        vnpParams.put("vnp_CurrCode", vnPayProperties.currencyCode());
 
         if (bankCode != null && !bankCode.isEmpty()) {
-            vnp_Params.put("vnp_BankCode", bankCode);
+            vnpParams.put("vnp_BankCode", bankCode);
         }
 
-        vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
-        vnp_Params.put("vnp_OrderType", orderType);
-        vnp_Params.put("vnp_Locale", vnPayProperties.locale());
+        vnpParams.put("vnp_TxnRef", vnpTxnRef);
+        vnpParams.put("vnp_OrderInfo", "Thanh toan don hang:" + vnpTxnRef);
+        vnpParams.put("vnp_OrderType", orderType);
+        vnpParams.put("vnp_Locale", vnPayProperties.locale());
 
-        vnp_Params.put("vnp_ReturnUrl", "http://localhost:3000/payment-return");
+        vnpParams.put("vnp_ReturnUrl", "http://localhost:3000/payment-return");
 
-        vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
+        vnpParams.put("vnp_IpAddr", vnpIpAddr);
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
-        vnp_Params.put("vnp_CreateDate", formatter.format(cld.getTime()));
+        vnpParams.put("vnp_CreateDate", formatter.format(cld.getTime()));
         cld.add(Calendar.MINUTE, 15);
-        vnp_Params.put("vnp_ExpireDate", formatter.format(cld.getTime()));
+        vnpParams.put("vnp_ExpireDate", formatter.format(cld.getTime()));
 
-        List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
+        List<String> fieldNames = new ArrayList<>(vnpParams.keySet());
         Collections.sort(fieldNames);
 
         StringBuilder hashData = new StringBuilder();
@@ -82,7 +82,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         for (Iterator<String> itr = fieldNames.iterator(); itr.hasNext(); ) {
             String fieldName = itr.next();
-            String fieldValue = vnp_Params.get(fieldName);
+            String fieldValue = vnpParams.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
                 hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
                 query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII))
@@ -95,8 +95,8 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
 
-        String vnp_SecureHash = vnPayUtil.hmacSHA512(vnPayProperties.hashSecret(), hashData.toString());
-        query.append("&vnp_SecureHash=").append(vnp_SecureHash);
+        String vnpSecureHash = vnPayUtil.hmacSHA512(vnPayProperties.hashSecret(), hashData.toString());
+        query.append("&vnp_SecureHash=").append(vnpSecureHash);
 
         String paymentUrl = vnPayProperties.payUrl() + "?" + query;
         return PaymentResponse.builder().url(paymentUrl).build();

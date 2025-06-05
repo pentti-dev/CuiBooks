@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -54,7 +53,7 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public CartItemResponseDTO getCartItem(UUID  cartItemId) throws AppException {
+    public CartItemResponseDTO getCartItem(UUID cartItemId) throws AppException {
         CartItem cartItem = getByCartId(cartItemId);
         return CartItemResponseDTO.builder()
                 .id(cartItem.getId())
@@ -64,19 +63,19 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public void deleteCartItem(UUID  cartItemId) {
+    public void deleteCartItem(UUID cartItemId) {
         cartItemRepository.deleteById(cartItemId);
     }
 
     @Override
-    public void updateCartItem(UUID  id, CartItemRequestDTO cartItem) {
+    public void updateCartItem(UUID id, CartItemRequestDTO cartItem) {
         CartItem cartI = getByCartId(id);
         cartI.setQuantity(cartItem.getQuantity());
         cartItemRepository.save(cartI);
     }
 
     @Override
-    public void updateCartItemQuantity(UUID  cartItemId, int quantity) {
+    public void updateCartItemQuantity(UUID cartItemId, int quantity) {
         CartItem cartI = getByCartId(cartItemId);
         cartI.setQuantity(cartI.getQuantity() + quantity);
         if (cartI.getQuantity() <= 0) {
@@ -88,26 +87,20 @@ public class CartItemServiceImpl implements CartItemService {
     }
 
     @Override
-    public void deleteCartItemByCartId(UUID  cartId) {
+    public void deleteCartItemByCartId(UUID cartId) {
         cartItemRepository.deleteByCartId(cartId);
     }
 
-    public CartItem getByCartId(UUID  cartItemId) {
+    public CartItem getByCartId(UUID cartItemId) {
         return cartItemRepository.findById(cartItemId).orElse(null);
     }
 
-    public List<CartItemResponseDTO> getCartItemsByCartId(UUID  cartId) {
+    public List<CartItemResponseDTO> getCartItemsByCartId(UUID cartId) {
         List<CartItem> cartItems = cartItemRepository.findByCartId(cartId);
-        return cartItems.stream().map(cartItem -> {
-            try {
-                return CartItemResponseDTO.builder()
-                        .id(cartItem.getId())
-                        .product(productServiceImpl.getProductById(cartItem.getProduct().getId()))
-                        .quantity(cartItem.getQuantity())
-                        .build();
-            } catch (AppException e) {
-                throw new RuntimeException(e);
-            }
-        }).collect(Collectors.toList());
+        return cartItems.stream().map(cartItem -> CartItemResponseDTO.builder()
+                .id(cartItem.getId())
+                .product(productServiceImpl.getProductById(cartItem.getProduct().getId()))
+                .quantity(cartItem.getQuantity())
+                .build()).toList();
     }
 }
