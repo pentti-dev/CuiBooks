@@ -1,7 +1,7 @@
 package com.example.mobileapi.controller;
 
-import com.example.mobileapi.dto.request.CreateDiscountDTO;
-import com.example.mobileapi.dto.request.UpdateDiscountDTO;
+import com.example.mobileapi.dto.request.create.CreateDiscountDTO;
+import com.example.mobileapi.dto.request.update.UpdateDiscountDTO;
 import com.example.mobileapi.dto.response.*;
 import com.example.mobileapi.entity.Category;
 import com.example.mobileapi.entity.Product;
@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -162,7 +163,7 @@ public class AdminController {
     }
 
     @Operation(summary = "Cập nhật trạng thái đơn hàng")
-    @PutMapping("/status/{status}/{orderId}")
+    @PatchMapping("/status/{status}/{orderId}")
     public ApiResponse<Void> changeOrderStatus(@PathVariable("status") OrderStatus status,
                                                @PathVariable("orderId") UUID orderId) {
         try {
@@ -175,6 +176,15 @@ public class AdminController {
                     .build();
 
         }
+    }
+
+    @GetMapping("/order/{id}/next-status")
+    @Operation(summary = "Lấy trạng thái tiếp theo của đơn hàng")
+    public ApiResponse<Set<OrderStatus>> getNextOrderStatus(@PathVariable("id") UUID orderId) {
+        OrderStatus status = orderService.getOrder(orderId).getStatus();
+        return ApiResponse.<Set<OrderStatus>>builder()
+                .data(status.nextStatus())
+                .build();
     }
 
     ProductService productService;

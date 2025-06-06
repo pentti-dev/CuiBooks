@@ -8,7 +8,9 @@ import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
 import com.example.mobileapi.dto.response.RevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
+import com.example.mobileapi.entity.enums.StockAction;
 import com.example.mobileapi.event.RemoveCartEvent;
+import com.example.mobileapi.event.StockUpdateEvent;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.entity.Order;
@@ -19,6 +21,7 @@ import com.example.mobileapi.repository.OrderDetailRepository;
 import com.example.mobileapi.repository.OrderRepository;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.OrderService;
+import com.example.mobileapi.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +37,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.example.mobileapi.entity.enums.OrderStatus.*;
 
 @Service
 @Slf4j
@@ -55,6 +60,7 @@ public class OrderServiceImpl implements OrderService {
     @PreAuthorize("hasRole('USER')")
     @Transactional
     public UUID saveOrder(OrderRequestDTO dto) throws AppException {
+
         BigDecimal amount = calcTotalAmount(
                 dto.getOrderDetails(),
                 discountService.getDiscountPercent(dto.getDiscountCode())
@@ -95,6 +101,9 @@ public class OrderServiceImpl implements OrderService {
         // tính tiền tổng
         BigDecimal totalAmount = orderDetails.stream()
                 .map(detail -> {
+                    //Kiểm tra tồn kho
+                    applicationEventPublisher.publishEvent(new StockUpdateEvent(this, detail.getProductId(), detail.getQuantity(), StockAction.DECREASE));
+
                     BigDecimal price = productService.getPriceById(detail.getProductId());
                     return price.multiply(BigDecimal.valueOf(detail.getQuantity()));
                 })
@@ -133,8 +142,25 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void deleteOrder(UUID orderId) {
-        orderRepository.deleteById(orderId);
+        changeOrderStatus(orderId, CANCELLED);
+        List<OrderDetail> details = orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND))
+                .getOrderDetails();
+        if (details.isEmpty()) {
+            throw new AppException(ErrorCode.ORDER_NOT_FOUND);
+        }
+        details.forEach(d ->
+                applicationEventPublisher.publishEvent(
+                        new StockUpdateEvent(
+                                this, d.getProduct().getId(), d.getQuantity(), StockAction.INCREASE
+                        ))
+        );
+
+        orderDetailRepository.deleteAll(details);
+
+
     }
 
     @Override
@@ -207,7 +233,7 @@ public class OrderServiceImpl implements OrderService {
                 .withHour(23).withMinute(59).withSecond(59);
         List<Order> order = orderRepository.findAllByOrderDateBetween(startOfMonth, endOfMonth)
                 .stream()
-                .filter(o -> o.getStatus() == OrderStatus.DELIVERED).
+                .filter(o -> o.getStatus() == DELIVERED).
                 toList();
         return RevenueResponse
                 .builder()
@@ -230,7 +256,7 @@ public class OrderServiceImpl implements OrderService {
 
         BigDecimal revenue = orderRepository.findAllByOrderDateBetween(startOfYear, endOfYear)
                 .stream()
-                .filter(order -> order.getStatus() == OrderStatus.DELIVERED)
+                .filter(order -> order.getStatus() == DELIVERED)
                 .map(Order::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return RevenueResponse.builder()
@@ -248,7 +274,7 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = orderRepository.findAllByOrderDateBetween(startOfDay, endOfDay);
 
         BigDecimal revenue = orders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.DELIVERED)
+                .filter(o -> o.getStatus() == DELIVERED)
                 .map(Order::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -269,12 +295,19 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderResponseDTOList(orders);
     }
 
+
     @Override
-    public void changeOrderStatus(UUID orderId, OrderStatus status) throws AppException {
+
+    public void changeOrderStatus(UUID orderId, OrderStatus status) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        OrderStatus currentStatus = order.getStatus();
+        if (!currentStatus.canChangeTo(status)) {
+            throw new AppException(ErrorCode.INVALID_CHANGE_ORDER_STATUS);
+        }
         order.setStatus(status);
         orderRepository.save(order);
     }
+
 
     @Override
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #customerId")

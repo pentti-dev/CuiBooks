@@ -1,9 +1,11 @@
 package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.dto.request.ProductFilter;
-import com.example.mobileapi.dto.request.ProductRequestDTO;
+import com.example.mobileapi.dto.request.create.ProductCreateDTO;
+import com.example.mobileapi.dto.request.update.ProductUpdateDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Product;
+import com.example.mobileapi.entity.enums.StockAction;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.mapper.ProductMapper;
@@ -32,7 +34,7 @@ public class ProductServiceImpl implements ProductService {
     ProductMapper productMapper;
 
     @Override
-    public ProductResponseDTO saveProduct(ProductRequestDTO dto) {
+    public ProductResponseDTO saveProduct(ProductCreateDTO dto) {
         return productMapper.toProductResponseDTO(productRepository.save(productMapper.toProduct(dto)));
 
     }
@@ -50,8 +52,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO updateProduct(UUID id, ProductRequestDTO productRequestDTO) {
-        Product product = productMapper.toProduct(productRequestDTO);
+    public ProductResponseDTO updateProduct(UUID id, ProductUpdateDTO dto) {
+        Product product = productMapper.toProduct(dto);
         product.setId(id);
         productRepository.save(product);
         return productMapper.toProductResponseDTO(product);
@@ -140,6 +142,49 @@ public class ProductServiceImpl implements ProductService {
         // giảm giá
         List<Product> productsOnSale = productRepository.findByDiscountGreaterThan(0);
         return productMapper.toProductResponseDTOList(productsOnSale);
+    }
+
+    @Override
+    public Integer getProductStock(UUID productId) {
+        return getProductById(productId).getStock();
+    }
+
+    @Override
+    @Transactional
+    public void checkQuantityAvailability(UUID id, int quantity, StockAction action) {
+        Integer stock = getProductStock(id);
+
+
+        switch (action) {
+            case CHECK:
+                if (stock < quantity) {
+                    throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+                }
+                if (stock <= 0) {
+                    throw new AppException(ErrorCode.OUT_OF_STOCK);
+                }
+                break;
+
+            case DECREASE:
+                if (stock <= 0) {
+                    throw new AppException(ErrorCode.OUT_OF_STOCK);
+                }
+                if (stock < quantity) {
+                    throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+                }
+                int updatedRows = productRepository.reduceStock(id, quantity);
+                if (updatedRows == 0) {
+                    throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+                }
+                break;
+
+            case INCREASE:
+                productRepository.increaseStock(id, quantity);
+                break;
+
+            default:
+                throw new AppException(ErrorCode.STOCK_UNVAILABLE);
+        }
     }
 
 

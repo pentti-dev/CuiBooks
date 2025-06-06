@@ -55,6 +55,7 @@ public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter 
                                 .code(errorCode.getCode())
                                 .build());
     }
+
     @ExceptionHandler(value = ConstraintViolationException.class)
     ResponseEntity<ApiResponse<Void>> handlingConstraintViolationException(ConstraintViolationException e) {
         var violation = e.getConstraintViolations();
@@ -169,6 +170,7 @@ public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter 
         }
         if (cause instanceof InvalidFormatException) {
             ErrorCode errorCode = ErrorCode.INVALID_DATA;
+            log.error("Lỗi: {}", cause.getMessage(), e);
             return ResponseEntity
                     .status(errorCode.getHttpStatus())
                     .body(

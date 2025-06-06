@@ -1,4 +1,4 @@
-    package com.example.mobileapi.dto.request;
+    package com.example.mobileapi.dto.request.create;
 
     import com.example.mobileapi.dto.base.DiscountDTO;
     import com.fasterxml.jackson.annotation.JsonIgnore;

@@ -79,4 +79,11 @@ public class OrderController {
                 .data(orderService.getOrdersByStatusAndCustomerId(status, customerId))
                 .build();
     }
+
+    @Operation(summary = "Hủy đơn hàng")
+    @DeleteMapping("/{orderId}")
+    public ApiResponse<Void> deleteOrder(@PathVariable UUID orderId) {
+        orderService.deleteOrder(orderId);
+        return ApiResponse.success();
+    }
 }

@@ -98,6 +98,17 @@ public enum ErrorCode {
     INVALID_SCORE(HttpStatus.BAD_REQUEST, 4146, "Điểm đánh giá không hợp lệ. Phải từ 1 đến 5."),
     DISCOUNT_EXISTED(HttpStatus.BAD_REQUEST, 4147, "Mã giảm giá đã tồn tại."),
     INVALID_TIME(HttpStatus.BAD_REQUEST, 4148, "Thời gian không hợp lệ."),
+    INVALID_PRODUCT_WEIGHT(HttpStatus.BAD_REQUEST, 4149, "Trọng lượng sản phẩm không hợp lệ. Phải là số dương."),
+    INVALID_PRODUCT_SIZE(HttpStatus.BAD_REQUEST, 4150, "Kích thước sản phẩm không hợp lệ."),
+    INVALID_PRODUCT_PAGE_NUMBER(HttpStatus.BAD_REQUEST, 4151, "Số trang sản phẩm không hợp lệ. Phải là số dương."),
+    INVALID_PRODUCT_FORM(HttpStatus.BAD_REQUEST, 4152, "Hình thức sản phẩm không hợp lệ."),
+    OUT_OF_STOCK(HttpStatus.BAD_REQUEST, 4153, "Sản phẩm đã hết hàng."),
+    INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, 4154, "Số lượng sản phẩm trong kho không đủ."),
+    ORDER_CANNOT_CANCELLED(HttpStatus.BAD_REQUEST, 4155, "Đơn hàng không thể hủy. Đơn hàng đã được xử lý hoặc giao hàng."),
+    INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, 4156, "Trạng thái đơn hàng không hợp lệ."),
+    INVALID_ORDER_METHOD(HttpStatus.BAD_REQUEST, 4157, "Phương thức đặt hàng không hợp lệ."),
+    INVALID_CHANGE_ORDER_STATUS(HttpStatus.BAD_REQUEST, 4158, "Không thể thay đổi trạng thái đơn hàng từ trạng thái hiện tại sang trạng thái mới."),
+    STOCK_UNVAILABLE(HttpStatus.BAD_REQUEST, 4159, "Số lượng sản phẩm không đủ trong kho để thực hiện thao tác."),
     /**
      * ========== LỖI XÁC THỰC ==========
      */

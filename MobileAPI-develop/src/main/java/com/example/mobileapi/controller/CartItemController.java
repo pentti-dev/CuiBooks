@@ -4,6 +4,7 @@ import com.example.mobileapi.dto.request.CartItemRequestDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.service.CartItemService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class CartItemController {
     private final CartItemService cartItemService;
 
     @PostMapping
-    public ApiResponse<Void> saveCartItem(@RequestBody CartItemRequestDTO cartItemRequestDTO) {
+    public ApiResponse<Void> saveCartItem(@RequestBody @Valid CartItemRequestDTO cartItemRequestDTO) {
         cartItemService.saveCartItem(cartItemRequestDTO);
         return ApiResponse.success();
     }

@@ -3,8 +3,8 @@ package com.example.mobileapi.service.impl;
 import com.example.mobileapi.dto.request.CartItemRequestDTO;
 import com.example.mobileapi.dto.response.CartItemResponseDTO;
 import com.example.mobileapi.entity.CartItem;
+import com.example.mobileapi.entity.enums.StockAction;
 import com.example.mobileapi.exception.AppException;
-import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.repository.CartItemRepository;
 import com.example.mobileapi.service.CartItemService;
 import lombok.RequiredArgsConstructor;
@@ -28,10 +28,7 @@ public class CartItemServiceImpl implements CartItemService {
     public UUID saveCartItem(CartItemRequestDTO cartItem) throws AppException {
         UUID cartId = cartItem.getCartId();
         UUID productId = cartItem.getProductId();
-        if (!productServiceImpl.existById(productId)) {
-            throw new AppException(ErrorCode.PRODUCT_NOT_FOUND);
-        }
-
+        productServiceImpl.checkQuantityAvailability(productId, cartItem.getQuantity(), StockAction.CHECK);
 
         // Tìm CartItem dựa trên cartId và productId
         CartItem existingCartItem = cartItemRepository.findByCartIdAndProductId(cartId, productId);
