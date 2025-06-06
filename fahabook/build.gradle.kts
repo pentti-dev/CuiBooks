@@ -68,7 +68,8 @@ dependencies {
     implementation("io.github.cdimascio:dotenv-java:2.2.4")
 
     // OpenAPI & GraphQL UI
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0")
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8")
     implementation("org.webjars.npm:graphql-playground-html:1.6.30")
     implementation("com.graphql-java:graphql-java-extended-scalars:22.0")
 
