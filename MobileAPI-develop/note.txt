@@ -1,2 +1,0 @@
-Phân quyền cho người dùng là đối tác.
-Cho phép đối tác đăng bán sản phẩm.
