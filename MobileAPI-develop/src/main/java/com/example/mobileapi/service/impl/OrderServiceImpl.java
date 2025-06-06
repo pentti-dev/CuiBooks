@@ -35,6 +35,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.example.mobileapi.entity.enums.OrderStatus.*;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -55,6 +57,7 @@ public class OrderServiceImpl implements OrderService {
     @PreAuthorize("hasRole('USER')")
     @Transactional
     public UUID saveOrder(OrderRequestDTO dto) throws AppException {
+
         BigDecimal amount = calcTotalAmount(
                 dto.getOrderDetails(),
                 discountService.getDiscountPercent(dto.getDiscountCode())
@@ -207,7 +210,7 @@ public class OrderServiceImpl implements OrderService {
                 .withHour(23).withMinute(59).withSecond(59);
         List<Order> order = orderRepository.findAllByOrderDateBetween(startOfMonth, endOfMonth)
                 .stream()
-                .filter(o -> o.getStatus() == OrderStatus.DELIVERED).
+                .filter(o -> o.getStatus() == DELIVERED).
                 toList();
         return RevenueResponse
                 .builder()
@@ -230,7 +233,7 @@ public class OrderServiceImpl implements OrderService {
 
         BigDecimal revenue = orderRepository.findAllByOrderDateBetween(startOfYear, endOfYear)
                 .stream()
-                .filter(order -> order.getStatus() == OrderStatus.DELIVERED)
+                .filter(order -> order.getStatus() == DELIVERED)
                 .map(Order::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return RevenueResponse.builder()
@@ -248,7 +251,7 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = orderRepository.findAllByOrderDateBetween(startOfDay, endOfDay);
 
         BigDecimal revenue = orders.stream()
-                .filter(o -> o.getStatus() == OrderStatus.DELIVERED)
+                .filter(o -> o.getStatus() == DELIVERED)
                 .map(Order::getTotalAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -269,12 +272,19 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderResponseDTOList(orders);
     }
 
+
     @Override
-    public void changeOrderStatus(UUID orderId, OrderStatus status) throws AppException {
+
+    public void changeOrderStatus(UUID orderId, OrderStatus status) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+        OrderStatus currentStatus = order.getStatus();
+        if (!currentStatus.canChangeTo(status)) {
+            throw new AppException(ErrorCode.INVALID_CHANGE_ORDER_STATUS);
+        }
         order.setStatus(status);
         orderRepository.save(order);
     }
+
 
     @Override
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #customerId")
