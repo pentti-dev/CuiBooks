@@ -1,7 +1,7 @@
 package com.example.mobileapi.mapper;
 
-import com.example.mobileapi.dto.request.CreateDiscountDTO;
-import com.example.mobileapi.dto.request.UpdateDiscountDTO;
+import com.example.mobileapi.dto.request.create.CreateDiscountDTO;
+import com.example.mobileapi.dto.request.update.UpdateDiscountDTO;
 import com.example.mobileapi.dto.response.DiscountResponseDTO;
 import com.example.mobileapi.entity.Discount;
 import org.mapstruct.*;

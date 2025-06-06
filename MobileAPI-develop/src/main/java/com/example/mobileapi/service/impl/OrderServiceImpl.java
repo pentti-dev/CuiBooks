@@ -98,6 +98,9 @@ public class OrderServiceImpl implements OrderService {
         // tính tiền tổng
         BigDecimal totalAmount = orderDetails.stream()
                 .map(detail -> {
+                    //Kiểm tra tồn kho
+                    productService.checkQuantityAvailability(detail.getProductId(), detail.getQuantity());
+
                     BigDecimal price = productService.getPriceById(detail.getProductId());
                     return price.multiply(BigDecimal.valueOf(detail.getQuantity()));
                 })
@@ -136,8 +139,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void deleteOrder(UUID orderId) {
-        orderRepository.deleteById(orderId);
+        changeOrderStatus(orderId, CANCELLED);
+
+
     }
 
     @Override
