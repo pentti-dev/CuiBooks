@@ -149,14 +149,42 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public void checkQuantityAvailability(UUID id, int inputQuantity) {
+    @Transactional
+    public void checkQuantityAvailability(UUID id, int quantity, StockAction action) {
         Integer stock = getProductStock(id);
-        if (stock <= 0) {
-            throw new AppException(ErrorCode.OUT_OF_STOCK);
-        }
-        if (stock < inputQuantity) {
-            throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+
+
+        switch (action) {
+            case CHECK:
+                if (stock < quantity) {
+                    throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+                }
+                if (stock <= 0) {
+                    throw new AppException(ErrorCode.OUT_OF_STOCK);
+                }
+                break;
+
+            case DECREASE:
+                if (stock <= 0) {
+                    throw new AppException(ErrorCode.OUT_OF_STOCK);
+                }
+                if (stock < quantity) {
+                    throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+                }
+                int updatedRows = productRepository.reduceStock(id, quantity);
+                if (updatedRows == 0) {
+                    throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+                }
+                break;
+
+            case INCREASE:
+                productRepository.increaseStock(id, quantity);
+                break;
+
+            default:
+                throw new AppException(ErrorCode.STOCK_UNVAILABLE);
         }
     }
+
 
 }
