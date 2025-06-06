@@ -1,15 +1,13 @@
 package com.example.mobileapi.controller;
 
+import com.example.mobileapi.dto.request.CreateDiscountDTO;
+import com.example.mobileapi.dto.request.UpdateDiscountDTO;
+import com.example.mobileapi.dto.response.*;
 import com.example.mobileapi.entity.Category;
 import com.example.mobileapi.entity.Product;
 import com.example.mobileapi.entity.enums.OrderStatus;
-import com.example.mobileapi.dto.DiscountDTO;
 import com.example.mobileapi.dto.request.CustomerRequestDTO;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
-import com.example.mobileapi.dto.response.ApiResponse;
-import com.example.mobileapi.dto.response.CustomerResponseDTO;
-import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
-import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.service.AdminService;
 import com.example.mobileapi.service.OrderService;
@@ -172,27 +170,27 @@ public class AdminController {
 
     @Operation(summary = "Thêm mã giảm giá")
     @PostMapping(value = "/discount")
-    public ApiResponse<DiscountDTO> createDiscount(@Valid @RequestBody DiscountDTO dto) {
-        return ApiResponse.<DiscountDTO>builder().data(adminService.create(dto)).build();
+    public ApiResponse<DiscountResponseDTO> createDiscount(@Valid @RequestBody CreateDiscountDTO dto) {
+        return ApiResponse.<DiscountResponseDTO>builder().data(adminService.create(dto)).build();
     }
 
     @Operation(summary = "Sửa mã giảm giá")
     @PutMapping(value = "/discount")
-    public ApiResponse<DiscountDTO> updateDiscount(@Valid @RequestBody DiscountDTO dto) {
-        return ApiResponse.<DiscountDTO>builder().data(adminService.update(dto)).build();
+    public ApiResponse<DiscountResponseDTO> updateDiscount(@Valid @RequestBody UpdateDiscountDTO dto) {
+        return ApiResponse.<DiscountResponseDTO>builder().data(adminService.update(dto)).build();
     }
 
     @Operation(summary = "Lấy tất cả mã giảm giá")
     @GetMapping(value = "/discount/all")
-    public ApiResponse<List<DiscountDTO>> getDiscount() {
-        return ApiResponse.<List<DiscountDTO>>builder().data(adminService.getAllDiscount()).build();
+    public ApiResponse<List<DiscountResponseDTO>> getDiscount() {
+        return ApiResponse.<List<DiscountResponseDTO>>builder().data(adminService.getAllDiscount()).build();
 
     }
 
     @Operation(summary = "Lấy mã giảm giá theo code")
     @GetMapping(value = "/discount")
-    public ApiResponse<DiscountDTO> getAllDiscount(@RequestParam("code") String code) {
-        return ApiResponse.<DiscountDTO>builder().data(adminService.getDiscount(code)).build();
+    public ApiResponse<DiscountResponseDTO> getAllDiscount(@RequestParam("code") String code) {
+        return ApiResponse.<DiscountResponseDTO>builder().data(adminService.getDiscount(code)).build();
     }
 
     @Operation(summary = "Xóa mã giảm giá")

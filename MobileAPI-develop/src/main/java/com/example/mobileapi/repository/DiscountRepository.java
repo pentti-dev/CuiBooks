@@ -14,4 +14,5 @@ public interface DiscountRepository extends JpaRepository<Discount, UUID> {
 
     Optional<UUID> findIdByCode(String code);
 
+    boolean existsByCode(String code);
 }

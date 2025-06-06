@@ -1,8 +1,7 @@
 package com.example.mobileapi.graphql.query;
 
-import com.example.mobileapi.dto.ProductFilterInput;
+import com.example.mobileapi.dto.request.ProductFilter;
 import com.example.mobileapi.entity.Product;
-import com.example.mobileapi.entity.enums.BookForm;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.mapper.ProductMapper;
 import com.example.mobileapi.service.ProductService;
@@ -13,7 +12,6 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +44,7 @@ public class ProductQueryResolver {
     }
 
     @QueryMapping
-    public List<Product> filteredProducts(@Argument("filter") ProductFilterInput filter) {
+    public List<Product> filteredProducts(@Argument("filter") ProductFilter filter) {
 
         return productMapper.toProductList(productService.filterProducts(filter));
     }

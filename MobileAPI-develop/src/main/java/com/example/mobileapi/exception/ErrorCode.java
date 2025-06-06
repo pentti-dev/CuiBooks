@@ -96,7 +96,7 @@ public enum ErrorCode {
     MISSING_COMMENT(HttpStatus.BAD_REQUEST, 4144, "Bình luận không được để trống."),
     INVALID_COMMENT_LENGTH(HttpStatus.BAD_REQUEST, 4145, "Độ dài bình luận không hợp lệ. Phải từ 10 đến 500 ký tự."),
     INVALID_SCORE(HttpStatus.BAD_REQUEST, 4146, "Điểm đánh giá không hợp lệ. Phải từ 1 đến 5."),
-
+    DISCOUNT_EXISTED(HttpStatus.BAD_REQUEST, 4147, "Mã giảm giá đã tồn tại."),
     /**
      * ========== LỖI XÁC THỰC ==========
      */

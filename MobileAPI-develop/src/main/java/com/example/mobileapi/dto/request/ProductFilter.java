@@ -1,4 +1,4 @@
-package com.example.mobileapi.dto;
+package com.example.mobileapi.dto.request;
 
 import com.example.mobileapi.entity.enums.BookForm;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductFilterInput {
+public class ProductFilter {
     private String name;
     private UUID categoryId;
     private BigDecimal minPrice;

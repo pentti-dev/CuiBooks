@@ -1,6 +1,6 @@
 package com.example.mobileapi.service.impl;
 
-import com.example.mobileapi.dto.ProductFilterInput;
+import com.example.mobileapi.dto.request.ProductFilter;
 import com.example.mobileapi.dto.request.ProductRequestDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Product;
@@ -92,7 +92,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductResponseDTO> filterProducts(ProductFilterInput filter) {
+    public List<ProductResponseDTO> filterProducts(ProductFilter filter) {
         Specification<Product> spec = Specification.where(null);
         if (StringUtils.hasText(filter.getName())) {
             spec = spec.and(ProductSpecifications.nameContains(filter.getName()));

@@ -1,20 +1,27 @@
 package com.example.mobileapi.mapper;
 
+import com.example.mobileapi.dto.request.CreateDiscountDTO;
+import com.example.mobileapi.dto.request.UpdateDiscountDTO;
+import com.example.mobileapi.dto.response.DiscountResponseDTO;
+import com.example.mobileapi.entity.Discount;
+import org.mapstruct.*;
+
 import java.util.List;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-
-import com.example.mobileapi.dto.DiscountDTO;
-import com.example.mobileapi.entity.Discount;
-
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 public interface DiscountMapper {
+
     @Mapping(target = "id", ignore = true)
-    Discount toDiscount(DiscountDTO dto);
+    Discount toEntity(CreateDiscountDTO dto);
 
-    DiscountDTO toDTO(Discount entity);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    void updateEntityFromDto(UpdateDiscountDTO dto, @MappingTarget Discount entity);
 
-    List<DiscountDTO> toListDTO(List<Discount> listEntity);
+    DiscountResponseDTO toResponseDto(Discount entity);
 
+    List<DiscountResponseDTO> toResponseDtoList(List<Discount> entities);
 }

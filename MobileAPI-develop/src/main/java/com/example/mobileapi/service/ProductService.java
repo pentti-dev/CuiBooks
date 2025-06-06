@@ -1,6 +1,6 @@
 package com.example.mobileapi.service;
 
-import com.example.mobileapi.dto.ProductFilterInput;
+import com.example.mobileapi.dto.request.ProductFilter;
 import com.example.mobileapi.dto.request.ProductRequestDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Product;
@@ -26,7 +26,7 @@ public interface ProductService {
 
     List<ProductResponseDTO> findByNameContainingIgnoreCase(String name);
 
-    List<ProductResponseDTO> filterProducts(ProductFilterInput filterInput);
+    List<ProductResponseDTO> filterProducts(ProductFilter filterInput);
 
     void saveAll(List<Product> products);
 
