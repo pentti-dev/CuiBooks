@@ -164,9 +164,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public List<OrderResponseDTO> getAllOrders() {
         List<Order> orders = orderRepository.findAll();
-        log.warn("List of orders: {}", orders);
+        log.warn("List of orders: {}", orders.size());
         if (orders.isEmpty()) {
-            return Collections.emptyList(); // Return an empty list if no orders found
+            return Collections.emptyList();
         }
 
         return orders.stream()

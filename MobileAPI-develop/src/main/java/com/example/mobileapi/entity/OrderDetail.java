@@ -2,10 +2,7 @@ package com.example.mobileapi.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
@@ -27,6 +24,7 @@ public class OrderDetail implements Serializable {
     @ManyToOne
     @JsonBackReference
     @JoinColumn(name = "order_id", nullable = false)
+    @ToString.Exclude
     Order order;
 
     @ManyToOne

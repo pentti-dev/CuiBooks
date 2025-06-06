@@ -4,10 +4,7 @@ import com.example.mobileapi.entity.enums.OrderMethod;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
@@ -48,6 +45,7 @@ public class Order implements Serializable {
 
     @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @ToString.Exclude
     private List<OrderDetail> orderDetails = new ArrayList<>();
 
     String receiver;
