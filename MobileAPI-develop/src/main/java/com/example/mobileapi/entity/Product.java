@@ -54,6 +54,8 @@ public class Product implements Serializable {
 
     @Enumerated(EnumType.STRING)
     BookForm form; // hình thức
+@Column(columnDefinition = "integer default 0")
+    Integer stock =0;
 
     @Column(nullable = false)
     double discount;

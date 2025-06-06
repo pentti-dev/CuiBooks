@@ -19,4 +19,5 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
     List<Product> findByDiscountGreaterThan(double discount);
 
 
+    Integer findProductById(UUID id);
 }

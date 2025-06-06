@@ -1,7 +1,8 @@
 package com.example.mobileapi.service.impl;
 
 import com.example.mobileapi.dto.request.ProductFilter;
-import com.example.mobileapi.dto.request.ProductRequestDTO;
+import com.example.mobileapi.dto.request.create.ProductCreateDTO;
+import com.example.mobileapi.dto.request.update.ProductUpdateDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Product;
 import com.example.mobileapi.exception.AppException;
@@ -32,7 +33,7 @@ public class ProductServiceImpl implements ProductService {
     ProductMapper productMapper;
 
     @Override
-    public ProductResponseDTO saveProduct(ProductRequestDTO dto) {
+    public ProductResponseDTO saveProduct(ProductCreateDTO dto) {
         return productMapper.toProductResponseDTO(productRepository.save(productMapper.toProduct(dto)));
 
     }
@@ -50,8 +51,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductResponseDTO updateProduct(UUID id, ProductRequestDTO productRequestDTO) {
-        Product product = productMapper.toProduct(productRequestDTO);
+    public ProductResponseDTO updateProduct(UUID id, ProductUpdateDTO dto) {
+        Product product = productMapper.toProduct(dto);
         product.setId(id);
         productRepository.save(product);
         return productMapper.toProductResponseDTO(product);
@@ -142,5 +143,20 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toProductResponseDTOList(productsOnSale);
     }
 
+    @Override
+    public Integer getProductStock(UUID productId) {
+        return getProductById(productId).getStock();
+    }
+
+    @Override
+    public void checkQuantityAvailability(UUID id, int inputQuantity) {
+        Integer stock = getProductStock(id);
+        if (stock <= 0) {
+            throw new AppException(ErrorCode.OUT_OF_STOCK);
+        }
+        if (stock < inputQuantity) {
+            throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+        }
+    }
 
 }

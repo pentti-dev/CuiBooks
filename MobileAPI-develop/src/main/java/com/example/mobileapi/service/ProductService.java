@@ -1,7 +1,8 @@
 package com.example.mobileapi.service;
 
 import com.example.mobileapi.dto.request.ProductFilter;
-import com.example.mobileapi.dto.request.ProductRequestDTO;
+import com.example.mobileapi.dto.request.create.ProductCreateDTO;
+import com.example.mobileapi.dto.request.update.ProductUpdateDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Product;
 import com.example.mobileapi.exception.AppException;
@@ -10,9 +11,9 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ProductService {
-    ProductResponseDTO saveProduct(ProductRequestDTO productRequestDTO);
+    ProductResponseDTO saveProduct(ProductCreateDTO productCreateDTO);
 
-    ProductResponseDTO updateProduct(UUID id, ProductRequestDTO productRequestDTO);
+    ProductResponseDTO updateProduct(UUID id, ProductUpdateDTO productCreateDTO);
 
     void deleteProduct(UUID id);
 
@@ -32,4 +33,7 @@ public interface ProductService {
 
     List<ProductResponseDTO> getProductSale();
 
+    Integer getProductStock(UUID productId);
+
+    void checkQuantityAvailability(UUID id, int inputQuantity);
 }

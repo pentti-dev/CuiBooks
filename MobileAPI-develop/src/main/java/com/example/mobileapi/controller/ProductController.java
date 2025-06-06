@@ -1,6 +1,7 @@
 package com.example.mobileapi.controller;
 
-import com.example.mobileapi.dto.request.ProductRequestDTO;
+import com.example.mobileapi.dto.request.create.ProductCreateDTO;
+import com.example.mobileapi.dto.request.update.ProductUpdateDTO;
 import com.example.mobileapi.dto.response.ApiResponse;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.exception.AppException;
@@ -24,7 +25,7 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping
-    public ApiResponse<ProductResponseDTO> addProduct(@RequestBody @Valid ProductRequestDTO product) {
+    public ApiResponse<ProductResponseDTO> addProduct(@RequestBody @Valid ProductCreateDTO product) {
         return ApiResponse.<ProductResponseDTO>builder()
                 .data(productService.saveProduct(product))
                 .build();
@@ -32,7 +33,7 @@ public class ProductController {
 
     @PutMapping("/{productId}")
     public ApiResponse<ProductResponseDTO> updateProduct(@PathVariable UUID productId,
-                                                         @RequestBody @Valid ProductRequestDTO product) {
+                                                         @RequestBody @Valid ProductUpdateDTO product) {
         return ApiResponse.<ProductResponseDTO>builder()
                 .data(productService.updateProduct(productId, product))
                 .build();
