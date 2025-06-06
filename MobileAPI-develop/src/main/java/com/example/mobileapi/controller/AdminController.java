@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -87,13 +88,44 @@ public class AdminController {
     OrderService orderService;
 
     @GetMapping("/order/revenue")
-    @Operation(summary = "Lấy doanh thu theo tháng")
-    public ApiResponse<List<MonthlyRevenueResponse>> getOrderRevenue() {
+    @Operation(summary = "Lấy doanh thu theo tháng của năm hiện tại")
+    public ApiResponse<List<RevenueResponse>> getOrderRevenueAtYear() {
 
-        return ApiResponse.<List<MonthlyRevenueResponse>>builder()
+        return ApiResponse.<List<RevenueResponse>>builder()
                 .data(orderService.getMonthlyRevenue())
                 .build();
     }
+
+    @GetMapping("/order/revenue/{month}/{year}")
+    @Operation(summary = "Lấy doanh thu theo tháng và nămi")
+    public ApiResponse<RevenueResponse> getOrderRevenueAtYear(@PathVariable("month") int month,
+                                                              @PathVariable("year") int year) {
+
+        return ApiResponse.<RevenueResponse>builder()
+                .data(orderService.getRevenueByMonth(month, year))
+                .build();
+    }
+
+    @GetMapping("/order/revenue/year/{year}")
+    @Operation(summary = "Lấy doanh thu theo năm")
+    public ApiResponse<RevenueResponse> getOrderRevenueAtYear(
+            @PathVariable("year") int year) {
+
+        return ApiResponse.<RevenueResponse>builder()
+                .data(orderService.getRevenueByYear(year))
+                .build();
+    }
+
+    @GetMapping("/order/revenue/date/{date}")
+    @Operation(summary = "Lấy doanh thu theo ngày")
+    public ApiResponse<RevenueResponse> getOrderRevenueAtYear(
+            @PathVariable("date") LocalDate date) {
+
+        return ApiResponse.<RevenueResponse>builder()
+                .data(orderService.getRevenueByDate(date))
+                .build();
+    }
+
 
     @DeleteMapping("/order/{orderId}")
     @Operation(summary = "Hủy đơn hàng")

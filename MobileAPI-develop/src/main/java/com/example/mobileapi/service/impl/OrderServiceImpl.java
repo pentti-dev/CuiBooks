@@ -5,7 +5,7 @@ import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
 import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
-import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
+import com.example.mobileapi.dto.response.RevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
 import com.example.mobileapi.event.RemoveCartEvent;
@@ -30,11 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -185,13 +183,81 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public List<MonthlyRevenueResponse> getMonthlyRevenue() {
-        return orderRepository.getMonthlyRevenue().stream()
-                .map(p -> MonthlyRevenueResponse.builder()
-                        .month(p.getMonth())
-                        .revenue(p.getRevenue() != null ? p.getRevenue() : BigDecimal.ZERO)
-                        .build())
-                .toList();
+    public List<RevenueResponse> getMonthlyRevenue() {
+        List<RevenueResponse> monthlyRevenues = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+
+            monthlyRevenues.add(getRevenueByMonth(month, LocalDate.now().getYear()));
+
+        }
+        return monthlyRevenues;
+    }
+
+    @Override
+    public RevenueResponse getRevenueByMonth(int month, int year) {
+        if (month < 1 || month > 12) {
+            throw new AppException(ErrorCode.INVALID_TIME);
+        }
+        if (year < 2000 || year > LocalDate.now().getYear()) {
+            throw new AppException(ErrorCode.INVALID_TIME);
+        }
+
+        LocalDateTime startOfMonth = LocalDate.of(year, month, 1).atStartOfDay();
+        LocalDateTime endOfMonth = startOfMonth.withDayOfMonth(startOfMonth.toLocalDate().lengthOfMonth())
+                .withHour(23).withMinute(59).withSecond(59);
+        List<Order> order = orderRepository.findAllByOrderDateBetween(startOfMonth, endOfMonth)
+                .stream()
+                .filter(o -> o.getStatus() == OrderStatus.DELIVERED).
+                toList();
+        return RevenueResponse
+                .builder()
+                .month(month)
+                .revenue(order
+                        .stream()
+                        .map(Order::getTotalAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add)
+                )
+                .build();
+    }
+
+    @Override
+    public RevenueResponse getRevenueByYear(int year) {
+        if (year < 2000 || year > LocalDate.now().getYear()) {
+            throw new AppException(ErrorCode.INVALID_TIME);
+        }
+        LocalDateTime startOfYear = LocalDate.of(year, 1, 1).atStartOfDay();
+        LocalDateTime endOfYear = startOfYear.plusYears(1).minusNanos(1);
+
+        BigDecimal revenue = orderRepository.findAllByOrderDateBetween(startOfYear, endOfYear)
+                .stream()
+                .filter(order -> order.getStatus() == OrderStatus.DELIVERED)
+                .map(Order::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return RevenueResponse.builder()
+                .year(year)
+                .revenue(revenue)
+                .build();
+
+    }
+
+    @Override
+    public RevenueResponse getRevenueByDate(LocalDate date) {
+        LocalDateTime startOfDay = date.atStartOfDay(); // 00:00:00
+        LocalDateTime endOfDay = date.atTime(23, 59, 59); // 23:59:59
+
+        List<Order> orders = orderRepository.findAllByOrderDateBetween(startOfDay, endOfDay);
+
+        BigDecimal revenue = orders.stream()
+                .filter(o -> o.getStatus() == OrderStatus.DELIVERED)
+                .map(Order::getTotalAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return RevenueResponse.builder()
+                .day(date.getDayOfMonth())
+                .month(date.getMonthValue())
+                .year(date.getYear())
+                .revenue(revenue)
+                .build();
     }
 
     @Override

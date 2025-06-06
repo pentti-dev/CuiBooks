@@ -4,11 +4,12 @@ import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
 import com.example.mobileapi.entity.enums.OrderStatus;
 import com.example.mobileapi.dto.request.OrderEditRequestDTO;
 import com.example.mobileapi.dto.request.OrderRequestDTO;
-import com.example.mobileapi.dto.response.MonthlyRevenueResponse;
+import com.example.mobileapi.dto.response.RevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.exception.AppException;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +33,13 @@ public interface OrderService {
 
     void editOrder(UUID id, OrderEditRequestDTO orderEditRequestDTO) throws AppException;
 
-    List<MonthlyRevenueResponse> getMonthlyRevenue();
+    List<RevenueResponse> getMonthlyRevenue();
+
+    RevenueResponse getRevenueByMonth(int month, int year);
+
+    RevenueResponse getRevenueByYear(int year);
+
+    RevenueResponse getRevenueByDate(LocalDate date);
 
     List<OrderResponseDTO> getOrdersByStatus(OrderStatus status);
 
@@ -41,7 +48,6 @@ public interface OrderService {
     List<OrderResponseDTO> getOrdersByStatusAndCustomerId(OrderStatus status, UUID customerId);
 
     boolean existById(UUID orderId);
-
 
 
 }
