@@ -8,7 +8,9 @@ import com.example.mobileapi.dto.request.OrderDetailRequestDTO;
 import com.example.mobileapi.dto.response.RevenueResponse;
 import com.example.mobileapi.dto.response.OrderResponseDTO;
 import com.example.mobileapi.dto.response.OrderDetailResponseDTO;
+import com.example.mobileapi.entity.enums.StockAction;
 import com.example.mobileapi.event.RemoveCartEvent;
+import com.example.mobileapi.event.StockUpdateEvent;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
 import com.example.mobileapi.entity.Order;
@@ -19,6 +21,7 @@ import com.example.mobileapi.repository.OrderDetailRepository;
 import com.example.mobileapi.repository.OrderRepository;
 import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.OrderService;
+import com.example.mobileapi.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -99,7 +102,7 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal totalAmount = orderDetails.stream()
                 .map(detail -> {
                     //Kiểm tra tồn kho
-                    productService.checkQuantityAvailability(detail.getProductId(), detail.getQuantity());
+                    applicationEventPublisher.publishEvent(new StockUpdateEvent(this, detail.getProductId(), detail.getQuantity(), StockAction.DECREASE));
 
                     BigDecimal price = productService.getPriceById(detail.getProductId());
                     return price.multiply(BigDecimal.valueOf(detail.getQuantity()));
@@ -142,6 +145,20 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void deleteOrder(UUID orderId) {
         changeOrderStatus(orderId, CANCELLED);
+        List<OrderDetail> details = orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND))
+                .getOrderDetails();
+        if (details.isEmpty()) {
+            throw new AppException(ErrorCode.ORDER_NOT_FOUND);
+        }
+        details.forEach(d ->
+                applicationEventPublisher.publishEvent(
+                        new StockUpdateEvent(
+                                this, d.getProduct().getId(), d.getQuantity(), StockAction.INCREASE
+                        ))
+        );
+
+        orderDetailRepository.deleteAll(details);
 
 
     }

@@ -5,8 +5,10 @@ import com.example.mobileapi.dto.request.create.ProductCreateDTO;
 import com.example.mobileapi.dto.request.update.ProductUpdateDTO;
 import com.example.mobileapi.dto.response.ProductResponseDTO;
 import com.example.mobileapi.entity.Product;
+import com.example.mobileapi.entity.enums.StockAction;
 import com.example.mobileapi.exception.AppException;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,5 +37,7 @@ public interface ProductService {
 
     Integer getProductStock(UUID productId);
 
-    void checkQuantityAvailability(UUID id, int inputQuantity);
+    void checkQuantityAvailability(UUID id, int inputQuantity, StockAction action);
+
+    BigDecimal getPriceById(UUID productId);
 }

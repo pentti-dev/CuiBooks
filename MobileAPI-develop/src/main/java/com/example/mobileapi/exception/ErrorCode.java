@@ -108,6 +108,7 @@ public enum ErrorCode {
     INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, 4156, "Trạng thái đơn hàng không hợp lệ."),
     INVALID_ORDER_METHOD(HttpStatus.BAD_REQUEST, 4157, "Phương thức đặt hàng không hợp lệ."),
     INVALID_CHANGE_ORDER_STATUS(HttpStatus.BAD_REQUEST, 4158, "Không thể thay đổi trạng thái đơn hàng từ trạng thái hiện tại sang trạng thái mới."),
+    STOCK_UNVAILABLE(HttpStatus.BAD_REQUEST, 4159, "Số lượng sản phẩm không đủ trong kho để thực hiện thao tác."),
     /**
      * ========== LỖI XÁC THỰC ==========
      */
