@@ -33,7 +33,7 @@ public enum ErrorCode {
     PASSWORD_MISMATCH(HttpStatus.BAD_REQUEST, 4104, "Mật khẩu và xác nhận mật khẩu không khớp."),
     PASSWORD_TOO_WEAK(HttpStatus.BAD_REQUEST, 4105, "Mật khẩu quá yếu."),
     INVALID_EMAIL(HttpStatus.BAD_REQUEST, 4106, "Email không hợp lệ."),
-    USERNAME_EXISTED(HttpStatus.BAD_REQUEST, 4107, "Tên người dùng đã tồn tại."),
+    USERNAME_EXISTED(HttpStatus.BAD_REQUEST, 4107, "Tên đăng nhập đã tồn tại."),
     EMAIL_ALREADY_REGISTERED(HttpStatus.BAD_REQUEST, 4108, "Email đã được đăng ký."),
     UNDERAGE_USER(HttpStatus.BAD_REQUEST, 4109, "Người dùng chưa đủ tuổi đăng ký."),
     MISSING_FULLNAME(HttpStatus.BAD_REQUEST, 4110, "Họ tên không được để trống."),

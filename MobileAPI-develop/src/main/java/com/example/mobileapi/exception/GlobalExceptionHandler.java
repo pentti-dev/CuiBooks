@@ -55,6 +55,21 @@ public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter 
                                 .code(errorCode.getCode())
                                 .build());
     }
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    ResponseEntity<ApiResponse<Void>> handlingConstraintViolationException(ConstraintViolationException e) {
+        var violation = e.getConstraintViolations();
+        ErrorCode errorCode = violation.stream()
+                .map(ConstraintViolation::getMessage)
+                .map(ErrorCode::valueOf)
+                .findFirst().orElse(ErrorCode.INVALID_DATA);
+        return ResponseEntity
+                .status(errorCode.getHttpStatus())
+                .body(
+                        ApiResponse.<Void>builder()
+                                .message(errorCode.getMessage())
+                                .code(errorCode.getCode())
+                                .build());
+    }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
     ResponseEntity<ApiResponse<Void>> handlingValidation(MethodArgumentNotValidException e) {
