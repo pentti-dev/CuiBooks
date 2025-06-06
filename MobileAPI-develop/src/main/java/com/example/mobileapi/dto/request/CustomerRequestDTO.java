@@ -1,5 +1,6 @@
 package com.example.mobileapi.dto.request;
 
+import com.example.mobileapi.annotation.UniqueCustomerField;
 import com.example.mobileapi.entity.enums.Role;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.validation.constraints.Email;
@@ -12,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
+@UniqueCustomerField
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class CustomerRequestDTO {
 

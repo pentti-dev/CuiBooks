@@ -13,8 +13,6 @@ import com.example.mobileapi.repository.CustomerRepository;
 import com.example.mobileapi.service.CustomerService;
 import com.example.mobileapi.service.EmailService;
 import com.example.mobileapi.util.JwtUtil;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -46,15 +44,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public CustomerResponseDTO saveCustomer(CustomerRequestDTO request) throws AppException {
-        if (checkUsername(request.getUsername())) {
-            throw new AppException(ErrorCode.USERNAME_EXISTED);
-        } else if (checkEmail(request.getEmail())) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
-        } else if (checkPhone(request.getPhone())) {
-            throw new AppException(ErrorCode.PHONE_EXISTED);
-
-        }
-
         // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
         request.setPassword(passwordEncoder.encode(request.getPassword())); // Sử dụng passwordEncoder
         request.setRole(Role.USER);
@@ -62,12 +51,6 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Customer created with ID: {}", customer.getId());
         applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, customer.getId()));
         return customerMapper.toCustomerResponse(customer);
-    }
-
-    private boolean checkPhone(@NotBlank(message = "MISSING_PHONE") @Pattern(
-            regexp = "^(0|\\+84)\\d{9,10}$"
-            , message = "INVALID_PHONE") String phone) {
-        return customerRepository.existsByPhone(phone);
     }
 
 
