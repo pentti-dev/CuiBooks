@@ -1,6 +1,8 @@
 package com.example.mobileapi.service;
 
-import com.example.mobileapi.dto.DiscountDTO;
+import com.example.mobileapi.dto.request.CreateDiscountDTO;
+import com.example.mobileapi.dto.request.UpdateDiscountDTO;
+import com.example.mobileapi.dto.response.DiscountResponseDTO;
 import com.example.mobileapi.entity.Discount;
 
 import java.util.List;
@@ -13,13 +15,13 @@ public interface DiscountService {
     Integer getDiscountPercent(String code);
 
 
-    DiscountDTO getDiscount(String code);
+    DiscountResponseDTO getDiscount(String code);
 
-    List<DiscountDTO> getAllDiscount();
+    List<DiscountResponseDTO> getAllDiscount();
 
-    DiscountDTO create(DiscountDTO discount);
+    DiscountResponseDTO create(CreateDiscountDTO discount);
 
-    DiscountDTO update(DiscountDTO discount);
+    DiscountResponseDTO update(UpdateDiscountDTO discount);
 
     void delete(String code);
 }

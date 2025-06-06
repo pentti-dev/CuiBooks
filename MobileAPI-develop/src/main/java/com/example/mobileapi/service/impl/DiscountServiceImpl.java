@@ -1,6 +1,8 @@
 package com.example.mobileapi.service.impl;
 
-import com.example.mobileapi.dto.DiscountDTO;
+import com.example.mobileapi.dto.request.CreateDiscountDTO;
+import com.example.mobileapi.dto.request.UpdateDiscountDTO;
+import com.example.mobileapi.dto.response.DiscountResponseDTO;
 import com.example.mobileapi.entity.Discount;
 import com.example.mobileapi.exception.AppException;
 import com.example.mobileapi.exception.ErrorCode;
@@ -62,31 +64,33 @@ public class DiscountServiceImpl implements DiscountService {
     }
 
     @Override
-    public DiscountDTO getDiscount(String code) {
-        return discountMapper.toDTO(getDiscountEntity(code));
+    public DiscountResponseDTO getDiscount(String code) {
+        return discountMapper.toResponseDto(getDiscountEntity(code));
     }
 
     @Override
-    public List<DiscountDTO> getAllDiscount() {
-        return discountMapper.toListDTO(discountRepository.getAllByActive(true));
-    }
-
-    @Override
-    @Transactional
-    public DiscountDTO create(DiscountDTO discount) {
-        Discount entity = discountMapper.toDiscount(discount);
-        return discountMapper.toDTO(discountRepository.save(entity));
+    public List<DiscountResponseDTO> getAllDiscount() {
+        return discountMapper.toResponseDtoList(discountRepository.getAllByActive(true));
     }
 
     @Override
     @Transactional
-    public DiscountDTO update(DiscountDTO dto) {
+    public DiscountResponseDTO create(CreateDiscountDTO discount) {
+        if (discountRepository.existsByCode(discount.getCode())) {
+            throw new AppException(ErrorCode.DISCOUNT_EXISTED);
+        }
+        Discount entity = discountMapper.toEntity(discount);
+        return discountMapper.toResponseDto(
+                discountRepository.save(entity));
+    }
+
+    @Override
+    @Transactional
+    public DiscountResponseDTO update(UpdateDiscountDTO dto) {
         Discount disc = getDiscountEntity(dto.getCode());
-        disc.setPercent(dto.getPercent());
-        disc.setStartDate(dto.getStartDate());
-        disc.setEndDate(dto.getEndDate());
-        disc.setActive(dto.getActive());
-        return discountMapper.toDTO(discountRepository.save(disc));
+        discountMapper.updateEntityFromDto(dto, disc);
+
+        return discountMapper.toResponseDto(discountRepository.save(disc));
     }
 
 
