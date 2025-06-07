@@ -1,7 +1,5 @@
 package vn.edu.hcmuaf.fit.fahabook.config;
 
-import java.util.List;
-
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +10,6 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class SwaggerConfig {
@@ -28,10 +25,8 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI(
             @Value("${openapi.service.title}") String title,
-            @Value("${openapi.service.version}") String version,
-            @Value("${openapi.service.server}") String serverUrl) {
+            @Value("${openapi.service.version}") String version) {
         return new OpenAPI()
-                .servers(List.of(new Server().url(serverUrl)))
                 .info(new Info()
                         .title(title)
                         .description("API documents")

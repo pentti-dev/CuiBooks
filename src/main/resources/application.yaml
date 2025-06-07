@@ -65,7 +65,8 @@ openapi:
     server: http://localhost:8080
     title: API FahaBook
     version: 1.0.0
-
+server:
+  forward-headers-strategy: framework
 cloudinary:
   cloud-name: dmdjbuvig
   api-key: 652981452525434
