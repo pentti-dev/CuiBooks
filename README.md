@@ -48,7 +48,7 @@ Cài đặt:
 # Clone code
 git clone https://github.com/NgocTai-NLUStudent/WebEco.git
 cd WebEco
-
+---
 # Chạy app
 ./gradlew bootRun
 
@@ -56,11 +56,13 @@ cd WebEco
 Tạo khi khởi động (dữ liệu seed hoặc REST/GraphQL mutation)
 
 admin / admin
+
 user  / user@
 
 🔍 Ví dụ Request
 REST:
 GET /api/books
+
 Authorization: Bearer <jwt-token>
 
 GraphQL:
@@ -73,10 +75,13 @@ query {
 
 🐳 Docker 
 docker build -t bookstore-api .
-docker run -p 8080:8080 bookstore-api
 
+docker run -p 8080:8080 bookstore-api
+---
 📌 Định hướng phát triển
+
 ✅ REST + GraphQL song song
+
 
 🛒 Thêm giỏ hàng, đơn hàng, payment VNPAY
 
