@@ -57,10 +57,12 @@ Tạo khi khởi động (dữ liệu seed hoặc REST/GraphQL mutation)
 
 admin / admin
 user  / user@
+
 🔍 Ví dụ Request
 REST:
 GET /api/books
 Authorization: Bearer <jwt-token>
+
 GraphQL:
 query {
   products {
@@ -68,9 +70,11 @@ query {
     price
   }
 }
+
 🐳 Docker 
 docker build -t bookstore-api .
 docker run -p 8080:8080 bookstore-api
+
 📌 Định hướng phát triển
 ✅ REST + GraphQL song song
 
