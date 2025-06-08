@@ -36,7 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) throws AppException {
-        log.warn("Username: {} Password: {}", loginRequest.getUsername(), loginRequest.getPassword());
+        log.info("Username: {} Password: {}", loginRequest.getUsername(), loginRequest.getPassword());
         Customer customer = customerRepository
                 .findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));

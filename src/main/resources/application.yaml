@@ -14,8 +14,10 @@ spring:
             client-id: 564809681010-j9tb6t9o5p64hrf9f9s7gvrfq51vnplo.apps.googleusercontent.com
             client-secret: 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
             redirect-uri: http://localhost:8080/login/oauth2/code/google
-            scope: profile, email, openid
-
+            scope:
+              - openid
+              - profile
+              - email
         provider:
           google:
             issuer-uri: https://accounts.google.com
@@ -62,7 +64,6 @@ spring:
 openapi:
   service:
     api-docs: api-service
-    server: http://localhost:8080
     title: API FahaBook
     version: 1.0.0
 server:

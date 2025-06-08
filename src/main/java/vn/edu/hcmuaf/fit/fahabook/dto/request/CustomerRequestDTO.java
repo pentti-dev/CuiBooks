@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
@@ -13,6 +14,7 @@ import vn.edu.hcmuaf.fit.fahabook.entity.enums.Role;
 
 @Getter
 @Setter
+@Builder
 @UniqueCustomerField
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class CustomerRequestDTO {

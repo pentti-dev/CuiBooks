@@ -1,6 +1,7 @@
 package vn.edu.hcmuaf.fit.fahabook.service.impl;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -48,7 +49,7 @@ public class CustomerServiceImpl implements CustomerService {
         // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
         request.setPassword(passwordEncoder.encode(request.getPassword())); // Sử dụng passwordEncoder
         request.setRole(Role.USER);
-        Customer customer = customerRepository.save(customerMapper.toCustomer(request));
+        Customer customer = customerRepository.saveAndFlush(customerMapper.toCustomer(request));
         log.info("Customer created with ID: {}", customer.getId());
         applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, customer.getId()));
         return customerMapper.toCustomerResponse(customer);
@@ -165,11 +166,32 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toCustomerResponse(getCustomerByUserName(username));
     }
 
+    @Override
+    @Transactional
+    public Customer findByEmailAndCreate(String email, String fullname) {
+        Optional<Customer> customer = customerRepository.findByEmail(email);
+        if (customer.isPresent()) {
+            return customer.get();
+        }
+
+
+        Customer saved = customerRepository.saveAndFlush(Customer.builder()
+                .email(email)
+                .username(email)
+                .fullname(fullname)
+                .password(passwordEncoder.encode(email))
+                .role(Role.USER)
+                .build());
+        applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, saved.getId()));
+
+        return saved;
+    }
+
     private boolean isCurrentUserAdmin() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication != null
                 && authentication.getAuthorities().stream()
-                        .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
     }
 
     Customer getCustomerByUserName(String username) throws AppException {
