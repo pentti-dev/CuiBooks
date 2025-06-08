@@ -18,7 +18,6 @@ import vn.edu.hcmuaf.fit.fahabook.entity.enums.Role;
 @AllArgsConstructor
 @Getter
 @Setter
-@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Customer implements Serializable {
     @Id
@@ -39,14 +38,14 @@ public class Customer implements Serializable {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     String password;
 
-    @Column(nullable = false, name = "number_phone")
+    @Column(name = "number_phone")
     String phone;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     Role role;
 
-    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 
     @Column(name = "reset_code")

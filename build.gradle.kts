@@ -40,7 +40,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-authorization-server")
-    implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+
 
     // Core libraries
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")

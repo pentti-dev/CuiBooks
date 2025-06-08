@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.servlet.view.RedirectView;
 import vn.edu.hcmuaf.fit.fahabook.annotation.GetToken;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.LoginRequest;
@@ -19,6 +20,7 @@ import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
 import vn.edu.hcmuaf.fit.fahabook.service.AuthenticationService;
 import vn.edu.hcmuaf.fit.fahabook.service.CustomerService;
+
 
 @Slf4j
 @RestController
@@ -31,8 +33,13 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
     CustomerService customerService;
 
+    @GetMapping("login-google")
+    RedirectView redirectToGoogle() {
+        return new RedirectView("/oauth2/authorize/google");
+    }
+
     @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) throws AppException {
+    ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest) throws AppException {
         return ApiResponse.<LoginResponse>builder()
                 .code(HttpStatus.OK.value())
                 .data(authenticationService.login(loginRequest))
@@ -40,7 +47,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ApiResponse<Void> logout(@Parameter(hidden = true) @GetToken String token) {
+    ApiResponse<Void> logout(@Parameter(hidden = true) @GetToken String token) {
         if (token == null || token.isEmpty()) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
@@ -49,14 +56,14 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ApiResponse<Void> register(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+    ApiResponse<Void> register(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
 
         customerService.saveCustomer(customer);
         return ApiResponse.success();
     }
 
     @PostMapping("/check-username")
-    public ApiResponse<Boolean> checkUsername(@RequestBody String username) {
+    ApiResponse<Boolean> checkUsername(@RequestBody String username) {
         return ApiResponse.<Boolean>builder()
                 .code(HttpStatus.OK.value())
                 .data(customerService.checkUsername(username))
@@ -64,7 +71,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/check-email")
-    public ApiResponse<Boolean> checkEmail(@RequestBody String email) {
+    ApiResponse<Boolean> checkEmail(@RequestBody String email) {
         return ApiResponse.<Boolean>builder()
                 .code(HttpStatus.OK.value())
                 .data(customerService.checkEmail(email))
@@ -72,7 +79,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/checkTokenExpiration/{token}")
-    public ApiResponse<Void> checkTokenExpiration(@PathVariable("token") String token) throws AppException {
+    ApiResponse<Void> checkTokenExpiration(@PathVariable("token") String token) throws AppException {
         authenticationService.checkTokenExpiration(token);
         return ApiResponse.success();
     }

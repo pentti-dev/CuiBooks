@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.CustomerResponseDTO;
+import vn.edu.hcmuaf.fit.fahabook.entity.Customer;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 
 public interface CustomerService {
@@ -31,4 +32,6 @@ public interface CustomerService {
     void changePassword(UUID customerId, String oldPassword, String newPassword) throws AppException;
 
     CustomerResponseDTO getCustomerProfile(String token) throws AppException;
+
+    Customer findByEmailAndCreate(String email, String fullname);
 }
