@@ -33,6 +33,8 @@ public class Category implements Serializable {
 
     @Column(nullable = false, unique = true)
     String code;
+    @Column(name = "image")
+    String image;
 
     @Builder.Default
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
