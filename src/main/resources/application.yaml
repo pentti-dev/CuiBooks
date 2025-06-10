@@ -1,4 +1,12 @@
+server:
+  port: ${PORT:8080}
+  address: 0.0.0.0
+  forward-headers-strategy: framework
+
 spring:
+  devtools:
+    restart:
+      enabled: false
   application:
     name: fahabook
   datasource:
@@ -66,8 +74,6 @@ openapi:
     api-docs: api-service
     title: API FahaBook
     version: 1.0.0
-server:
-  forward-headers-strategy: framework
 cloudinary:
   cloud-name: dmdjbuvig
   api-key: 652981452525434
