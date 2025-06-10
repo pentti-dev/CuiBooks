@@ -13,7 +13,7 @@ spring:
           google:
             client-id: 564809681010-j9tb6t9o5p64hrf9f9s7gvrfq51vnplo.apps.googleusercontent.com
             client-secret: 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
-            redirect-uri: http://localhost:8080/login/oauth2/code/google
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope:
               - openid
               - profile
@@ -32,7 +32,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: false
-    format-sql: true
   mail:
     host: smtp.gmail.com
     port: 587
@@ -57,9 +56,10 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   graphql:
-    path: /graphql
     graphiql:
       enabled: true
+    http:
+      path: /graphql
 
 openapi:
   service:
@@ -77,15 +77,15 @@ vnpay:
   tmn-code: C0LUS1XF
   hash-secret: MRSUPJYDQQV713GJPX8IVD1XAJIEVVJI
   pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
-  return-url: http://localhost:8080/api/payments/return
+  return-url: "{baseUrl}/api/payments/return"
   version: 2.1.0
   command: pay
   currency-code: VND
   locale: vn
   bank-code: NCB
 jwt:
-  issuer: ngoctaiphan
-  audience: ngoctaiphan
+  issuer: fahacompany
+  audience: fahacompany
   expiration-minutes: 10080
   keys:
     private-key: classpath:keys/private_key.pem
