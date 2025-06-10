@@ -118,6 +118,9 @@ public enum ErrorCode {
             4158,
             "Không thể thay đổi trạng thái đơn hàng từ trạng thái hiện tại sang trạng thái mới."),
     STOCK_UNVAILABLE(HttpStatus.BAD_REQUEST, 4159, "Số lượng sản phẩm không đủ trong kho để thực hiện thao tác."),
+    PRODUCT_ALREADY_EXISTS(
+            HttpStatus.BAD_REQUEST, 4160, "Sản phẩm đã tồn tại."),
+
     /**
      * ========== LỖI XÁC THỰC ==========
      */
@@ -146,16 +149,27 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 4401, "Người dùng không tồn tại."),
 
     DUPLICATE_ENTRY(HttpStatus.CONFLICT, 4500, "Dữ liệu đã tồn tại."),
+
     INVALID_CART(HttpStatus.BAD_REQUEST, 4501, "Giỏ hàng không hợp lệ."),
+
     INVALID_ORDER(HttpStatus.BAD_REQUEST, 4502, "Đơn hàng không hợp lệ."),
+
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, 4503, "Đơn hàng không tồn tại."),
+
     ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, 4504, "Địa chỉ không tồn tại."),
+
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 4505, "Danh mục không tồn tại."),
+
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, 4506, "Sản phẩm không tồn tại."),
+
     ORDER_DETAIL_NOT_FOUND(HttpStatus.NOT_FOUND, 4507, "Chi tiết đơn hàng không tồn tại."),
+
     CATEGORY_NOT_FOUND_BY_ID(HttpStatus.NOT_FOUND, 4508, "Không tìm thấy danh mục với ID đã cho."),
+
     DISCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, 4509, "Không tìm thấy mã giảm giá."),
+
     CATEGORY_EXISTED(HttpStatus.BAD_REQUEST, 4510, "Danh mục đã tồn tại."),
+
     /**
      * ========== LỖI HỆ THỐNG ==========
      */
