@@ -21,9 +21,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.CategoryRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.OrderEditRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.create.CreateDiscountDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.update.ProductUpdateDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.update.UpdateDiscountDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.*;
 import vn.edu.hcmuaf.fit.fahabook.dto.validationgroup.ValidationGroups;
@@ -200,6 +202,26 @@ public class AdminController {
         return ApiResponse.success("Thêm thành công");
     }
 
+    @Operation(summary = "Cập nhật thông tin sản phẩm")
+    @PutMapping("/product/{id}")
+    public ApiResponse<ProductResponseDTO> updateProduct(
+            @PathVariable UUID id,
+            @Valid @RequestBody ProductUpdateDTO dto) {
+
+        return ApiResponse.<ProductResponseDTO>builder()
+                .data(productService.updateProduct(id, dto))
+                .build();
+    }
+
+
+    @Operation(summary = "Xóa sản phẩm")
+    @DeleteMapping("/product/{productId}")
+    public ApiResponse<Void> deleteProduct(@PathVariable UUID productId) {
+        productService.deleteProduct(productId);
+        return ApiResponse.success("Xóa sản phẩm thành công");
+    }
+
+
     CategoryService categoryService;
 
     @Operation(summary = "Nhập danh mục với excel")
@@ -210,6 +232,31 @@ public class AdminController {
             categoryService.saveAllCategoryEntries(categories);
         }
         return ApiResponse.success("Thêm thành công");
+    }
+
+    @Operation(summary = "Thêm danh mục")
+    @PostMapping("/category")
+    public ApiResponse<CategoryResponseDTO> addCategory(@Valid @RequestBody CategoryRequestDTO categoryRequestDTO) {
+        return ApiResponse.<CategoryResponseDTO>builder()
+                .data(categoryService.saveCategory(categoryRequestDTO))
+                .build();
+    }
+
+    @Operation(summary = "Cập nhật danh mục")
+    @PutMapping("/category")
+    public ApiResponse<CategoryResponseDTO> updateCategory(
+            @Valid @RequestBody CategoryRequestDTO categoryRequestDTO
+    ) {
+        return ApiResponse.<CategoryResponseDTO>builder()
+                .data(categoryService.updateCategory(categoryRequestDTO))
+                .build();
+    }
+
+    @Operation(summary = "Xóa danh mục")
+    @DeleteMapping("/category/{id}")
+    public ApiResponse<Void> deleteCategory(@PathVariable UUID id) {
+        categoryService.deleteCategory(id);
+        return ApiResponse.success("Xóa danh mục thành công");
     }
 
     DiscountService discountService;

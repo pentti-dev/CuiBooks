@@ -193,9 +193,9 @@ public class OrderServiceImpl implements OrderService {
     public void editOrder(UUID id, OrderEditRequestDTO orderEditRequestDTO) throws AppException {
         Order order = orderRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
         order.setAddress(orderEditRequestDTO.getAddress());
-        order.setNumberPhone(orderEditRequestDTO.getPhone());
+        order.setNumberPhone(orderEditRequestDTO.getNumberPhone());
         order.setStatus(orderEditRequestDTO.getStatus());
-        order.setReceiver(orderEditRequestDTO.getFullname());
+        order.setReceiver(orderEditRequestDTO.getReceiver());
         orderRepository.save(order);
     }
 
@@ -278,15 +278,27 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void changeOrderStatus(UUID orderId, OrderStatus status) {
-        Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+    public void changeOrderStatus(UUID orderId, OrderStatus newStatus) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new AppException(ErrorCode.ORDER_NOT_FOUND));
+
         OrderStatus currentStatus = order.getStatus();
-        if (!currentStatus.canChangeTo(status)) {
-            throw new AppException(ErrorCode.INVALID_CHANGE_ORDER_STATUS);
+
+        if (currentStatus == newStatus) {
+            log.info("Trạng thái đơn hàng {} đã là {}, không cần cập nhật.", orderId, newStatus);
+            return;
         }
-        order.setStatus(status);
+
+        if (!currentStatus.canChangeTo(newStatus)) {
+            log.warn("Không thể chuyển trạng thái từ {} sang {} cho đơn hàng {}", currentStatus, newStatus, orderId);
+            return;
+        }
+
+        order.setStatus(newStatus);
         orderRepository.save(order);
+        log.info("Đã cập nhật trạng thái đơn hàng {} từ {} sang {}", orderId, currentStatus, newStatus);
     }
+
 
     @Override
     @PreAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #customerId")

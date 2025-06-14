@@ -14,6 +14,7 @@ public interface CustomerMapper {
     Customer toCustomer(CustomerRequestDTO request);
 
     @Mapping(target = "cartId", source = "cart", qualifiedByName = "cartToCartId")
+    @Mapping(target = "password", source = "password")
     CustomerResponseDTO toCustomerResponse(Customer customer);
 
     @Named("cartToCartId")

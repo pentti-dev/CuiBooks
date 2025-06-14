@@ -50,12 +50,11 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponseDTO updateCategory(UUID id, CategoryRequestDTO dto) throws AppException {
+    public CategoryResponseDTO updateCategory(CategoryRequestDTO dto) throws AppException {
         if (!categoryRepository.existsById(dto.getId())) {
             throw new AppException(ErrorCode.CATEGORY_NOT_FOUND);
         }
         Category entity = categoryMapper.toCategory(dto);
-        entity.setId(id);
         return categoryMapper.toCategoryResponseDTO(categoryRepository.save(entity));
     }
 

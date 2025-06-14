@@ -33,7 +33,7 @@ public class CategoryMutationResolver {
     @MutationMapping
     public CategoryResponseDTO updateCategory(
             @Argument("id") UUID id, @Valid @Argument("input") CategoryRequestDTO category) throws AppException {
-        return categoryService.updateCategory(id, category);
+        return categoryService.updateCategory(category);
     }
 
     @MutationMapping
