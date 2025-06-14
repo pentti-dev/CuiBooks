@@ -26,6 +26,8 @@ public class Product implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
+    @Column(nullable = false, unique = true)
+    String code;
 
     @Column(nullable = false)
     String name;

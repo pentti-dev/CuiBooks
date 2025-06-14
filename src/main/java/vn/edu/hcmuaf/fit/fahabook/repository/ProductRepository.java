@@ -31,4 +31,6 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
     @Modifying
     @Query("UPDATE Product p SET p.stock = p.stock + :quantity WHERE p.id = :id ")
     int increaseStock(@Param("id") UUID id, @Param("quantity") int quantity);
+
+    boolean existsByCode(String code);
 }

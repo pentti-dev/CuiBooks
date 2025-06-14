@@ -17,25 +17,39 @@ import vn.edu.hcmuaf.fit.fahabook.entity.enums.BookForm;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
 import vn.edu.hcmuaf.fit.fahabook.repository.CategoryRepository;
+import vn.edu.hcmuaf.fit.fahabook.repository.ProductRepository;
 
 @Slf4j
 @Component
 public class ImportDataHelper {
 
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
-    public ImportDataHelper(CategoryRepository categoryRepository) {
+    public ImportDataHelper(CategoryRepository categoryRepository, ProductRepository productRepository) {
         this.categoryRepository = categoryRepository;
+        this.productRepository = productRepository;
     }
 
     public List<Product> importProducts(InputStream is) throws IOException {
         return parseSheet(is, (row, headers) -> {
             String categoryCode = getString(row, headers.get("category"));
+            String code = getString(row, headers.get("code"));
             Category category = categoryRepository
                     .findByCode(categoryCode)
-                    .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_FOUND));
+                    .orElseThrow(() -> {
+                        log.error("Category not found with code: {}", categoryCode);
+                        return new AppException(ErrorCode.CATEGORY_NOT_FOUND);
+                    });
+            if (code != null && productRepository.existsByCode(code)) {
+                log.info("Skip existed product at row {}: code={}", row.getRowNum(), code);
+                return null;
+            }
+
+
             return Product.builder()
                     .category(category)
+                    .code(code)
                     .name(getString(row, headers.get("name")))
                     .img(getString(row, headers.get("img")))
                     .detail(getString(row, headers.get("detail")))
@@ -57,6 +71,7 @@ public class ImportDataHelper {
                 .name(getString(row, headers.get("name")))
                 .description(getString(row, headers.get("description")))
                 .code(getString(row, headers.get("code")))
+                .image(getString(row, headers.get("image")))
                 .build());
     }
 
@@ -68,13 +83,7 @@ public class ImportDataHelper {
             if (!rows.hasNext()) return results;
 
             Map<String, Integer> headers = buildHeaderMap(rows.next());
-            rows.forEachRemaining(row -> {
-                try {
-                    results.add(mapper.apply(row, headers));
-                } catch (Exception ex) {
-                    log.error("❌ Lỗi parse row {}: {}", row.getRowNum(), ex.getMessage());
-                }
-            });
+            rows.forEachRemaining(row -> results.add(mapper.apply(row, headers)));
         }
         return results;
     }
