@@ -19,6 +19,7 @@ import vn.edu.hcmuaf.fit.fahabook.config.BCryptPasswordEncoder;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.CustomerResponseDTO;
 import vn.edu.hcmuaf.fit.fahabook.entity.Customer;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.CustomerStatus;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.Role;
 import vn.edu.hcmuaf.fit.fahabook.event.CustomerCreatedEvent;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
@@ -45,19 +46,35 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public CustomerResponseDTO saveCustomer(CustomerRequestDTO request) throws AppException {
+    public CustomerResponseDTO saveCustomer(CustomerRequestDTO dto) throws AppException {
         // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
-        request.setPassword(passwordEncoder.encode(request.getPassword())); // Sử dụng passwordEncoder
-        request.setRole(Role.USER);
-        Customer customer = customerRepository.saveAndFlush(customerMapper.toCustomer(request));
+        dto.setPassword(passwordEncoder.encode(dto.getPassword())); // Sử dụng passwordEncoder
+        dto.setRole(Role.USER);
+        dto.setStatus(CustomerStatus.ACTIVE);
+        Customer customer = customerMapper.toCustomer(dto);
+        Customer customerSaved = customerRepository.saveAndFlush(customer);
+        log.warn(
+                "Customer save  ID: {}, username: {}, email: {}, phone: {}",
+                customerSaved.getId(),
+                customerSaved.getUsername(),
+                customerSaved.getEmail(),
+                customerSaved.getPhone()
+        );
         log.info("Customer created with ID: {}", customer.getId());
         applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, customer.getId()));
-        return customerMapper.toCustomerResponse(customer);
+        return customerMapper.toCustomerResponse(customerSaved);
     }
 
     @Override
     public void deleteCustomer(UUID customerId) {
-        customerRepository.deleteById(customerId);
+        changeStatusById(customerId, CustomerStatus.DELETED);
+    }
+
+    @Override
+    public void changeStatusById(UUID customerId, CustomerStatus status) {
+        Customer customer = getCustomerById(customerId);
+        customer.setStatus(status);
+        customerRepository.save(customer);
     }
 
     @Override
@@ -89,7 +106,7 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO request) throws AppException {
         Customer customer =
                 customerRepository.findById(customerId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        log.error("Role: {}", request.getRole());
+        log.info("Role before update : {}", request.getRole());
         if (request.getRole() != null) {
             if (!isCurrentUserAdmin() && request.getRole() != Role.USER) {
                 throw new AppException(ErrorCode.FORBIDDEN);
@@ -103,7 +120,7 @@ public class CustomerServiceImpl implements CustomerService {
         request.setRole(Role.USER);
         // Cập nhật thông tin từ DTO
         customerMapper.updateCustomerFromDto(request, customer);
-        log.error("Role : {}  ", customer.getRole());
+        log.warn("Role after update  : {}  ", customer.getRole());
         customerRepository.save(customer);
 
         return customerMapper.toCustomerResponse(customer);

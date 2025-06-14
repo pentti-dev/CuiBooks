@@ -4,11 +4,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.transaction.annotation.Transactional;
 import vn.edu.hcmuaf.fit.fahabook.entity.Customer;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.CustomerStatus;
 
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, UUID> {
@@ -33,4 +36,10 @@ public interface CustomerRepository extends JpaRepository<Customer, UUID> {
     Optional<Customer> findByEmail(String email);
 
     boolean existsByPhone(String phone);
+
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Customer c SET c.status = :status WHERE c.id = :id")
+    void changeStatusById(@Param("id") UUID id, @Param("status") CustomerStatus status);
 }

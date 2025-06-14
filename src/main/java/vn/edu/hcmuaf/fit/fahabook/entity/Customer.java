@@ -1,6 +1,7 @@
 package vn.edu.hcmuaf.fit.fahabook.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.*;
 
 import jakarta.persistence.*;
@@ -9,6 +10,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.CustomerStatus;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.Role;
 
 @Table(name = "customers")
@@ -50,6 +54,19 @@ public class Customer implements Serializable {
 
     @Column(name = "reset_code")
     String resetCode;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    CustomerStatus status;
+
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    Instant updatedAt;
+
 
     @Builder.Default
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

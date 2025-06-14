@@ -3,6 +3,7 @@ package vn.edu.hcmuaf.fit.fahabook.controller;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Parameter;
@@ -16,6 +17,7 @@ import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.LoginRequest;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.ApiResponse;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.LoginResponse;
+import vn.edu.hcmuaf.fit.fahabook.dto.validationgroup.ValidationGroups;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
 import vn.edu.hcmuaf.fit.fahabook.service.AuthenticationService;
@@ -28,6 +30,7 @@ import vn.edu.hcmuaf.fit.fahabook.service.CustomerService;
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Authentication API")
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
+@Validated
 public class AuthenticationController {
 
     AuthenticationService authenticationService;
@@ -56,7 +59,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    ApiResponse<Void> register(@RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+    ApiResponse<Void> register(
+            @RequestBody
+            @Validated(ValidationGroups.Create.class) CustomerRequestDTO customer) throws AppException {
 
         customerService.saveCustomer(customer);
         return ApiResponse.success();
