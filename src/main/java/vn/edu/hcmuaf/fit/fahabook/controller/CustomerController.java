@@ -5,6 +5,7 @@ import java.util.UUID;
 import jakarta.validation.Valid;
 
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -18,6 +19,7 @@ import vn.edu.hcmuaf.fit.fahabook.dto.request.ChangePasswordDto;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.ApiResponse;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.CustomerResponseDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.validationgroup.ValidationGroups;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
 import vn.edu.hcmuaf.fit.fahabook.service.CustomerService;
@@ -41,9 +43,12 @@ public class CustomerController {
     }
 
     @Operation(summary = "Cập nhật thông tin người dùng")
-    @PutMapping("/{customerId}")
+    @PatchMapping("/{customerId}")
     public ApiResponse<CustomerResponseDTO> updateCustomer(
-            @PathVariable UUID customerId, @Valid @RequestBody CustomerRequestDTO customer) throws AppException {
+            @PathVariable UUID customerId
+            , @RequestBody
+            @Validated(ValidationGroups.Update.class)
+            CustomerRequestDTO customer) throws AppException {
 
         return ApiResponse.success(customerService.updateCustomer(customerId, customer));
     }

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import vn.edu.hcmuaf.fit.fahabook.entity.Customer;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.CustomerStatus;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.Role;
 import vn.edu.hcmuaf.fit.fahabook.repository.CustomerRepository;
 
@@ -31,6 +32,7 @@ public class ApplicationInitConfig {
                         .password(bCryptPasswordEncoder.encode("admin"))
                         .email("admin@gmail.com")
                         .phone("0123456789")
+                        .status(CustomerStatus.ACTIVE)
                         .build();
                 customerRepository.save(customer);
                 log.info("Admin account created");

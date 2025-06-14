@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.CustomerStatus;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.Role;
 
 @Getter
@@ -23,6 +24,8 @@ public class CustomerResponseDTO {
     String email;
 
     String phone;
+
+    CustomerStatus status;
 
     Role role;
 

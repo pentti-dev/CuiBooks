@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ import vn.edu.hcmuaf.fit.fahabook.dto.request.OrderEditRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.create.CreateDiscountDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.update.UpdateDiscountDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.*;
+import vn.edu.hcmuaf.fit.fahabook.dto.validationgroup.ValidationGroups;
 import vn.edu.hcmuaf.fit.fahabook.entity.Category;
 import vn.edu.hcmuaf.fit.fahabook.entity.Product;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.OrderStatus;
@@ -39,6 +41,7 @@ import vn.edu.hcmuaf.fit.fahabook.service.*;
 @Tag(name = "Admin", description = "Admin API")
 @FieldDefaults(makeFinal = true, level = lombok.AccessLevel.PRIVATE)
 @PreAuthorize("hasRole('ADMIN')")
+@Validated
 public class AdminController {
 
     CustomerService customerService;
@@ -62,10 +65,11 @@ public class AdminController {
 
     @Operation(summary = "Thêm người dùng")
     @PostMapping("/customer")
-    public ApiResponse<CustomerResponseDTO> addCustomer(@RequestBody @Valid CustomerRequestDTO customer)
+    public ApiResponse<CustomerResponseDTO> addCustomer(
+            @RequestBody
+            @Validated(ValidationGroups.Create.class) CustomerRequestDTO customer)
             throws AppException {
 
-        customerService.saveCustomer(customer);
         return ApiResponse.<CustomerResponseDTO>builder()
                 .data(customerService.saveCustomer(customer))
                 .build();
@@ -74,7 +78,9 @@ public class AdminController {
     @Operation(summary = "Cập nhật thông tin người dùng")
     @PatchMapping("/customer/{customerId}")
     public ApiResponse<CustomerResponseDTO> updateCustomer(
-            @PathVariable UUID customerId, @RequestBody @Valid CustomerRequestDTO customer) throws AppException {
+            @PathVariable UUID customerId,
+            @RequestBody
+            @Validated(ValidationGroups.Update.class) CustomerRequestDTO customer) throws AppException {
         return ApiResponse.<CustomerResponseDTO>builder()
                 .data(customerService.updateCustomer(customerId, customer))
                 .build();

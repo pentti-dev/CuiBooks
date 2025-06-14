@@ -6,12 +6,15 @@ import java.util.UUID;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.CustomerResponseDTO;
 import vn.edu.hcmuaf.fit.fahabook.entity.Customer;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.CustomerStatus;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 
 public interface CustomerService {
     CustomerResponseDTO saveCustomer(CustomerRequestDTO request) throws AppException;
 
     void deleteCustomer(UUID customerId);
+
+    void changeStatusById(UUID customerId, CustomerStatus status);
 
     CustomerResponseDTO getCustomer(UUID customerId);
 

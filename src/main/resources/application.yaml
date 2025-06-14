@@ -4,9 +4,6 @@ server:
   forward-headers-strategy: framework
 
 spring:
-  devtools:
-    restart:
-      enabled: false
   application:
     name: fahabook
   datasource:
@@ -68,6 +65,9 @@ spring:
       enabled: true
     http:
       path: /graphql
+logging:
+  level:
+    web: debug
 
 openapi:
   service:

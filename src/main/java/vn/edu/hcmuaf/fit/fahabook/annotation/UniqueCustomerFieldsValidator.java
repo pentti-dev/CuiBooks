@@ -22,6 +22,7 @@ public class UniqueCustomerFieldsValidator implements ConstraintValidator<Unique
     @Override
     public boolean isValid(CustomerRequestDTO dto, ConstraintValidatorContext context) {
         boolean isValid = true;
+
         if (customerRepository.existsByUsername(dto.getUsername())) {
             isValid = false;
             addViolation(context, "username", "USERNAME_EXISTED");
