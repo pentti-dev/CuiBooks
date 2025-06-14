@@ -2,6 +2,7 @@ package vn.edu.hcmuaf.fit.fahabook.controller;
 
 import java.util.UUID;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,6 +56,7 @@ public class CustomerController {
 
     @Operation(summary = "Lấy thông tin người dùng bằng token")
     @GetMapping("/profile")
+    @PreAuthorize("permitAll()")
     public ApiResponse<CustomerResponseDTO> getCustomerFromToken(@Parameter(hidden = true) @GetToken String token)
             throws AppException {
 

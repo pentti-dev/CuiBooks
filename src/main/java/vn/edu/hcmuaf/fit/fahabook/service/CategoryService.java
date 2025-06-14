@@ -15,7 +15,7 @@ public interface CategoryService {
 
     void saveAllCategoryDTOs(List<CategoryRequestDTO> dtos);
 
-    CategoryResponseDTO updateCategory(UUID id, CategoryRequestDTO category) throws AppException;
+    CategoryResponseDTO updateCategory(CategoryRequestDTO category) throws AppException;
 
     void deleteCategory(UUID id);
 

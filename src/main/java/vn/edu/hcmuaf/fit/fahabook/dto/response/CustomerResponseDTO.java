@@ -29,5 +29,7 @@ public class CustomerResponseDTO {
 
     Role role;
 
+    String password;
+
     UUID cartId;
 }

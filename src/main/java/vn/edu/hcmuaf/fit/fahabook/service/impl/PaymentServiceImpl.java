@@ -66,7 +66,7 @@ public class PaymentServiceImpl implements PaymentService {
         vnpParams.put("vnp_OrderType", orderType);
         vnpParams.put("vnp_Locale", vnPayProperties.locale());
 
-        vnpParams.put("vnp_ReturnUrl", "http://localhost:3000/payment-return");
+        vnpParams.put("vnp_ReturnUrl", returnUrl);
 
         vnpParams.put("vnp_IpAddr", vnpIpAddr);
 
@@ -116,7 +116,6 @@ public class PaymentServiceImpl implements PaymentService {
             UUID orderUUID = UUID.fromString(orderId);
             UUID transactionId = UUID.nameUUIDFromBytes(orderId.getBytes(StandardCharsets.UTF_8));
 
-            // ✅ Sử dụng vnpTransactionStatus để kiểm tra
             boolean isSuccess = "00".equals(vnpTransactionStatus);
 
             OrderStatus newStatus = isSuccess ? OrderStatus.PAYMENT_SUCCESS : OrderStatus.PAYMENT_FAILED;

@@ -9,8 +9,8 @@ import vn.edu.hcmuaf.fit.fahabook.entity.enums.OrderStatus;
 @Setter
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class OrderEditRequestDTO {
-    String fullname;
+    String receiver;
     String address;
     OrderStatus status;
-    String phone;
+    String numberPhone;
 }

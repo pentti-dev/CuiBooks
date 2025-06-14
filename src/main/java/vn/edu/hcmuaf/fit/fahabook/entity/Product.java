@@ -61,6 +61,9 @@ public class Product implements Serializable {
     Integer stock = 0;
 
     @Column(nullable = false)
+    String code;
+
+    @Column(nullable = false)
     double discount;
 
     @ManyToOne(fetch = FetchType.LAZY)

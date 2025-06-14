@@ -106,26 +106,41 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO request) throws AppException {
         Customer customer =
                 customerRepository.findById(customerId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        // Kiểm tra nếu email thay đổi và email mới đã tồn tại ở user khác
+        if (!customer.getEmail().equals(request.getEmail())
+                && customerRepository.existsByEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+
+        // Kiểm tra nếu số điện thoại thay đổi và số mới đã tồn tại ở user khác
+        if (!customer.getPhone().equals(request.getPhone())
+                && customerRepository.existsByPhone(request.getPhone())) {
+            throw new AppException(ErrorCode.PHONE_EXISTED);
+        }
+
         log.info("Role before update : {}", request.getRole());
+
         if (request.getRole() != null) {
             if (!isCurrentUserAdmin() && request.getRole() != Role.USER) {
                 throw new AppException(ErrorCode.FORBIDDEN);
             }
             customer.setRole(request.getRole());
-
         }
-        if (request.getPassword() != null) {
 
+        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
             request.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        request.setRole(Role.USER);
-        // Cập nhật thông tin từ DTO
+
+        request.setRole(Role.USER); // luôn giữ quyền là USER nếu không phải admin
         customerMapper.updateCustomerFromDto(request, customer);
+
         log.warn("Role after update  : {}  ", customer.getRole());
         customerRepository.save(customer);
 
         return customerMapper.toCustomerResponse(customer);
     }
+
 
     @Override
     public void resetPassword(String username, String resetCode, String newPassword) throws AppException {
