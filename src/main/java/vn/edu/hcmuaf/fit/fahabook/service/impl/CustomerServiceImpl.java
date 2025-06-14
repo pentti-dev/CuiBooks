@@ -113,7 +113,8 @@ public class CustomerServiceImpl implements CustomerService {
             }
             customer.setRole(request.getRole());
 
-        } else if (request.getPassword() != null) {
+        }
+        if (request.getPassword() != null) {
 
             request.setPassword(passwordEncoder.encode(request.getPassword()));
         }

@@ -16,7 +16,7 @@ import vn.edu.hcmuaf.fit.fahabook.entity.enums.Role;
 @Getter
 @Setter
 @Builder
-@UniqueCustomerField(groups = {ValidationGroups.Create.class, ValidationGroups.Update.class})
+@UniqueCustomerField(groups = ValidationGroups.Create.class)
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class CustomerRequestDTO {
 
