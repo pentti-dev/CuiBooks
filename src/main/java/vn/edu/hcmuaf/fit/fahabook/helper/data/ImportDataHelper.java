@@ -66,6 +66,10 @@ public class ImportDataHelper {
                     .size(getString(row, headers.get("size")))
                     .pageNumber(getInt(row, headers.get("page_number")))
                     .form(BookForm.valueOf(getString(row, headers.get("form"))))
+                    .stock(0)
+                    .discount(0.0)
+                    .code(Optional.ofNullable(getString(row, headers.get("code")))
+                            .orElse(UUID.randomUUID().toString()))
                     .build();
         });
         return productsReaded.stream()

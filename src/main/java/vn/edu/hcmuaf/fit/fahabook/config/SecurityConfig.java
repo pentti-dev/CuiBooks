@@ -76,7 +76,7 @@ public class SecurityConfig {
             "/api/graphql/product",
             "/graphql-ui",
             "/webjars/**",
-            "/auth/login-google", "/login-google", "/oauth2/**", "/api/v1/auth/**"
+            "/api/auth/login-google", "/login-google", "/oauth2/**", "/api/v1/auth/**"
     };
 
     @Bean
