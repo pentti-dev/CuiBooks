@@ -195,6 +195,12 @@ public class AdminController {
     public ApiResponse<Void> importProduct(@RequestParam("file") MultipartFile file) throws IOException {
         try (InputStream inputStream = file.getInputStream()) {
             List<Product> products = exportDataHelper.importProducts(inputStream);
+            if (products.isEmpty()) {
+                return ApiResponse.<Void>builder()
+                        .code(HttpStatus.NO_CONTENT.value())
+                        .message("Không có sản phẩm nào được nhập")
+                        .build();
+            }
             productService.saveAll(products);
         }
         return ApiResponse.success("Thêm thành công");
@@ -207,6 +213,12 @@ public class AdminController {
     public ApiResponse<Void> importCategory(@RequestParam("file") MultipartFile file) throws IOException {
         try (InputStream inputStream = file.getInputStream()) {
             List<Category> categories = exportDataHelper.importCategories(inputStream);
+            if (categories.isEmpty()) {
+                return ApiResponse.<Void>builder()
+                        .code(HttpStatus.NO_CONTENT.value())
+                        .message("Không có danh mục nào được nhập")
+                        .build();
+            }
             categoryService.saveAllCategoryEntries(categories);
         }
         return ApiResponse.success("Thêm thành công");
