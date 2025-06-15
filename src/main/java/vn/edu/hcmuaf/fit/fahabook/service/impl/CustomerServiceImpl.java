@@ -199,6 +199,8 @@ public class CustomerServiceImpl implements CustomerService {
                 .fullname(fullname)
                 .password(passwordEncoder.encode(email))
                 .role(Role.USER)
+
+                .status(CustomerStatus.ACTIVE)
                 .build());
         applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, saved.getId()));
 
