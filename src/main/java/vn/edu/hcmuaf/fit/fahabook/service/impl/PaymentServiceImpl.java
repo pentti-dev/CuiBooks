@@ -62,11 +62,13 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         vnpParams.put("vnp_TxnRef", vnpTxnRef);
-        vnpParams.put("vnp_OrderInfo", "Thanh toan don hang:" + vnpTxnRef);
+        vnpParams.put("vnp_OrderInfo", "Thanh toan don hang " + vnpTxnRef);
+
+
         vnpParams.put("vnp_OrderType", orderType);
         vnpParams.put("vnp_Locale", vnPayProperties.locale());
 
-        vnpParams.put("vnp_ReturnUrl", returnUrl);
+        vnpParams.put("vnp_ReturnUrl", "http://localhost:3000/payment-return");
 
         vnpParams.put("vnp_IpAddr", vnpIpAddr);
 

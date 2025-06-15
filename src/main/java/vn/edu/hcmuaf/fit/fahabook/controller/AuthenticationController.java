@@ -3,6 +3,8 @@ package vn.edu.hcmuaf.fit.fahabook.controller;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,9 +38,9 @@ public class AuthenticationController {
     AuthenticationService authenticationService;
     CustomerService customerService;
 
-    @GetMapping("login-google")
-    RedirectView redirectToGoogle() {
-        return new RedirectView("/oauth2/authorize/google");
+    @GetMapping("/login-google")
+    public RedirectView redirectToGoogle() {
+        return new RedirectView("/oauth2/authorization/google");
     }
 
     @PostMapping("/login")
