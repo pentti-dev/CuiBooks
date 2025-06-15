@@ -17,11 +17,13 @@ import vn.edu.hcmuaf.fit.fahabook.dto.request.LoginRequest;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.LoginResponse;
 import vn.edu.hcmuaf.fit.fahabook.entity.Customer;
 import vn.edu.hcmuaf.fit.fahabook.entity.InvalidateToken;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.CustomerStatus;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
 import vn.edu.hcmuaf.fit.fahabook.repository.CustomerRepository;
 import vn.edu.hcmuaf.fit.fahabook.repository.InvalidateTokenRepository;
 import vn.edu.hcmuaf.fit.fahabook.service.AuthenticationService;
+import vn.edu.hcmuaf.fit.fahabook.service.EmailService;
 import vn.edu.hcmuaf.fit.fahabook.util.JwtUtil;
 
 @Service
@@ -33,19 +35,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     CustomerRepository customerRepository;
     InvalidateTokenRepository invalidateTokenRepository;
     BCryptPasswordEncoder passwordEncoder;
+    EmailService emailService;
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) throws AppException {
-        log.info("Username: {} Password: {}", loginRequest.getUsername(), loginRequest.getPassword());
+        log.info("Username: {} ", loginRequest.getUsername());
+
         Customer customer = customerRepository
                 .findByUsername(loginRequest.getUsername())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
-        if (passwordEncoder.matches(loginRequest.getPassword(), customer.getPassword())) { // Sử dụng passwordEncoder
+        validateCustomerLogin(customer);
+
+
+        if (passwordEncoder.matches(loginRequest.getPassword(), customer.getPassword())) {
 
             var token = JwtUtil.generateToken(customer);
-            return LoginResponse.builder().token(token).build();
+            return new LoginResponse(token);
         } else {
             throw new AppException(ErrorCode.WRONG_PASSWORD);
+        }
+    }
+
+    private void validateCustomerLogin(Customer customer) {
+        if (customer.getStatus().equals(CustomerStatus.DELETED)) {
+            throw new AppException(ErrorCode.ACCOUNT_DELETED);
         }
     }
 
@@ -64,12 +77,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void checkTokenExpiration(String token) throws AppException {
         try {
-            // Giải mã token và kiểm tra thời gian hết hạn
             SignedJWT jwt = SignedJWT.parse(token);
             JWTClaimsSet claims = jwt.getJWTClaimsSet();
             Date expirationTime = claims.getExpirationTime();
 
-            // Kiểm tra nếu token đã hết hạn
             if (expirationTime.before(new Date())) {
                 throw new AppException(ErrorCode.TOKEN_EXPIRED);
             }

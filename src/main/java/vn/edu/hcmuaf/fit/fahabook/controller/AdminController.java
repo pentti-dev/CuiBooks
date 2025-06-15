@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import jakarta.validation.Valid;
 
@@ -190,23 +191,26 @@ public class AdminController {
     }
 
     ProductService productService;
-    ImportDataHelper exportDataHelper;
+    ImportDataHelper importDataHelper;
 
     @Operation(summary = "Nhập sản phẩm với excel")
     @PostMapping(value = "/product/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<Void> importProduct(@RequestParam("file") MultipartFile file) throws IOException {
-        try (InputStream inputStream = file.getInputStream()) {
-            List<Product> products = exportDataHelper.importProducts(inputStream);
-            if (products.isEmpty()) {
-                return ApiResponse.<Void>builder()
-                        .code(HttpStatus.NO_CONTENT.value())
-                        .message("Không có sản phẩm nào được nhập")
-                        .build();
-            }
-            productService.saveAll(products);
+    public CompletableFuture<ApiResponse<Void>> importProduct(@RequestParam("file") MultipartFile file) throws IOException {
+        try (InputStream is = file.getInputStream()) {
+            return importDataHelper.importProducts(is)
+                    .thenApply(products -> {
+                        if (products.isEmpty()) {
+                            return ApiResponse.<Void>builder()
+                                    .code(HttpStatus.NO_CONTENT.value())
+                                    .message("Không có sản phẩm nào được nhập")
+                                    .build();
+                        }
+                        productService.saveAll(products);
+                        return ApiResponse.success("Thêm thành công");
+                    });
         }
-        return ApiResponse.success("Thêm thành công");
     }
+
 
     @Operation(summary = "Cập nhật thông tin sản phẩm")
     @PutMapping("/product/{id}")
@@ -232,18 +236,20 @@ public class AdminController {
 
     @Operation(summary = "Nhập danh mục với excel")
     @PostMapping(value = "/category/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ApiResponse<Void> importCategory(@RequestParam("file") MultipartFile file) throws IOException {
-        try (InputStream inputStream = file.getInputStream()) {
-            List<Category> categories = exportDataHelper.importCategories(inputStream);
-            if (categories.isEmpty()) {
-                return ApiResponse.<Void>builder()
-                        .code(HttpStatus.NO_CONTENT.value())
-                        .message("Không có danh mục nào được nhập")
-                        .build();
-            }
-            categoryService.saveAllCategoryEntries(categories);
+    public CompletableFuture<ApiResponse<Void>> importCategory(@RequestParam("file") MultipartFile file) throws IOException {
+        try (InputStream is = file.getInputStream()) {
+            return importDataHelper.importCategories(is)
+                    .thenApply(categories -> {
+                        if (categories.isEmpty()) {
+                            return ApiResponse.<Void>builder()
+                                    .code(HttpStatus.NO_CONTENT.value())
+                                    .message("Không có danh mục nào được nhập")
+                                    .build();
+                        }
+                        categoryService.saveAllCategoryEntries(categories);
+                        return ApiResponse.success("Thêm thành công " + categories.size() + " danh mục");
+                    });
         }
-        return ApiResponse.success("Thêm thành công");
     }
 
     @Operation(summary = "Thêm danh mục")

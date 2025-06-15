@@ -120,6 +120,7 @@ public enum ErrorCode {
     STOCK_UNVAILABLE(HttpStatus.BAD_REQUEST, 4159, "Số lượng sản phẩm không đủ trong kho để thực hiện thao tác."),
     PRODUCT_ALREADY_EXISTS(
             HttpStatus.BAD_REQUEST, 4160, "Sản phẩm đã tồn tại."),
+    ACCOUNT_DELETED(HttpStatus.BAD_REQUEST, 4161, "Tài khoản đã bị xóa."),
 
     /**
      * ========== LỖI XÁC THỰC ==========
