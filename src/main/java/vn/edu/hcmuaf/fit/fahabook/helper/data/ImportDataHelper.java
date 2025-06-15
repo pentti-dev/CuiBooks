@@ -5,12 +5,15 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
+import vn.edu.hcmuaf.fit.fahabook.dto.response.ApiResponse;
 import vn.edu.hcmuaf.fit.fahabook.entity.Category;
 import vn.edu.hcmuaf.fit.fahabook.entity.Product;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.BookForm;
@@ -32,14 +35,15 @@ public class ImportDataHelper {
     }
 
     public List<Product> importProducts(InputStream is) throws IOException {
-        return parseSheet(is, (row, headers) -> {
+        List<Product> productsReaded = parseSheet(is, (row, headers) -> {
             String categoryCode = getString(row, headers.get("category"));
             String code = getString(row, headers.get("code"));
             Category category = categoryRepository
                     .findByCode(categoryCode)
                     .orElseThrow(() -> {
                         log.error("Category not found with code: {}", categoryCode);
-                        return new AppException(ErrorCode.CATEGORY_NOT_FOUND);
+                        return new AppException("Không tìm thầy loại hàng với mã: " + categoryCode +
+                                " ở hàng  " + row.getRowNum());
                     });
             if (code != null && productRepository.existsByCode(code)) {
                 log.info("Skip existed product at row {}: code={}", row.getRowNum(), code);
@@ -64,16 +68,31 @@ public class ImportDataHelper {
                     .form(BookForm.valueOf(getString(row, headers.get("form"))))
                     .build();
         });
+        return productsReaded.stream()
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     public List<Category> importCategories(InputStream is) throws IOException {
-        return parseSheet(is, (row, headers) -> Category.builder()
-                .name(getString(row, headers.get("name")))
-                .description(getString(row, headers.get("description")))
-                .code(getString(row, headers.get("code")))
-                .image(getString(row, headers.get("image")))
-                .build());
+        List<Category> categories = parseSheet(is, (row, headers) -> {
+            String code = getString(row, headers.get("code"));
+            if (code != null && categoryRepository.existsByCode(code)) {
+                log.warn("Skip existed category at row {}: code={}", row.getRowNum(), code);
+                return null;
+            }
+            return Category.builder()
+                    .name(getString(row, headers.get("name")))
+                    .description(getString(row, headers.get("description")))
+                    .code(code)
+                    .image(getString(row, headers.get("image")))
+                    .build();
+        });
+        return categories.stream()
+                .filter(Objects::nonNull)
+                .toList();
+
     }
+
 
     private <T> List<T> parseSheet(InputStream is, BiFunction<Row, Map<String, Integer>, T> mapper) throws IOException {
         List<T> results = new ArrayList<>();

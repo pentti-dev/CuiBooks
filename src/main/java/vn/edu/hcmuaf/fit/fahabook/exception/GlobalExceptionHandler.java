@@ -35,6 +35,13 @@ public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse<Void>> handlingAppException(AppException e) {
         ErrorCode errorCode = e.getErrorCode();
+        if (errorCode == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.<Void>builder()
+                            .message(e.getMessage())
+                            .code(HttpStatus.BAD_REQUEST.value())
+                            .build());
+        }
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(ApiResponse.<Void>builder()
                         .message(errorCode.getMessage())
@@ -112,7 +119,6 @@ public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter 
     @ExceptionHandler(value = RuntimeException.class)
     ResponseEntity<ApiResponse<Void>> handlingRuntimeException(Exception e) {
         ErrorCode errorCode = ErrorCode.INTERNAL_SERVER_ERROR;
-        e.printStackTrace();
         return ResponseEntity.status(errorCode.getHttpStatus())
                 .body(ApiResponse.<Void>builder()
                         .message(e.getMessage())
