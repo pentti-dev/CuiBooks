@@ -57,6 +57,6 @@ public class ProductDTO {
     Integer stock;
 
     String discount;
-
+    String code;
     UUID categoryId;
 }
