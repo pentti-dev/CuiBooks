@@ -57,9 +57,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @PostAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #dto.customerId")
-    @PreAuthorize("hasRole('USER')")
     @Transactional
     public UUID saveOrder(OrderRequestDTO dto) throws AppException {
+        if (discountService.getDiscount(dto.getDiscountCode()) == null) {
+            throw new AppException(ErrorCode.DISCOUNT_NOT_FOUND);
+        }
+
 
         BigDecimal amount =
                 calcTotalAmount(dto.getOrderDetails(), discountService.getDiscountPercent(dto.getDiscountCode()));
@@ -89,30 +92,41 @@ public class OrderServiceImpl implements OrderService {
 
         orderDetailRepository.saveAll(details);
         applicationEventPublisher.publishEvent(
-                new RemoveCartEvent(this, order.getCustomer().getId()));
+                new
+
+                        RemoveCartEvent(this, order.getCustomer().
+
+                        getId()));
         return savedOrder.getId();
     }
 
     // Tính toán tổng tiền đơn hàng từ chi tiết đơn hàng và mã giảm giá
     @Override
     public BigDecimal calcTotalAmount(List<OrderDetailRequestDTO> orderDetails, Integer discountPercent) {
+        log.info(
+                " mã giảm giá: {}", discountPercent
+        );
+
         // tính tiền tổng
         BigDecimal totalAmount = orderDetails.stream()
                 .map(detail -> {
                     // Kiểm tra tồn kho
                     applicationEventPublisher.publishEvent(new StockUpdateEvent(
                             this, detail.getProductId(), detail.getQuantity(), StockAction.DECREASE));
-
                     BigDecimal price = productService.getPriceById(detail.getProductId());
+                    log.info("Product ID: {}, Price: {}", detail.getProductId(), price);
                     return price.multiply(BigDecimal.valueOf(detail.getQuantity()));
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+
+        log.info("Tổng tiền đơn hàng: {}", totalAmount);
         // tính toán neeus có mã giảm giá
         if (discountPercent != null && discountPercent > 0) {
             BigDecimal discountAmount = totalAmount
                     .multiply(BigDecimal.valueOf(discountPercent))
                     .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-            totalAmount = totalAmount.subtract(discountAmount);
+            return totalAmount.subtract(discountAmount);
         }
         return totalAmount;
     }
@@ -323,7 +337,8 @@ public class OrderServiceImpl implements OrderService {
             return Collections.emptyList(); // Return an empty list if no orders found
         }
 
-        return orders.stream().map(this::convertToOrderResponseDTO).collect(Collectors.toCollection(ArrayList::new));
+        return orderMapper
+                .toOrderResponseDTOList(orders);
     }
 
     private Order getOrderById(UUID orderId) {
@@ -344,6 +359,7 @@ public class OrderServiceImpl implements OrderService {
                 .numberPhone(order.getNumberPhone())
                 .status(order.getStatus())
                 .receiver(order.getReceiver())
+                .paymentMethod(order.getPaymentMethod())
                 .orderDetails(orderDetailDTOs)
                 .build();
     }

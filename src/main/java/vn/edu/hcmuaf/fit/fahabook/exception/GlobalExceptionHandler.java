@@ -34,6 +34,7 @@ import vn.edu.hcmuaf.fit.fahabook.dto.response.ApiResponse;
 public class GlobalExceptionHandler extends DataFetcherExceptionResolverAdapter {
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse<Void>> handlingAppException(AppException e) {
+
         ErrorCode errorCode = e.getErrorCode();
         if (errorCode == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

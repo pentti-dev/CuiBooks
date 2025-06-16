@@ -1,26 +1,30 @@
 package vn.edu.hcmuaf.fit.fahabook.service.impl;
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Delegate;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import vn.edu.hcmuaf.fit.fahabook.config.props.VnPayProperties;
+import vn.edu.hcmuaf.fit.fahabook.dto.response.OrderResponseDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.response.PaymentResponse;
+import vn.edu.hcmuaf.fit.fahabook.entity.Order;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.OrderMethod;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.OrderStatus;
+import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
+import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
+import vn.edu.hcmuaf.fit.fahabook.service.OrderService;
+import vn.edu.hcmuaf.fit.fahabook.service.PaymentService;
+import vn.edu.hcmuaf.fit.fahabook.service.TransactionService;
+import vn.edu.hcmuaf.fit.fahabook.util.VnPayUtil;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import org.springframework.stereotype.Service;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.Delegate;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import vn.edu.hcmuaf.fit.fahabook.config.props.VnPayProperties;
-import vn.edu.hcmuaf.fit.fahabook.dto.response.PaymentResponse;
-import vn.edu.hcmuaf.fit.fahabook.entity.enums.OrderStatus;
-import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
-import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
-import vn.edu.hcmuaf.fit.fahabook.service.*;
-import vn.edu.hcmuaf.fit.fahabook.util.VnPayUtil;
 
 @Slf4j
 @Service
@@ -29,16 +33,14 @@ import vn.edu.hcmuaf.fit.fahabook.util.VnPayUtil;
 public class PaymentServiceImpl implements PaymentService {
     @Delegate
     OrderService orderService;
-
     VnPayProperties vnPayProperties;
     VnPayUtil vnPayUtil;
     TransactionService transactionService;
 
     @Override
     public PaymentResponse createVNPayPayment(UUID orderId, String returnUrl) throws AppException {
-        if (!orderService.existById(orderId)) {
-            throw new AppException(ErrorCode.ORDER_NOT_FOUND);
-        }
+        OrderResponseDTO order = orderService.getOrder(orderId);
+        validateOrder(order);
 
         BigDecimal price = orderService.getPriceByOrderId(orderId);
         log.info("Đơn hàng: {}, giá: {}", orderId, price);
@@ -88,10 +90,10 @@ public class PaymentServiceImpl implements PaymentService {
             String fieldName = itr.next();
             String fieldValue = vnpParams.get(fieldName);
             if (fieldValue != null && !fieldValue.isEmpty()) {
-                hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
-                query.append(URLEncoder.encode(fieldName, StandardCharsets.US_ASCII))
+                hashData.append(fieldName).append('=').append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8));
+                query.append(URLEncoder.encode(fieldName, StandardCharsets.UTF_8))
                         .append('=')
-                        .append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
+                        .append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8));
                 if (itr.hasNext()) {
                     hashData.append('&');
                     query.append('&');
@@ -105,6 +107,21 @@ public class PaymentServiceImpl implements PaymentService {
         String paymentUrl = vnPayProperties.payUrl() + "?" + query;
         return PaymentResponse.builder().url(paymentUrl).build();
     }
+
+    private void validateOrder(OrderResponseDTO order) {
+        if (order == null) {
+            throw new AppException(ErrorCode.ORDER_NOT_FOUND);
+        }
+
+        if (!order.getStatus().equals(OrderStatus.PENDING_PAYMENT)) {
+            throw new AppException(ErrorCode.INVALID_ORDER_STATUS);
+        }
+        if (!order.getPaymentMethod().equals(OrderMethod.VN_PAY)) {
+            throw new AppException(ErrorCode.INVALID_PAYMENT_METHOD);
+
+        }
+    }
+
 
     @Override
     public boolean notifyOrder(
