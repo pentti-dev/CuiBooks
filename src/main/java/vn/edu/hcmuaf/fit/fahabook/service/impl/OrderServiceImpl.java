@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.OrderDetailRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.OrderEditRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.OrderRequestDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.response.CustomerResponseDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.OrderDetailResponseDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.OrderResponseDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.RevenueResponse;
@@ -334,11 +335,11 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderResponseDTO> getOrdersByCustomerId(UUID customerId) {
         List<Order> orders = orderRepository.findByCustomerId(customerId);
         if (orders.isEmpty()) {
-            return Collections.emptyList(); // Return an empty list if no orders found
+            return Collections.emptyList();
         }
-
-        return orderMapper
-                .toOrderResponseDTOList(orders);
+        return orders.stream()
+                .map(this::convertToOrderResponseDTO)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     private Order getOrderById(UUID orderId) {
@@ -349,10 +350,11 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetailResponseDTO> orderDetailDTOs = order.getOrderDetails().stream()
                 .map(this::convertToOrderDetailResponseDTO)
                 .collect(Collectors.toCollection(ArrayList::new));
-
+        CustomerResponseDTO customer = customerServiceImpl.getCustomer(order.getCustomer().getId());
+        log.info("Customer: {}", customer.getFullname());
         return OrderResponseDTO.builder()
                 .id(order.getId())
-                .customerDTO(customerServiceImpl.getCustomer(order.getCustomer().getId()))
+                .customerDTO(customer)
                 .orderDate(order.getOrderDate())
                 .totalAmount(order.getTotalAmount()) // Ensure this matches your field in OrderResponseDTO
                 .address(order.getAddress())
