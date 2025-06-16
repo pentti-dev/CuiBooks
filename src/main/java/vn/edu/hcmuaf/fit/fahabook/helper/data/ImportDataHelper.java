@@ -4,56 +4,118 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
-import vn.edu.hcmuaf.fit.fahabook.dto.response.ApiResponse;
 import vn.edu.hcmuaf.fit.fahabook.entity.Category;
 import vn.edu.hcmuaf.fit.fahabook.entity.Product;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.BookForm;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
-import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
 import vn.edu.hcmuaf.fit.fahabook.repository.CategoryRepository;
 import vn.edu.hcmuaf.fit.fahabook.repository.ProductRepository;
 
 @Slf4j
 @Component
 public class ImportDataHelper {
-
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
+    private final Executor asyncExecutor;
 
-    public ImportDataHelper(CategoryRepository categoryRepository, ProductRepository productRepository) {
+    public ImportDataHelper(CategoryRepository categoryRepository,
+                            ProductRepository productRepository,
+                            @Qualifier("asyncExecutor") Executor asyncExecutor) {
         this.categoryRepository = categoryRepository;
         this.productRepository = productRepository;
+        this.asyncExecutor = asyncExecutor;
     }
 
-    public List<Product> importProducts(InputStream is) throws IOException {
-        List<Product> productsReaded = parseSheet(is, (row, headers) -> {
+    public CompletableFuture<List<Product>> importProducts(InputStream is) throws IOException {
+        List<CompletableFuture<Product>> futures = new ArrayList<>();
+
+        try (Workbook wb = new XSSFWorkbook(is)) {
+            Sheet sheet = wb.getSheetAt(0);
+            Iterator<Row> rows = sheet.iterator();
+            if (!rows.hasNext()) return CompletableFuture.completedFuture(Collections.emptyList());
+
+            Map<String, Integer> headers = buildHeaderMap(rows.next());
+            while (rows.hasNext()) {
+                Row row = rows.next();
+                futures.add(CompletableFuture.supplyAsync(() -> processProductRow(row, headers), asyncExecutor));
+            }
+        }
+
+        return CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> futures.stream()
+                        .map(CompletableFuture::join)
+                        .filter(Objects::nonNull)
+                        .toList());
+    }
+    public CompletableFuture<List<Category>> importCategories(InputStream is) throws IOException {
+        List<CompletableFuture<Category>> futures = new ArrayList<>();
+
+        try (Workbook wb = new XSSFWorkbook(is)) {
+            Sheet sheet = wb.getSheetAt(0);
+            Iterator<Row> rows = sheet.iterator();
+            if (!rows.hasNext()) {
+                return CompletableFuture.completedFuture(Collections.emptyList());
+            }
+
+            Map<String, Integer> headers = buildHeaderMap(rows.next());
+            while (rows.hasNext()) {
+                Row row = rows.next();
+                futures.add(
+                        CompletableFuture.supplyAsync(() -> processCategoryRow(row, headers), asyncExecutor)
+                );
+            }
+        }
+
+        return CompletableFuture
+                .allOf(futures.toArray(new CompletableFuture[0]))
+                .thenApply(v -> futures.stream()
+                        .map(CompletableFuture::join)
+                        .filter(Objects::nonNull)
+                        .toList());
+    }
+
+    private Category processCategoryRow(Row row, Map<String, Integer> headers) {
+        try {
+            String code = getString(row, headers.get("code"));
+            if (code != null && categoryRepository.existsByCode(code)) {
+                log.warn("Skip existed category at row {}: code={}", row.getRowNum(), code);
+                return null;
+            }
+            return Category.builder()
+                    .code(code)
+                    .name(getString(row, headers.get("name")))
+                    .description(getString(row, headers.get("description")))
+                    .image(getString(row, headers.get("image")))
+                    .build();
+        } catch (Exception ex) {
+            log.error("Error processing category row {}: {}", row.getRowNum(), ex.getMessage());
+            return null;
+        }
+    }
+    private Product processProductRow(Row row, Map<String, Integer> headers) {
+        try {
             String categoryCode = getString(row, headers.get("category"));
             String code = getString(row, headers.get("code"));
-            Category category = categoryRepository
-                    .findByCode(categoryCode)
-                    .orElseThrow(() -> {
-                        log.error("Category not found with code: {}", categoryCode);
-                        return new AppException("Không tìm thầy loại hàng với mã: " + categoryCode +
-                                " ở hàng  " + row.getRowNum());
-                    });
             if (code != null && productRepository.existsByCode(code)) {
                 log.info("Skip existed product at row {}: code={}", row.getRowNum(), code);
                 return null;
             }
 
+            Category category = categoryRepository.findByCode(categoryCode)
+                    .orElseThrow(() -> new AppException("Không tìm thấy loại hàng với mã: " + categoryCode + " ở hàng " + row.getRowNum()));
 
             return Product.builder()
                     .category(category)
-                    .code(code)
+                    .code(Optional.ofNullable(code).orElse(UUID.randomUUID().toString()))
                     .name(getString(row, headers.get("name")))
                     .img(getString(row, headers.get("img")))
                     .detail(getString(row, headers.get("detail")))
@@ -68,48 +130,15 @@ public class ImportDataHelper {
                     .form(BookForm.valueOf(getString(row, headers.get("form"))))
                     .stock(0)
                     .discount(0.0)
-                    .code(Optional.ofNullable(getString(row, headers.get("code")))
-                            .orElse(UUID.randomUUID().toString()))
                     .build();
-        });
-        return productsReaded.stream()
-                .filter(Objects::nonNull)
-                .toList();
-    }
 
-    public List<Category> importCategories(InputStream is) throws IOException {
-        List<Category> categories = parseSheet(is, (row, headers) -> {
-            String code = getString(row, headers.get("code"));
-            if (code != null && categoryRepository.existsByCode(code)) {
-                log.warn("Skip existed category at row {}: code={}", row.getRowNum(), code);
-                return null;
-            }
-            return Category.builder()
-                    .name(getString(row, headers.get("name")))
-                    .description(getString(row, headers.get("description")))
-                    .code(code)
-                    .image(getString(row, headers.get("image")))
-                    .build();
-        });
-        return categories.stream()
-                .filter(Objects::nonNull)
-                .toList();
-
-    }
-
-
-    private <T> List<T> parseSheet(InputStream is, BiFunction<Row, Map<String, Integer>, T> mapper) throws IOException {
-        List<T> results = new ArrayList<>();
-        try (Workbook wb = new XSSFWorkbook(is)) {
-            Sheet sheet = wb.getSheetAt(0);
-            Iterator<Row> rows = sheet.iterator();
-            if (!rows.hasNext()) return results;
-
-            Map<String, Integer> headers = buildHeaderMap(rows.next());
-            rows.forEachRemaining(row -> results.add(mapper.apply(row, headers)));
+        } catch (Exception ex) {
+            log.error("Lỗi xử lý dòng {}: {}", row.getRowNum(), ex.getMessage());
+            return null;
         }
-        return results;
     }
+
+
 
     private Map<String, Integer> buildHeaderMap(Row headerRow) {
         Map<String, Integer> map = new HashMap<>();

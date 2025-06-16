@@ -62,7 +62,7 @@ public class Product implements Serializable {
     @Column(columnDefinition = "integer default 0")
     Integer stock = 0;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "integer default 0")
     double discount;
 
     @ManyToOne(fetch = FetchType.LAZY)

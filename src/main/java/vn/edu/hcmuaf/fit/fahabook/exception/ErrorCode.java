@@ -113,6 +113,8 @@ public enum ErrorCode {
             HttpStatus.BAD_REQUEST, 4155, "Đơn hàng không thể hủy. Đơn hàng đã được xử lý hoặc giao hàng."),
     INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, 4156, "Trạng thái đơn hàng không hợp lệ."),
     INVALID_ORDER_METHOD(HttpStatus.BAD_REQUEST, 4157, "Phương thức đặt hàng không hợp lệ."),
+    INVALID_PAYMENT_METHOD(
+            HttpStatus.BAD_REQUEST, 4157, "Phương thức thanh toán không hợp lệ."),
     INVALID_CHANGE_ORDER_STATUS(
             HttpStatus.BAD_REQUEST,
             4158,
@@ -120,6 +122,7 @@ public enum ErrorCode {
     STOCK_UNVAILABLE(HttpStatus.BAD_REQUEST, 4159, "Số lượng sản phẩm không đủ trong kho để thực hiện thao tác."),
     PRODUCT_ALREADY_EXISTS(
             HttpStatus.BAD_REQUEST, 4160, "Sản phẩm đã tồn tại."),
+    ACCOUNT_DELETED(HttpStatus.BAD_REQUEST, 4161, "Tài khoản đã bị xóa."),
 
     /**
      * ========== LỖI XÁC THỰC ==========

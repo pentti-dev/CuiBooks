@@ -40,7 +40,7 @@ public class AuthenticationController {
 
     @GetMapping("/login-google")
     public RedirectView redirectToGoogle() {
-        return new RedirectView("/oauth2/authorization/google");
+        return new RedirectView("/oauth2/authorize/google");
     }
 
     @PostMapping("/login")

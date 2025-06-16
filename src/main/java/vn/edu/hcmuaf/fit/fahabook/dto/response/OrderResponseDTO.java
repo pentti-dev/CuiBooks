@@ -8,6 +8,7 @@ import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.OrderMethod;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.OrderStatus;
 
 @Builder
@@ -24,4 +25,5 @@ public class OrderResponseDTO {
     String receiver;
     List<OrderDetailResponseDTO> orderDetails;
     String discountCode;
+    OrderMethod paymentMethod;
 }

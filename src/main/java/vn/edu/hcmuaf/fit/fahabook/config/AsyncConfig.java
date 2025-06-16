@@ -1,6 +1,7 @@
 package vn.edu.hcmuaf.fit.fahabook.config;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,11 @@ public class AsyncConfig implements AsyncConfigurer {
     @Override
     public Executor getAsyncExecutor() {
         return taskExecutor();
+    }
+
+    @Bean(name = "asyncExecutor")
+    public Executor asyncExecutor() {
+        return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     @Override
