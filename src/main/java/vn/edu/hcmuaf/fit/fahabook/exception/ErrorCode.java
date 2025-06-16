@@ -99,7 +99,7 @@ public enum ErrorCode {
     MISSING_PRODUCT(HttpStatus.BAD_REQUEST, 4142, "Sản phẩm không được để trống."),
     MISSING_CUSTOMER(HttpStatus.BAD_REQUEST, 4143, "Khách hàng không được để trống."),
     MISSING_COMMENT(HttpStatus.BAD_REQUEST, 4144, "Bình luận không được để trống."),
-    INVALID_COMMENT_LENGTH(HttpStatus.BAD_REQUEST, 4145, "Độ dài bình luận không hợp lệ. Phải từ 10 đến 500 ký tự."),
+    INVALID_COMMENT_LENGTH(HttpStatus.BAD_REQUEST, 4145, "Độ dài bình luận không hợp lệ. Phải từ 5 đến 255 ký tự."),
     INVALID_SCORE(HttpStatus.BAD_REQUEST, 4146, "Điểm đánh giá không hợp lệ. Phải từ 1 đến 5."),
     DISCOUNT_EXISTED(HttpStatus.BAD_REQUEST, 4147, "Mã giảm giá đã tồn tại."),
     INVALID_TIME(HttpStatus.BAD_REQUEST, 4148, "Thời gian không hợp lệ."),
@@ -123,7 +123,7 @@ public enum ErrorCode {
     PRODUCT_ALREADY_EXISTS(
             HttpStatus.BAD_REQUEST, 4160, "Sản phẩm đã tồn tại."),
     ACCOUNT_DELETED(HttpStatus.BAD_REQUEST, 4161, "Tài khoản đã bị xóa."),
-
+    RATING_NOT_FOUND(HttpStatus.NOT_FOUND, 4162, "Đánh giá không tồn tại."),
     /**
      * ========== LỖI XÁC THỰC ==========
      */
@@ -172,6 +172,7 @@ public enum ErrorCode {
     DISCOUNT_NOT_FOUND(HttpStatus.NOT_FOUND, 4509, "Không tìm thấy mã giảm giá."),
 
     CATEGORY_EXISTED(HttpStatus.BAD_REQUEST, 4510, "Danh mục đã tồn tại."),
+    RATING_UPDATE_EXPIRED(HttpStatus.BAD_REQUEST, 4511, "Thời gian cập nhật đánh giá đã hết hạn. Chỉ có thể cập nhật trong vòng 30 phút sau khi đánh giá được tạo."),
 
     /**
      * ========== LỖI HỆ THỐNG ==========

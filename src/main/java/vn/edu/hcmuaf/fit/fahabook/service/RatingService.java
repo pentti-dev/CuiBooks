@@ -1,5 +1,6 @@
 package vn.edu.hcmuaf.fit.fahabook.service;
 
+import java.util.List;
 import java.util.UUID;
 
 import vn.edu.hcmuaf.fit.fahabook.dto.request.RatingRequestDTO;
@@ -7,13 +8,15 @@ import vn.edu.hcmuaf.fit.fahabook.dto.response.RatingResponseDTO;
 
 public interface RatingService {
 
-    void create(RatingRequestDTO dto);
+    RatingResponseDTO create(RatingRequestDTO dto);
 
-    RatingResponseDTO update(RatingRequestDTO dto);
+    RatingResponseDTO update(UUID id, RatingRequestDTO dto);
 
-    RatingResponseDTO getById(Long id);
+    RatingResponseDTO getById(UUID id);
 
     void delete(UUID id);
 
-    void getAllByProduct(UUID productId);
+    List<RatingResponseDTO> getAllByProduct(UUID productId);
+
+    Double avgRating(UUID productId);
 }

@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Table(name = "ratings", indexes = @Index(name = "idx_ratings_product", columnList = "product_id"))
@@ -31,7 +32,6 @@ public class Rating {
     @JoinColumn(
             name = "product_id",
             nullable = false,
-            unique = true,
             foreignKey = @ForeignKey(name = "FK_RATING_PRODUCT"))
     private Product product;
 
@@ -40,6 +40,10 @@ public class Rating {
     private Customer customer;
 
     @CreationTimestamp
-    @Column(updatable = false)
-    private Instant createdAt;
+    @Column(name = "created_at", nullable = false, updatable = false)
+    Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    Instant updatedAt;
 }
