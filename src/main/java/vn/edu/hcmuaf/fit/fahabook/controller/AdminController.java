@@ -30,8 +30,6 @@ import vn.edu.hcmuaf.fit.fahabook.dto.request.update.ProductUpdateDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.update.UpdateDiscountDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.*;
 import vn.edu.hcmuaf.fit.fahabook.dto.validationgroup.ValidationGroups;
-import vn.edu.hcmuaf.fit.fahabook.entity.Category;
-import vn.edu.hcmuaf.fit.fahabook.entity.Product;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.OrderStatus;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 import vn.edu.hcmuaf.fit.fahabook.helper.data.ImportDataHelper;
