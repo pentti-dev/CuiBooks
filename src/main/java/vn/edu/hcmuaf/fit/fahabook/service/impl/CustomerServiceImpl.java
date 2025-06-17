@@ -1,22 +1,17 @@
 package vn.edu.hcmuaf.fit.fahabook.service.impl;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
-
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import vn.edu.hcmuaf.fit.fahabook.config.BCryptPasswordEncoder;
-import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.create.CreateCustomerDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.update.UpdateCustomerDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.CustomerResponseDTO;
 import vn.edu.hcmuaf.fit.fahabook.entity.Customer;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.CustomerStatus;
@@ -29,6 +24,11 @@ import vn.edu.hcmuaf.fit.fahabook.repository.CustomerRepository;
 import vn.edu.hcmuaf.fit.fahabook.service.CustomerService;
 import vn.edu.hcmuaf.fit.fahabook.service.EmailService;
 import vn.edu.hcmuaf.fit.fahabook.util.JwtUtil;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -46,9 +46,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public CustomerResponseDTO saveCustomer(CustomerRequestDTO dto) throws AppException {
-        // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
-        dto.setPassword(passwordEncoder.encode(dto.getPassword())); // Sử dụng passwordEncoder
+    public CustomerResponseDTO saveCustomer(CreateCustomerDTO dto) throws AppException {
+        validateCustomerCreate(dto);
         dto.setRole(Role.USER);
         dto.setStatus(CustomerStatus.ACTIVE);
         Customer customer = customerMapper.toCustomer(dto);
@@ -63,6 +62,16 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Customer created with ID: {}", customer.getId());
         applicationEventPublisher.publishEvent(new CustomerCreatedEvent(this, customer.getId()));
         return customerMapper.toCustomerResponse(customerSaved);
+    }
+
+    private void validateCustomerCreate(CreateCustomerDTO dto) {
+        if (customerRepository.existsByEmail(dto.getEmail()))
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        if (customerRepository.existsByUsername(dto.getUsername()))
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        if (customerRepository.existsByPhone(dto.getPhone()))
+            throw new AppException(ErrorCode.PHONE_EXISTED);
+
     }
 
     @Override
@@ -103,21 +112,12 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     @Transactional
-    public CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO request) throws AppException {
+    public CustomerResponseDTO updateCustomer(UUID customerId, UpdateCustomerDTO request) throws AppException {
         Customer customer =
                 customerRepository.findById(customerId).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
 
-        // Kiểm tra nếu email thay đổi và email mới đã tồn tại ở user khác
-        if (!customer.getEmail().equals(request.getEmail())
-                && customerRepository.existsByEmail(request.getEmail())) {
-            throw new AppException(ErrorCode.EMAIL_EXISTED);
-        }
+        validateCustomerUpdate(request, customer);
 
-        // Kiểm tra nếu số điện thoại thay đổi và số mới đã tồn tại ở user khác
-        if (!customer.getPhone().equals(request.getPhone())
-                && customerRepository.existsByPhone(request.getPhone())) {
-            throw new AppException(ErrorCode.PHONE_EXISTED);
-        }
 
         log.info("Role before update : {}", request.getRole());
 
@@ -127,18 +127,36 @@ public class CustomerServiceImpl implements CustomerService {
             }
             customer.setRole(request.getRole());
         }
-
-        if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            request.setPassword(passwordEncoder.encode(request.getPassword()));
-        }
-
-        request.setRole(Role.USER); // luôn giữ quyền là USER nếu không phải admin
+        request.setRole(Role.USER);
         customerMapper.updateCustomerFromDto(request, customer);
 
         log.warn("Role after update  : {}  ", customer.getRole());
         customerRepository.save(customer);
 
         return customerMapper.toCustomerResponse(customer);
+    }
+
+    private void validateCustomerUpdate(UpdateCustomerDTO request, Customer customer) {
+        if (request.getPassword() != null && !isCurrentUserAdmin())
+            throw new AppException(ErrorCode.CANNOT_UPDATE_PASSWORD);
+
+        String usernameReq = request.getUsername();
+        String emailReq = request.getEmail();
+        String phoneReq = request.getPhone();
+
+        if (usernameReq != null && !usernameReq.equals(customer.getUsername())
+                && customerRepository.existsByUsername(usernameReq)) {
+            throw new AppException(ErrorCode.USERNAME_EXISTED);
+        }
+        if (emailReq != null && !emailReq.equals(customer.getEmail())
+                && customerRepository.existsByEmail(emailReq)) {
+            throw new AppException(ErrorCode.EMAIL_EXISTED);
+        }
+        if (phoneReq != null && !phoneReq.equals(customer.getPhone())
+                && customerRepository.existsByPhone(phoneReq)) {
+            throw new AppException(ErrorCode.PHONE_EXISTED);
+        }
+
     }
 
 

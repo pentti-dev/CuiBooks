@@ -136,6 +136,7 @@ public enum ErrorCode {
     ACCOUNT_LOCKED(HttpStatus.UNAUTHORIZED, 4203, "Tài khoản của bạn đã bị khóa."),
 
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED, 4204, "Lỗi xác thực đăng nhập."),
+    CANNOT_UPDATE_PASSWORD(HttpStatus.UNAUTHORIZED, 4205, "Không thể cập nhật mật khẩu. Hãy bấm đổi mật khẩu"),
 
     /**
      * ========== LỖI QUYỀN HẠN ==========

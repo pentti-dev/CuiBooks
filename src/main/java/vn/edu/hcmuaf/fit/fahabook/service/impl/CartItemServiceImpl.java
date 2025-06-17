@@ -1,20 +1,20 @@
 package vn.edu.hcmuaf.fit.fahabook.service.impl;
 
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.CartItemRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.CartItemResponseDTO;
 import vn.edu.hcmuaf.fit.fahabook.entity.CartItem;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.StockAction;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
+import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
 import vn.edu.hcmuaf.fit.fahabook.repository.CartItemRepository;
 import vn.edu.hcmuaf.fit.fahabook.service.CartItemService;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @Slf4j
@@ -74,8 +74,15 @@ public class CartItemServiceImpl implements CartItemService {
 
     @Override
     public void updateCartItemQuantity(UUID cartItemId, int quantity) {
+
         CartItem cartI = getByCartId(cartItemId);
-        cartI.setQuantity(cartI.getQuantity() + quantity);
+
+        int newQuantity = cartI.getQuantity() + quantity;
+        if (newQuantity > cartI.getProduct().getStock()) {
+            throw new AppException(ErrorCode.STOCK_UNVAILABLE);
+
+        }
+        cartI.setQuantity(newQuantity);
         if (cartI.getQuantity() <= 0) {
             cartItemRepository.delete(cartI);
         } else {

@@ -1,25 +1,20 @@
 package vn.edu.hcmuaf.fit.fahabook.controller;
 
-import jakarta.validation.Valid;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 import vn.edu.hcmuaf.fit.fahabook.annotation.GetToken;
-import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.LoginRequest;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.create.CreateCustomerDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.ApiResponse;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.LoginResponse;
-import vn.edu.hcmuaf.fit.fahabook.dto.validationgroup.ValidationGroups;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
 import vn.edu.hcmuaf.fit.fahabook.service.AuthenticationService;
@@ -63,7 +58,7 @@ public class AuthenticationController {
     @PostMapping("/register")
     ApiResponse<Void> register(
             @RequestBody
-            @Validated(ValidationGroups.Create.class) CustomerRequestDTO customer) throws AppException {
+            @Valid CreateCustomerDTO customer) throws AppException {
 
         customerService.saveCustomer(customer);
         return ApiResponse.success();

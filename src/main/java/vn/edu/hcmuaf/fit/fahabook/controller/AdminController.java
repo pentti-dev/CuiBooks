@@ -1,5 +1,31 @@
 package vn.edu.hcmuaf.fit.fahabook.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.CategoryRequestDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.OrderEditRequestDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.create.CreateCustomerDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.create.CreateDiscountDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.update.ProductUpdateDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.update.UpdateCustomerDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.update.UpdateDiscountDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.response.*;
+import vn.edu.hcmuaf.fit.fahabook.entity.enums.OrderStatus;
+import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
+import vn.edu.hcmuaf.fit.fahabook.helper.data.ImportDataHelper;
+import vn.edu.hcmuaf.fit.fahabook.service.*;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -7,35 +33,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-
-import jakarta.validation.Valid;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import vn.edu.hcmuaf.fit.fahabook.dto.request.CategoryRequestDTO;
-import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
-import vn.edu.hcmuaf.fit.fahabook.dto.request.OrderEditRequestDTO;
-import vn.edu.hcmuaf.fit.fahabook.dto.request.create.CreateDiscountDTO;
-import vn.edu.hcmuaf.fit.fahabook.dto.request.update.ProductUpdateDTO;
-import vn.edu.hcmuaf.fit.fahabook.dto.request.update.UpdateDiscountDTO;
-import vn.edu.hcmuaf.fit.fahabook.dto.response.*;
-import vn.edu.hcmuaf.fit.fahabook.dto.validationgroup.ValidationGroups;
-import vn.edu.hcmuaf.fit.fahabook.entity.Category;
-import vn.edu.hcmuaf.fit.fahabook.entity.Product;
-import vn.edu.hcmuaf.fit.fahabook.entity.enums.OrderStatus;
-import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
-import vn.edu.hcmuaf.fit.fahabook.helper.data.ImportDataHelper;
-import vn.edu.hcmuaf.fit.fahabook.service.*;
 
 @Slf4j
 @RestController
@@ -70,7 +67,7 @@ public class AdminController {
     @PostMapping("/customer")
     public ApiResponse<CustomerResponseDTO> addCustomer(
             @RequestBody
-            @Validated(ValidationGroups.Create.class) CustomerRequestDTO customer)
+            @Valid CreateCustomerDTO customer)
             throws AppException {
 
         return ApiResponse.<CustomerResponseDTO>builder()
@@ -83,7 +80,7 @@ public class AdminController {
     public ApiResponse<CustomerResponseDTO> updateCustomer(
             @PathVariable UUID customerId,
             @RequestBody
-            @Validated(ValidationGroups.Update.class) CustomerRequestDTO customer) throws AppException {
+            @Valid UpdateCustomerDTO customer) throws AppException {
         return ApiResponse.<CustomerResponseDTO>builder()
                 .data(customerService.updateCustomer(customerId, customer))
                 .build();
