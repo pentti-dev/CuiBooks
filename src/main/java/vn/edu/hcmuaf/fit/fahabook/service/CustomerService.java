@@ -1,16 +1,17 @@
 package vn.edu.hcmuaf.fit.fahabook.service;
 
-import java.util.List;
-import java.util.UUID;
-
-import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.create.CreateCustomerDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.update.UpdateCustomerDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.CustomerResponseDTO;
 import vn.edu.hcmuaf.fit.fahabook.entity.Customer;
 import vn.edu.hcmuaf.fit.fahabook.entity.enums.CustomerStatus;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 
+import java.util.List;
+import java.util.UUID;
+
 public interface CustomerService {
-    CustomerResponseDTO saveCustomer(CustomerRequestDTO request) throws AppException;
+    CustomerResponseDTO saveCustomer(CreateCustomerDTO request) throws AppException;
 
     void deleteCustomer(UUID customerId);
 
@@ -24,7 +25,7 @@ public interface CustomerService {
 
     boolean checkEmail(String email);
 
-    CustomerResponseDTO updateCustomer(UUID customerId, CustomerRequestDTO request) throws AppException;
+    CustomerResponseDTO updateCustomer(UUID customerId, UpdateCustomerDTO request) throws AppException;
 
     void resetPassword(String username, String resetCode, String newPassword) throws AppException;
 

@@ -60,7 +60,7 @@ public class OrderServiceImpl implements OrderService {
     @PostAuthorize("@customerServiceImpl.getCustomerIdByUsername(authentication.name) == #dto.customerId")
     @Transactional
     public UUID saveOrder(OrderRequestDTO dto) throws AppException {
-        if (discountService.getDiscount(dto.getDiscountCode()) == null) {
+        if (dto.getDiscountCode() != null && discountService.getDiscount(dto.getDiscountCode()) == null) {
             throw new AppException(ErrorCode.DISCOUNT_NOT_FOUND);
         }
 

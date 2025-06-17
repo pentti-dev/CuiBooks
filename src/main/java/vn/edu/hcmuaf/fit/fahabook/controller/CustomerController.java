@@ -1,29 +1,24 @@
 package vn.edu.hcmuaf.fit.fahabook.controller;
 
-import java.util.UUID;
-
-import jakarta.annotation.security.PermitAll;
-import jakarta.validation.Valid;
-
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 import vn.edu.hcmuaf.fit.fahabook.annotation.GetToken;
 import vn.edu.hcmuaf.fit.fahabook.dto.request.ChangePasswordDto;
-import vn.edu.hcmuaf.fit.fahabook.dto.request.CustomerRequestDTO;
+import vn.edu.hcmuaf.fit.fahabook.dto.request.update.UpdateCustomerDTO;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.ApiResponse;
 import vn.edu.hcmuaf.fit.fahabook.dto.response.CustomerResponseDTO;
-import vn.edu.hcmuaf.fit.fahabook.dto.validationgroup.ValidationGroups;
 import vn.edu.hcmuaf.fit.fahabook.exception.AppException;
 import vn.edu.hcmuaf.fit.fahabook.exception.ErrorCode;
 import vn.edu.hcmuaf.fit.fahabook.service.CustomerService;
+
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -48,9 +43,8 @@ public class CustomerController {
     public ApiResponse<CustomerResponseDTO> updateCustomer(
             @PathVariable UUID customerId
             , @RequestBody
-            @Validated(ValidationGroups.Update.class)
-            CustomerRequestDTO customer) throws AppException {
-
+            @Valid
+            UpdateCustomerDTO customer) throws AppException {
         return ApiResponse.success(customerService.updateCustomer(customerId, customer));
     }
 
