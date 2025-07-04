@@ -13,6 +13,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "your-project-name"
+rootProject.name = "cuibooks"
 
-rootProject.name = "fahabook"
+rootProject.name = "cuibooks"
