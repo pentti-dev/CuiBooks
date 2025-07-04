@@ -5,11 +5,11 @@ server:
 
 spring:
   application:
-    name: fahabook
+    name: cuibooks
   datasource:
-    url: jdbc:mysql://root:yMHPWJOeZQGjrWFuaSxiwiBqSKSncLwj@yamanote.proxy.rlwy.net:30917/railway
+    url: jdbc:mysql://localhost:3306/cuibooks
     username: root
-    password: yMHPWJOeZQGjrWFuaSxiwiBqSKSncLwj
+    password: 123
     driverClassName: com.mysql.cj.jdbc.Driver
   security:
     oauth2:
